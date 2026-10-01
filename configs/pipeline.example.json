@@ -1,0 +1,13 @@
+{
+  "run_root": "../runs/experiment_001",
+  "video_dir": "../data/videos",
+  "test_index": "../data/test_index.json",
+  "python_executable": "../.runtime/spatial-env/bin/python",
+  "temporal_python": "../.runtime/temporal-env/bin/python",
+  "temporal_model": "../.runtime/models/Video-ORA-4B",
+  "model_revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+  "yolo_model": "../.runtime/models/yolo11m.pt",
+  "pose_model": "../.runtime/models/yolo11m-pose.pt",
+  "profile": "auto",
+  "model_port": 8000
+}

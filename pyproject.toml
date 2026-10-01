@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "video-highlight-pipeline"
+version = "0.1.0"
+description = "Video-ORA highlight localization with YOLO, Pose and parallel BoT-SORT crops"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+highlight_pipeline = ["spatial/*.yaml"]

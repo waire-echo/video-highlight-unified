@@ -1,0 +1,6 @@
+ultralytics==8.4.106
+opencv-python==5.0.0.93
+numpy==2.2.6
+lap==0.5.13
+scipy==1.17.1
+pillow==12.3.0

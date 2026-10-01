@@ -1,0 +1,5 @@
+vllm==0.19.1
+transformers==5.5.4
+qwen-vl-utils==0.0.14
+huggingface_hub
+pillow==12.3.0
