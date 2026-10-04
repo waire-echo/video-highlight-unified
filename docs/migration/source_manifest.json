@@ -492,5 +492,12 @@
       "source": "tmp/ora9b_v2_tracking.py",
       "destination": "pipelines/baselines/ora9b_flow_reference/tracking.py"
     }
-  ]
+  ],
+  "workspace_relocation_evidence": {
+    "date": "2026-10-04",
+    "summary": "docs/migration/workspace_cleanup.json",
+    "local_path_map": "artifacts/workspace_cleanup/20261004/operations.local.json",
+    "lookup_command": "python tools/local_assets.py find --path <original-source-path>",
+    "note": "Original source paths and hashes above are immutable import evidence. Some local sources have since moved or been deduplicated."
+  }
 }

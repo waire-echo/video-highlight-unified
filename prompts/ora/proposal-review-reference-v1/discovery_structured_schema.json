@@ -1,0 +1,78 @@
+{
+  "json": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "scene_type": {
+        "type": "string",
+        "maxLength": 60
+      },
+      "main_subject": {
+        "type": "string",
+        "enum": [
+          "person",
+          "dog",
+          "cat",
+          "animal",
+          "object",
+          "scene",
+          "unknown"
+        ]
+      },
+      "events": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "start": {
+              "type": "number"
+            },
+            "end": {
+              "type": "number"
+            },
+            "value": {
+              "type": "string",
+              "enum": [
+                "retain",
+                "uncertain",
+                "discard"
+              ]
+            },
+            "evidence": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "continues_before": {
+              "type": "boolean"
+            },
+            "continues_after": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "query",
+            "start",
+            "end",
+            "value",
+            "evidence",
+            "continues_before",
+            "continues_after"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "scene_type",
+      "main_subject",
+      "events"
+    ]
+  },
+  "disable_any_whitespace": true
+}

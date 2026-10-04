@@ -36,6 +36,8 @@ TEMPSAMP_R1_ANALYSIS.md
 attachments/
 datasets/local/
 artifacts/
+references/local/
+references/assets.local.json
 experiments/artifact_locations.local.json
 *.npz
 *.npy

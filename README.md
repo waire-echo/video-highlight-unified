@@ -10,7 +10,7 @@
 
 原流程完成过复赛 426 视频、189,844 帧空间输出，非法框为 0，保留 4 条空预测。没有已确认的复赛排行榜分数。重构后的入口、Prompt 加载和实验登记只通过本地工程验证，尚未重跑 GPU 全链路。
 
-已知初赛最好是历史报告中 **56.43 分的 exp07**。它不是已确认分数的 ORA v5。结果 ZIP 已定位，生成代码、配置、Prompt、commit 尚未找齐，不能声称完整可复现。见 [历史结果](docs/history.md)。
+已知初赛最高报告分数是 **56.43**。新找到的 YOLO/Pose 报告记载 48,895 帧，现有 exp07 ZIP 为 45,234 帧，尚不能确认两者是同一版本。它们不是已确认分数的 ORA v5。完整生成代码、Prompt、commit 和结果对应关系仍待补齐，见 [历史结果](docs/history.md)。
 
 ## 目录结构
 
@@ -40,6 +40,8 @@ video-highlight-unified/
 ├── scripts/                    共用 runner、部署与合并脚本
 ├── tests/                      回归测试
 ├── licenses/                   第三方源码许可
+├── references/                 资料目录；原始本机资料放 local/，不提交Git
+├── artifacts/                  本机历史结果/交付/预览/来源快照，不提交Git
 └── docs/                       运行、历史、迁移和协作说明
 ```
 
@@ -52,10 +54,10 @@ Python 3.11+，准备 `ffmpeg` / `ffprobe`，从仓库运行：
 ```bash
 python -m pip install -e ".[dev]"
 python tools/make_demo.py
-python vh.py run --config configs/pipelines/baseline_center.json --experiment demo-center-20261004 --author yourname
+python vh.py run --config configs/pipelines/baseline_center.json --experiment demo-center-yourname-001 --author yourname
 ```
 
-生成两条合成视频，执行全片居中裁剪；结果在 `runs/demo-center-20261004/predictions.jsonl`，实验在 `experiments/records/demo-center-20261004/`。这检查读视频、稠密输出和边界，不代表高光成绩。新实验换 ID，已有 ID 表示续跑。
+生成两条合成视频，执行全片居中裁剪；结果在 `runs/demo-center-yourname-001/predictions.jsonl`，实验在 `experiments/records/demo-center-yourname-001/`。把yourname换成自己的名字，并为新实验选未使用的ID。这检查读视频、稠密输出和边界，不代表高光成绩。已有ID只用于原源码版本的续跑；历史 `demo-center-20261004` 绑定重构时的commit，不在当前源码上复用。
 
 CPU baseline 不需要 Torch、CUDA 或大模型。模型路线用独立环境，见 [环境与模型](docs/environments.md)。回归测试还需要 PyTorch，因为它覆盖 PGL 网络结构。
 
@@ -102,3 +104,5 @@ python tools/audit_repo.py
 分支用于一次开发：`feat/xxx`、`fix/xxx`、`exp/xxx`。值得留下的实现、配置、Prompt 和结论合入 `main`，完成后删除开发分支；算法不使用永久分支隔离。
 
 [迁移报告](docs/migration_report.md) 说明迁移/舍弃/Archive 建议与历史缺口；[来源许可](docs/sources.md) 说明第三方代码；[协作规范](docs/workflow.md) 说明团队流程。
+
+[参考资料索引](references/README.md) 集中赛题、历史方案和论文；[本地整理说明](docs/workspace_cleanup.md) 记录原目录归位、重复删除、旧路径查找和保留原则。

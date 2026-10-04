@@ -1,0 +1,521 @@
+{
+  "schema_version": "workspace-cleanup-summary/v1",
+  "date": "2026-10-04",
+  "moved_files": 3279.0,
+  "copied_files": 5.0,
+  "deleted_files": 1538,
+  "deleted_bytes": 97386382.0,
+  "retained_index_files": 2173,
+  "all_moves_hash_verified": true,
+  "old_git_repositories_deleted": false,
+  "old_git_repositories_archived": false,
+  "reason_counts": [
+    {
+      "files": 1176,
+      "reason": "exact-duplicate"
+    },
+    {
+      "files": 1,
+      "reason": "macos-directory-metadata"
+    },
+    {
+      "files": 352,
+      "reason": "macos-resource-forks"
+    },
+    {
+      "files": 8,
+      "reason": "regenerable-pdf-page-render"
+    },
+    {
+      "files": 1,
+      "reason": "regenerable-python-cache"
+    }
+  ],
+  "locations": [
+    {
+      "action": "move",
+      "source": "基于视频大模型的运动场景高光剪辑.pdf",
+      "destination": "references/local/competition/基于视频大模型的运动场景高光剪辑.pdf",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "【技术报告】基于视频大模型的运动场景高光剪辑测.docx",
+      "destination": "references/local/competition/【技术报告】基于视频大模型的运动场景高光剪辑测.docx",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "补充说明.txt",
+      "destination": "references/local/competition/补充说明.txt",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "关于测试集.txt",
+      "destination": "references/local/competition/关于测试集.txt",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "参赛选手承诺书.pdf",
+      "destination": "references/local/competition/参赛选手承诺书.pdf",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "HIGHLIGHT_TEMPORAL_DIAGNOSIS_AND_ROADMAP.md",
+      "destination": "references/local/analysis/HIGHLIGHT_TEMPORAL_DIAGNOSIS_AND_ROADMAP.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "ORA_DIAGNOSIS_AND_IMPROVEMENT_20260922.md",
+      "destination": "references/local/analysis/ORA_DIAGNOSIS_AND_IMPROVEMENT_20260922.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "ORA_DIRECT_OUTPUT_COMPARISON_20260923.md",
+      "destination": "references/local/analysis/ORA_DIRECT_OUTPUT_COMPARISON_20260923.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "ORA_FULL_PIPELINE_PLAN_20260923.md",
+      "destination": "references/local/analysis/ORA_FULL_PIPELINE_PLAN_20260923.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "PGL_SUM_FAILURE_AUDIT_20260820.md",
+      "destination": "references/local/analysis/PGL_SUM_FAILURE_AUDIT_20260820.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "PIPELINE_MODULES_AND_STAGE_ISOLATION.md",
+      "destination": "references/local/analysis/PIPELINE_MODULES_AND_STAGE_ISOLATION.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "PLAN_B_TIMELENS_AND_LLAVAST.md",
+      "destination": "references/local/analysis/PLAN_B_TIMELENS_AND_LLAVAST.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "WINDOW_SCORE_REZE_NEXT_PLAN.md",
+      "destination": "references/local/analysis/WINDOW_SCORE_REZE_NEXT_PLAN.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "视频时长统计.md",
+      "destination": "references/local/analysis/视频时长统计.md",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "TempSamp-R1/docs/YOLO高分框选方案总结_56.43分.docx",
+      "destination": "references/local/reports/yolo_56_43_20260715.docx",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "submit_example.jsonl",
+      "destination": "references/local/competition/format_examples/submit_example.jsonl",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "submit_example.zip",
+      "destination": "references/local/competition/format_examples/submit_example.zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "external/literature/reze_2608.04480.pdf",
+      "destination": "references/local/literature/reze_2608.04480.pdf",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "基于视频大模型的通用视频高光剪辑",
+      "destination": "datasets/local/aic_initial174",
+      "files_at_import": 348,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "cloud_temporal_20260816",
+      "destination": "artifacts/historical/qwen_window_20260816",
+      "files_at_import": 5,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "temporal_reaggregation_20260817",
+      "destination": "artifacts/historical/qwen_reaggregation_20260817",
+      "files_at_import": 25,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "pgl_sum_temporal_20260819",
+      "destination": "artifacts/historical/pgl_sum_20260819",
+      "files_at_import": 30,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "submit",
+      "destination": "artifacts/historical/baseline_submissions",
+      "files_at_import": 8,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "submission_exp07_boundary_b_v1.zip",
+      "destination": "artifacts/historical/exp07/submission_exp07_boundary_b_v1.zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "predictions_qwen_submission_clean.jsonl",
+      "destination": "artifacts/historical/unknown_qwen/predictions_qwen_submission_clean.jsonl",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "predictions_video_center(1).zip",
+      "destination": "artifacts/historical/center_baseline/predictions_video_center(1).zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "results/ora4b_v5_new426_20261001",
+      "destination": "artifacts/deliveries/ora4b_v5_426/temporal",
+      "files_at_import": 1095,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "results/ora4b_v5_new426_20261001.zip",
+      "destination": "artifacts/deliveries/ora4b_v5_426/temporal.zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "results/ora_stage2_new426_20261001",
+      "destination": "artifacts/deliveries/ora4b_v5_426/spatial",
+      "files_at_import": 3,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "previews",
+      "destination": "artifacts/previews",
+      "files_at_import": 227,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "cloud_review_20260815",
+      "destination": "artifacts/previews/qwen_cloud_review_20260815",
+      "files_at_import": 5,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "handoff_balanced_42_20260816",
+      "destination": "artifacts/source_archives/qwen_balanced_42",
+      "files_at_import": 72,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora4b_v5_new_dataset_20261001",
+      "destination": "artifacts/source_archives/ora4b_v5_426_preparation",
+      "files_at_import": 1145,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora_stage2_new426_20261001",
+      "destination": "artifacts/source_archives/ora_stage2_426_preparation",
+      "files_at_import": 49,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/clean_pipeline_20261002_source.tar.gz",
+      "destination": "artifacts/source_archives/clean_pipeline_20261002_source.tar.gz",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "video-highlight-editing-baseline.zip",
+      "destination": "artifacts/source_archives/modular_baseline.zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/unification_sources",
+      "destination": "artifacts/source_archives/unification_20261004/read_only_sources",
+      "files_at_import": 2,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/unify_import.py",
+      "destination": "artifacts/source_archives/unification_20261004/unify_import.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/unify_metadata.py",
+      "destination": "artifacts/source_archives/unification_20261004/unify_metadata.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/finalize_unification_metadata.py",
+      "destination": "artifacts/source_archives/unification_20261004/finalize_unification_metadata.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora9b_merge_v2.py",
+      "destination": "artifacts/source_archives/ora9b_flow_partial/ora9b_merge_v2.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora9b_v2_contracts.py",
+      "destination": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_contracts.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora9b_v2_serve.sh",
+      "destination": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_serve.sh",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora9b_v2_test_v2.py",
+      "destination": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_test_v2.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/ora9b_v2_tracking.py",
+      "destination": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_tracking.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/clean_pipeline_local_validation",
+      "destination": "artifacts/verification/clean_pipeline_20261002",
+      "files_at_import": 12,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/validate_clean_pipeline_locally.py",
+      "destination": "artifacts/verification/clean_pipeline_20261002/validate_clean_pipeline_locally.py",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/verify_balanced_handoff_20260903",
+      "destination": "artifacts/verification/balanced_20260903",
+      "files_at_import": 6,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tools",
+      "destination": "artifacts/source_archives/legacy_preview_tools",
+      "files_at_import": 4,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "external/incomplete-git-object-archive/video-highlight-upload-372f4c9f28b2466b8004d18aa9260f4a",
+      "destination": "artifacts/source_archives/github_upload_objects_20260820",
+      "files_at_import": 201,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "tmp/pdfs",
+      "destination": "artifacts/verification/competition_pdf_render",
+      "files_at_import": 8,
+      "verified": true
+    },
+    {
+      "action": "move",
+      "source": "results/ora4b_v5_new426_20261001.zip.sha256",
+      "destination": "artifacts/deliveries/ora4b_v5_426/temporal.zip.sha256",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "copy",
+      "source": "external/team-source-archive/submission_新版ORA_QwenReranker_35_spatial(1).zip",
+      "destination": "artifacts/source_archives/team_messages/submission_新版ORA_QwenReranker_35_spatial(1).zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "copy",
+      "source": "external/team-source-archive/semantic_proposals_partial.zip",
+      "destination": "artifacts/source_archives/team_messages/semantic_proposals_partial.zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "copy",
+      "source": "external/team-source-archive/ORA原画(1).zip",
+      "destination": "artifacts/source_archives/team_messages/ORA原画(1).zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "copy",
+      "source": "external/team-source-archive/ORA_candidates_raw_and_final_20260923.zip",
+      "destination": "artifacts/source_archives/team_messages/ORA_candidates_raw_and_final_20260923.zip",
+      "files_at_import": 1,
+      "verified": true
+    },
+    {
+      "action": "copy",
+      "source": "external/team-source-archive/ORA_RUN_v2_TEAM_20261001.zip",
+      "destination": "artifacts/source_archives/team_messages/ORA_RUN_v2_TEAM_20261001.zip",
+      "files_at_import": 1,
+      "verified": true
+    }
+  ],
+  "full_local_evidence": "artifacts/workspace_cleanup/20261004/operations.local.json",
+  "verification_status": "passed",
+  "verification": {
+    "retained_file_hashes": 2173,
+    "duplicate_keeper_hashes": 1176,
+    "asset_hash_failures": 0,
+    "registered_artifacts_verified": 16,
+    "pytest_passed": 251,
+    "compileall": "passed",
+    "local_links_checked": 88,
+    "missing_local_links": 0,
+    "initial_dataset_index_videos": 174,
+    "gpu_inference_rerun": false,
+    "server_connected": false,
+    "competition_submission_made": false
+  },
+  "preview_verification": [
+    {
+      "videos": [
+        {
+          "output_frames": 30,
+          "id": "wide",
+          "duration_sec": 2.0,
+          "source_frames": 20
+        },
+        {
+          "output_frames": 30,
+          "id": "portrait",
+          "duration_sec": 2.0,
+          "source_frames": 20
+        }
+      ],
+      "mode": "selected",
+      "screenshots_checked": true
+    },
+    {
+      "videos": [
+        {
+          "output_frames": 30,
+          "id": "wide",
+          "duration_sec": 2.0,
+          "source_frames": 20
+        },
+        {
+          "output_frames": 30,
+          "id": "portrait",
+          "duration_sec": 2.0,
+          "source_frames": 20
+        }
+      ],
+      "mode": "compare",
+      "screenshots_checked": true
+    },
+    {
+      "videos": [
+        {
+          "output_frames": 30,
+          "id": "wide",
+          "duration_sec": 2.0,
+          "source_frames": 20
+        },
+        {
+          "output_frames": 30,
+          "id": "portrait",
+          "duration_sec": 2.0,
+          "source_frames": 20
+        }
+      ],
+      "mode": "empty",
+      "screenshots_checked": true
+    }
+  ],
+  "additional_schema_imports": [
+    {
+      "destination": "prompts/ora/proposal-review-reference-v1/discovery_structured_schema.json",
+      "source_sha256": "8895d1f932cc19cc826f081e2a1aab26ab9067a78a3087d85f829fff79975f22",
+      "source": "artifacts/previews/ora_prompt_comparison_20260924/prompts/discovery_structured_schema.json",
+      "status": "reference-only"
+    },
+    {
+      "destination": "prompts/ora/proposal-review-reference-v1/decision_structured_schema.json",
+      "source_sha256": "cdcb99b9493a895a3bb3318cf77d397a64db6421c4ac9676cfebb5e2a5356869",
+      "source": "artifacts/previews/ora_prompt_comparison_20260924/prompts/decision_structured_schema.json",
+      "status": "reference-only"
+    }
+  ]
+}

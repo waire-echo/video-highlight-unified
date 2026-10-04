@@ -21,8 +21,9 @@
     }
   ],
   "reproduction_gaps": [
-    "Exact generating code, model, prompt, config, author, run date and commit not recovered"
+    "Exact generating code, model, prompt, config, author, run date and commit not recovered",
+    "The 2026-07-15 YOLO/Pose report claims 48895 final frames; this ZIP has 45234. Identity is unproven."
   ],
-  "notes": "Highest reported initial-dataset result. Not ground truth; output preserved in original location.",
+  "notes": "Reported 56.43 is linked by historical discussion, not independently verified for this exact ZIP. Artifact has 45234 frames. Keep separate from the 48895-frame YOLO/Pose report. Output relocated with SHA256 unchanged.",
   "score_evidence": "historical report / user report; not re-evaluated"
 }

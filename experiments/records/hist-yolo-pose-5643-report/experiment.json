@@ -1,0 +1,32 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-yolo-pose-5643-report",
+  "date": "2026-07-15; report version, exact run date unconfirmed",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "baselines",
+  "model": {
+    "id": "YOLO11m + YOLO11m-Pose; temporal model unconfirmed",
+    "revision": "unknown"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {},
+  "config": "experiments/records/hist-yolo-pose-5643-report/config.json",
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "sha256": "f9b0fb87d44d97afcb849fa424aed7405e6194a7960352fcac3a1386d6f6ee75",
+      "size_bytes": 51478,
+      "name": "technical_report",
+      "location_key": "hist-yolo-pose-5643-report:technical_report"
+    }
+  ],
+  "score_evidence": "Original technical report claims platform feedback; not independently re-evaluated",
+  "reproduction_gaps": [
+    "Original temporal hints and their generating model/prompt are missing",
+    "Original trim_prediction_segments.py and build_best_spatial_submission.py are missing",
+    "Exact final 48895-frame prediction file, weight hashes and git commit are missing",
+    "Located exp07 ZIP contains 45234 frames; its identity with this report is unproven"
+  ],
+  "notes": "Report-only evidence: 56.43 and 48895 frames. Keep separate from hist-exp07-boundary-b. Extracted settings are a historical reference, not a runnable modern config."
+}

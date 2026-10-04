@@ -1,0 +1,43 @@
+{
+  "json": {
+    "type": "object",
+    "properties": {
+      "decisions": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+          "type": "object",
+          "properties": {
+            "event_id": {
+              "type": "string",
+              "enum": [
+                "e000",
+                "e001",
+                "e002"
+              ]
+            },
+            "decision": {
+              "type": "string",
+              "enum": [
+                "retain",
+                "uncertain",
+                "discard"
+              ]
+            }
+          },
+          "required": [
+            "event_id",
+            "decision"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "decisions"
+    ],
+    "additionalProperties": false
+  },
+  "disable_any_whitespace": true
+}

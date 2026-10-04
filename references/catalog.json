@@ -1,0 +1,511 @@
+{
+  "schema_version": "reference-catalog/v1",
+  "date": "2026-10-04",
+  "note": "Original files are local and excluded from Git. Some archive duplicates were removed; consult local_assets.py and cleanup evidence.",
+  "items": [
+    {
+      "path": "references/local/competition/基于视频大模型的运动场景高光剪辑.pdf",
+      "kind": "competition-reference",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/competition/【技术报告】基于视频大模型的运动场景高光剪辑测.docx",
+      "kind": "competition-reference",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/competition/补充说明.txt",
+      "kind": "competition-reference",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/competition/关于测试集.txt",
+      "kind": "competition-reference",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/competition/参赛选手承诺书.pdf",
+      "kind": "competition-reference",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/HIGHLIGHT_TEMPORAL_DIAGNOSIS_AND_ROADMAP.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/ORA_DIAGNOSIS_AND_IMPROVEMENT_20260922.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/ORA_DIRECT_OUTPUT_COMPARISON_20260923.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/ORA_FULL_PIPELINE_PLAN_20260923.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/PGL_SUM_FAILURE_AUDIT_20260820.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/PIPELINE_MODULES_AND_STAGE_ISOLATION.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/PLAN_B_TIMELENS_AND_LLAVAST.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/WINDOW_SCORE_REZE_NEXT_PLAN.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/analysis/视频时长统计.md",
+      "kind": "historical-analysis",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/reports/yolo_56_43_20260715.docx",
+      "kind": "historical-report",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/competition/format_examples/submit_example.jsonl",
+      "kind": "format-example",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/competition/format_examples/submit_example.zip",
+      "kind": "format-example",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "references/local/literature/reze_2608.04480.pdf",
+      "kind": "literature",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-external-temp",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "datasets/local/aic_initial174",
+      "kind": "competition-dataset",
+      "files_at_import": 348,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/qwen_window_20260816",
+      "kind": "historical-result",
+      "files_at_import": 5,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/qwen_reaggregation_20260817",
+      "kind": "historical-result",
+      "files_at_import": 25,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/pgl_sum_20260819",
+      "kind": "historical-result",
+      "files_at_import": 30,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/baseline_submissions",
+      "kind": "historical-result",
+      "files_at_import": 8,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/exp07/submission_exp07_boundary_b_v1.zip",
+      "kind": "historical-result",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/unknown_qwen/predictions_qwen_submission_clean.jsonl",
+      "kind": "historical-result",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/historical/center_baseline/predictions_video_center(1).zip",
+      "kind": "historical-result",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/deliveries/ora4b_v5_426/temporal",
+      "kind": "delivery",
+      "files_at_import": 1095,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/deliveries/ora4b_v5_426/temporal.zip",
+      "kind": "delivery",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/deliveries/ora4b_v5_426/spatial",
+      "kind": "delivery",
+      "files_at_import": 3,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/previews",
+      "kind": "preview",
+      "files_at_import": 227,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/previews/qwen_cloud_review_20260815",
+      "kind": "preview",
+      "files_at_import": 5,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/qwen_balanced_42",
+      "kind": "source-and-handoff",
+      "files_at_import": 72,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora4b_v5_426_preparation",
+      "kind": "source-and-provenance",
+      "files_at_import": 1145,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora_stage2_426_preparation",
+      "kind": "source-and-provenance",
+      "files_at_import": 49,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/clean_pipeline_20261002_source.tar.gz",
+      "kind": "source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/modular_baseline.zip",
+      "kind": "source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/unification_20261004/read_only_sources",
+      "kind": "source-and-provenance",
+      "files_at_import": 2,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/unification_20261004/unify_import.py",
+      "kind": "one-time-migration-script",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/unification_20261004/unify_metadata.py",
+      "kind": "one-time-migration-script",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/unification_20261004/finalize_unification_metadata.py",
+      "kind": "one-time-migration-script",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora9b_flow_partial/ora9b_merge_v2.py",
+      "kind": "partial-source",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_contracts.py",
+      "kind": "partial-source",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_serve.sh",
+      "kind": "partial-source",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_test_v2.py",
+      "kind": "partial-source",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/ora9b_flow_partial/ora9b_v2_tracking.py",
+      "kind": "partial-source",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/verification/clean_pipeline_20261002",
+      "kind": "verification",
+      "files_at_import": 12,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/verification/clean_pipeline_20261002/validate_clean_pipeline_locally.py",
+      "kind": "verification-script",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/verification/balanced_20260903",
+      "kind": "verification",
+      "files_at_import": 6,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/legacy_preview_tools",
+      "kind": "historical-tool",
+      "files_at_import": 4,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/github_upload_objects_20260820",
+      "kind": "incomplete-git-object-archive",
+      "files_at_import": 201,
+      "storage": "local-ignored",
+      "source_type": "project-external-temp",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/deliveries/ora4b_v5_426/temporal.zip.sha256",
+      "kind": "delivery-checksum",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "project-workspace",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/team_messages/submission_新版ORA_QwenReranker_35_spatial(1).zip",
+      "kind": "team-source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "team-message-attachment",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/team_messages/semantic_proposals_partial.zip",
+      "kind": "team-source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "team-message-attachment",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/team_messages/ORA原画(1).zip",
+      "kind": "team-source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "team-message-attachment",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/team_messages/ORA_candidates_raw_and_final_20260923.zip",
+      "kind": "team-source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "team-message-attachment",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    },
+    {
+      "path": "artifacts/source_archives/team_messages/ORA_RUN_v2_TEAM_20261001.zip",
+      "kind": "team-source-archive",
+      "files_at_import": 1,
+      "storage": "local-ignored",
+      "source_type": "team-message-attachment",
+      "status": "present",
+      "note": "An archive may have duplicate files redirected to canonical locations by local_assets.py."
+    }
+  ]
+}

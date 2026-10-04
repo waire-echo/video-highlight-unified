@@ -1,6 +1,6 @@
 # 统一重构与迁移报告
 
-检查日期：2026-10-04，Asia/Hong_Kong。独立建立新目录，旧目录、工作区修改、分支和远端均保留。没有删除、强推或Archive。
+检查日期：2026-10-04，Asia/Hong_Kong。独立建立新目录，旧Git仓库、工作区修改、分支和远端保留。随后按用户要求实际归位本地资料、数据与结果，并核对哈希后清理重复文件和缓存；未删除旧仓库、强推或执行远端Archive。当前位置见 [本地整理说明](workspace_cleanup.md)。
 
 ## 检查与迁移
 
@@ -12,14 +12,15 @@
 | thekfjie/video-highlight-editing远端，08a5d27 | 核对完整树，共同baseline/PGL/Qwen/ORA4B资产，没有发现独立reranker实现 |
 | 独立TempSamp-R1，3fd4e85 | 官方center/qwen源码与Apache许可，训练框架保留上游链接 |
 | handoff_balanced_42_20260816 | profile、来源commit/overlay、结果hash；重复源码去重，不整包搬迁 |
-| cloud_temporal_20260816 / temporal_reaggregation_20260817 | raw原分数留原位置，登记统计/hash，实际验证balanced时间复现 |
+| cloud_temporal_20260816 / temporal_reaggregation_20260817 | raw原分数集中到artifacts/historical，登记统计/hash，实际验证balanced时间复现 |
 | pgl_sum_temporal_20260819 / E:/AI/sources/MR.HiSum | PGL源码/测试/配置/学术非商业许可，保留负面结果与模型依赖 |
-| results/ora4b_v5_new426_20261001 | 配置、revision、结果hash与统计；1095文件完整交接包留原位置 |
+| results/ora4b_v5_new426_20261001 | 配置、revision、结果hash与统计；1095文件完整交接包集中到artifacts/deliveries/ora4b_v5_426/temporal |
 | tmp/ora_stage2_new426_20261001 / 最终空间结果 | 主实现已在pipeline起点；保留交付hash/统计，临时部署/缓存不搬 |
 | tmp/ora9b_v2_* | contracts/光流tracking参考与题面参考指标；缺temporal/pipeline/media_base，非完整可运行路线 |
 | previews/ora_prompt_comparison_20260924/prompts | proposal Prompt/schema和v5请求样例；样例不等于运行模板 |
 | 微信归档semantic_proposals_partial、ORA_candidates_raw_and_final、新版35空间包、ORA_RUN_v2 | 检查ZIP条目与请求证据，登记必要hash，原回答/预测留原位置 |
 | submit/、exp07 ZIP、Qwen命名结果、根目录方案文档 | 成绩证据、失败结论、生成缺口汇总到history；不提交逐视频测试结果/个人背景 |
+| TempSamp-R1/docs的56.43报告、E:/AI/tmp的论文及上传残留 | 原报告/论文集中到references/local；保留缺引用的Git对象资料；56.43报告参数独立登记 |
 
 逐文件来源与原始SHA256：`docs/migration/source_manifest.json`。起点保留代码来自8f25180，Git能追踪文件移动。历史实验从registry进入详细来源记录。
 
@@ -27,9 +28,9 @@
 
 保留源码、公共几何/IO/校验、Qwen/PGL/REZE、baseline、版本Prompt、关键配置、模型来源、指标摘要与测试。失败但有解释价值的实现也留下。
 
-大型预测、回答、视频、权重、PTS/检测缓存、交接ZIP与预览仍在原位置，通过artifact hash和本机路径索引定位。它们不等于垃圾，也不属于Git源码。
+大型预测、回答、交接ZIP与预览已集中到被Git忽略的artifacts/；初赛视频集中到datasets/local/，权重和环境保留外部位置。通过artifact hash和更新后的本机路径索引定位。它们不等于垃圾，也不属于Git源码。
 
-不迁移多份TempSamp-R1/verl副本、重复baseline ZIP展开、重复交接解压目录、SSH/分块传输helper、进程快照、局部渲染缓存、__MACOSX、soffice临时目录、私人Agent/接手记录。独立训练框架保留来源链接，不并入当前比赛推理代码。
+不把多份TempSamp-R1/verl副本、重复baseline展开、SSH/分块传输helper和私人Agent记录并入维护中的源码。一份有来源价值的旧源码/部署快照保存在本地artifacts/source_archives；经完整hash核对的重复交接解压、重复服务器下载、重复论文和可重建缓存已删除。独立训练框架保留来源链接，不并入当前比赛推理代码。
 
 没有完整复制旧仓库到legacy。未找齐的结果不当作GT，不写逐视频特例规则。
 
@@ -55,7 +56,7 @@
 
 ## 仍无法确认
 
-1. 56.43 exp07原作者、完整源码、模型、Prompt、配置、日期与commit。
+1. 56.43原作者、时间模型/Prompt和原始commit；新找到报告补出了空间参数，但报告48895帧与exp07 ZIP的45234帧不同，两个版本的对应关系仍未确认。
 2. 46.55的榜单证据和其他submit产物的来源。
 3. Reranker完整代码、revision、实际Prompt、候选/logits/预算日志。
 4. proposal生成/整理脚本，只有code_sha256和请求证据。

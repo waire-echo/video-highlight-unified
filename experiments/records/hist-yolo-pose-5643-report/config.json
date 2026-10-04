@@ -1,0 +1,21 @@
+{
+  "schema_version": "historical-reference/v1",
+  "runnable": false,
+  "source": "2026-07-15 original YOLO/Pose technical report",
+  "temporal_input": {"source": "teammate model-generated intervals and subject hints", "model": "unknown", "prompt": "unknown"},
+  "yolo": {
+    "model": "yolo11m.pt", "stride": 3, "imgsz": 640, "batch_size": 8,
+    "conf": 0.15, "iou": 0.5, "half": true, "smooth_window": 15,
+    "center_blend": 1.0, "width_scale_16x9": 1.0, "width_scale_9x16": 1.0,
+    "person_16x9_anchor_limit": 0.45
+  },
+  "pose": {
+    "model": "yolo11m-pose.pt", "target_ratio": "9x16", "subject": "person",
+    "stride": 3, "imgsz": 640, "batch_size": 4, "conf": 0.15, "iou": 0.5,
+    "half": true, "smooth_window": 15, "pose_blend": 0.5,
+    "max_shift_fraction": 0.35, "keypoint_conf": 0.25,
+    "anchor": "median visible shoulder and hip x", "changes_y": false
+  },
+  "boundary": {"trim_sec": 0.25, "preserve_source_start": true, "preserve_source_end": true},
+  "note": "Original scripts are incomplete locally. These values must not be silently used as current pipeline defaults."
+}

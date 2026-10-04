@@ -4,7 +4,8 @@
 
 | 实验 | 结果 | 追溯状态 |
 |---|---|---|
-| hist-exp07-boundary-b | 初赛报告56.43，45234帧 | ZIP已定位，代码/Prompt/配置/commit缺失 |
+| hist-exp07-boundary-b | 历史关联56.43，ZIP实际45234帧 | 与高分报告版本身份尚未确认，代码/Prompt/配置/commit缺失 |
+| hist-yolo-pose-5643-report | 报告56.43，声称48895帧 | 找到2026-07-15原报告与空间参数，未找到对应完整输出与commit |
 | hist-yolo-smooth15-46-55 | 文件名46.55 | 分数与来源未独立确认 |
 | hist-qwen-balanced-42 | 初赛转述约42，35868帧 | 时间可重聚合，空间链路缺失 |
 | hist-ora-reranker-35 | 初赛转述40 | 35是档位，不是分数；缺代码与logits |
@@ -19,4 +20,4 @@ PGL架构有独立价值，失败不代表应该删除：历史片尾/广告峰�
 
 ORA proposal原Prompt/schema曾强制至少两个候选，阶段引用/整理可能拆散完整事件。保留失败对照，改进设计不能当作已实现代码。
 
-**56.43目前不能完整复现。** 保存结果指纹与缺口，待原作者补链路。可直接验证的步骤是CPU baseline和balanced时间复现；ORA v5是工程推荐，没有证据证明其榜单最好。
+**56.43目前不能完整复现。** 原报告恢复了空间方案参数，但其48,895帧与exp07 ZIP的45,234帧不一致，单独登记，不据此认定模型/Prompt或生成链路。详见 [历史空间参考](../pipelines/baselines/yolo_pose_5643_reference/README.md)。可直接验证的步骤是CPU baseline和balanced时间复现；ORA v5是工程推荐，没有证据证明其榜单最好。

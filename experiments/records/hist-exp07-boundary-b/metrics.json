@@ -1,6 +1,8 @@
 {
-  "metric_type": "leaderboard",
+  "metric_type": "leaderboard-historical-association-unconfirmed",
   "videos": 174,
   "selected_frames": 45234,
-  "score": 56.43
+  "score": 56.43,
+  "score_independently_verified": false,
+  "identity_with_yolo_report_verified": false
 }

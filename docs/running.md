@@ -41,7 +41,7 @@ python pipeline.py --config configs/pipeline.local.json preview --random 3
 有历史原始 handoff 和 raw 时，不需要模型/GPU/视频：
 
 ```bash
-python scripts/reaggregate_temporal_handoff.py --handoff /path/to/cloud_temporal_20260816/temporal_handoff.jsonl --raw /path/to/cloud_temporal_20260816/temporal_handoff.jsonl.raw.jsonl --out-root runs/balanced-reproduction --profiles balanced
+python scripts/reaggregate_temporal_handoff.py --handoff artifacts/historical/qwen_window_20260816/temporal_handoff.jsonl --raw artifacts/historical/qwen_window_20260816/temporal_handoff.jsonl.raw.jsonl --out-root runs/balanced-reproduction --profiles balanced
 ```
 
 历史 profile 在 `experiments/records/hist-qwen-balanced-42/config.json`。这里只复现时间选择，不能声称重现42分完整流程。
