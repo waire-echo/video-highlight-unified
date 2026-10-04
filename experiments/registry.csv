@@ -1,4 +1,5 @@
 experiment_id,date,author,pipeline,model,dataset,prompt_version,config,git_commit,status,score,metric_type,notes
+demo-center-20261004,2026-10-04T19:35:25.936963+08:00,thekfjie,baseline_center,none,synthetic_demo,,experiments/records/demo-center-20261004/config.json,dfa23a225fdb854b59c03e4c1ef56edd7ed7c067,completed,,engineering,
 hist-exp07-boundary-b,unknown; documented by 2026-08-20,historical-team-unconfirmed,baselines,unknown,aic_initial174,,,,historical-import,56.43,leaderboard,Highest reported initial-dataset result. Not ground truth; output preserved in original location.
 hist-ora-proposal-v1,2026-09-23; archive date,historical-team-unconfirmed,ora_proposal,OraRL/Video-ORA-4B,aic_initial174,ora/proposal-v1,experiments/records/hist-ora-proposal-v1/config.json,,historical-import,,engineering,169 first-pass successes and 3 reduced-sampling recoveries; 2 unfinished according to diagnosis.
 hist-ora-reranker-35,2026-09-22; diagnosis date,historical-team-unconfirmed,ora_reranker,Video-ORA + Qwen Reranker,aic_initial174,,,,historical-import,40,leaderboard-user-reported,"35 is a selection preset/version, not a 35-point score."

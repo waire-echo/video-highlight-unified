@@ -1,0 +1,35 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "demo-center-20261004",
+  "date": "2026-10-04T19:35:25.936963+08:00",
+  "author": "thekfjie",
+  "pipeline": "baseline_center",
+  "model": {
+    "id": "none",
+    "revision": "none"
+  },
+  "dataset": {
+    "id": "synthetic_demo",
+    "manifest": "datasets/manifests/synthetic_demo.json",
+    "manifest_sha256": "22c750d8bf92cc3bacec6cdddcc91a131c10c1e8d2af5a4a97d89bc6f3062c3e"
+  },
+  "prompts": {},
+  "prompt_hashes": {},
+  "config": "experiments/records/demo-center-20261004/config.json",
+  "config_sha256": "e7fa0c386ccad720521fd01327b2ecc4bfd5b5489ca161d9fccf42ceafd4cbd8",
+  "git_commit": "dfa23a225fdb854b59c03e4c1ef56edd7ed7c067",
+  "source_fingerprint": "2dbb8e99fd08cb5c0b7984d453dccb60392b6111935de65dcd98f7af9a45699a",
+  "status": "completed",
+  "notes": "",
+  "runtime_inputs": {
+    "test_index": {
+      "sha256": "173c11228ed5407da169e0f2cee9ac3fdb007f6743937dd82720b30509890120"
+    },
+    "video_manifest": {
+      "videos": 2,
+      "sha256": "d765870816f3e8617b282a5e8298dc101ba65840e2f8f6ee54e2a054d2adeab3"
+    }
+  },
+  "last_action": "temporal",
+  "updated_at": "2026-10-04T19:35:26.460908+08:00"
+}

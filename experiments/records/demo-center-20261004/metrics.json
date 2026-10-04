@@ -1,0 +1,9 @@
+{
+  "metric_type": "engineering",
+  "dataset": "synthetic_demo",
+  "videos": 2,
+  "selected_frames": 40,
+  "invalid_results": 0,
+  "submission_validation": "passed",
+  "notes": "Synthetic full+center end-to-end run through vh.py; no highlight accuracy score."
+}

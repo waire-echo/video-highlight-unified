@@ -1,0 +1,23 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "baseline_center",
+  "model": {
+    "id": "none",
+    "revision": "none"
+  },
+  "dataset": {
+    "id": "synthetic_demo",
+    "manifest": "datasets/manifests/synthetic_demo.json",
+    "manifest_sha256": "22c750d8bf92cc3bacec6cdddcc91a131c10c1e8d2af5a4a97d89bc6f3062c3e"
+  },
+  "prompts": {},
+  "parameters": {
+    "temporal_mode": "full",
+    "spatial_backend": "center",
+    "validate": true
+  },
+  "paths": {
+    "test_index": "datasets/examples/synthetic_index.json",
+    "video_dir": "datasets/local/demo/videos"
+  }
+}
