@@ -1,0 +1,29 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-ora-reranker-35",
+  "date": "2026-09-22; diagnosis date",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "ora_reranker",
+  "model": {
+    "id": "Video-ORA + Qwen Reranker",
+    "revision": "unknown"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {},
+  "config": null,
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "submission_zip",
+      "sha256": "76bad371539863cae160b31049c58597812ec75638f42789f83f29bb136ca10d",
+      "size_bytes": 214103,
+      "location_key": "hist-ora-reranker-35:submission_zip"
+    }
+  ],
+  "reproduction_gaps": [
+    "Complete proposal/reranker code, actual prompt, logits, model revision, config, author and commit missing"
+  ],
+  "notes": "35 is a selection preset/version, not a 35-point score.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "qwen_direct",
+  "model": {
+    "id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "revision": "local-snapshot-unresolved"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {
+    "qwen/direct-v1": "qwen/direct-v1"
+  },
+  "parameters": {
+    "temporal_mode": "vlm",
+    "vlm_load_in_4bit": true
+  },
+  "paths": {}
+}

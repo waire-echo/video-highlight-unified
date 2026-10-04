@@ -1,0 +1,11 @@
+{
+  "dataset_id": "aic_initial174",
+  "videos": 174,
+  "target_ratio_counts": {
+    "16:9": 119,
+    "9:16": 55
+  },
+  "source": "Organizer initial dataset; local media and full index excluded from Git",
+  "ground_truth_available": false,
+  "access": "local only"
+}

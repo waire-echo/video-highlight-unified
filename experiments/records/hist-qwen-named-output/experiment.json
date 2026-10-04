@@ -1,0 +1,28 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-qwen-named-output",
+  "date": "unknown",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "baselines",
+  "model": {
+    "id": "unknown"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {},
+  "config": null,
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "prediction",
+      "sha256": "923b97060961afbce831306dfc6acbcb8fe5cf858877daa28e23fd1946fd3d97",
+      "size_bytes": 687581,
+      "location_key": "hist-qwen-named-output:prediction"
+    }
+  ],
+  "reproduction_gaps": [
+    "Generating code/model/prompt/config/commit/source unknown"
+  ],
+  "notes": "File name does not prove Qwen origin or local reproducibility.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

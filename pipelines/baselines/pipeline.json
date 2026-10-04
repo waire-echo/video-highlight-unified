@@ -1,0 +1,6 @@
+{
+  "pipeline": "baselines",
+  "status": "runnable",
+  "default_config": "configs/pipelines/baseline_center.json",
+  "notes": "Full/motion temporal selection plus center crops; official source references and incomplete historical ORA optical-flow utilities."
+}

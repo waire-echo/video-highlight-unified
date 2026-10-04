@@ -1,0 +1,13 @@
+{
+  "model": "Video-ORA-4B",
+  "model_revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+  "window": 32,
+  "stride": 24,
+  "fps": 2,
+  "refine_fps": 4,
+  "side": 448,
+  "max_frames": 128,
+  "context": 3,
+  "pad": 0.25,
+  "no_structured": false
+}

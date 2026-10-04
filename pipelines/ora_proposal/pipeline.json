@@ -1,0 +1,6 @@
+{
+  "pipeline": "ora_proposal",
+  "status": "reference",
+  "default_config": "configs/pipelines/ora_proposal_v1.json",
+  "notes": "Prompt, schema, request configuration and failure evidence found. Complete proposal normalizer/source has not been recovered."
+}

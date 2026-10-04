@@ -1,0 +1,32 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-ora-proposal-v1",
+  "date": "2026-09-23; archive date",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "ora_proposal",
+  "model": {
+    "id": "OraRL/Video-ORA-4B",
+    "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+    "served_name": "Video-ORA-4B"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {
+    "ora/proposal-v1": "ora/proposal-v1"
+  },
+  "config": "experiments/records/hist-ora-proposal-v1/config.json",
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "raw_archive",
+      "sha256": "d1e574a218746ea861d2e713edf1c0d2c7efe5694a5df9866c8f74c5ccdc99ed",
+      "size_bytes": 858567,
+      "location_key": "hist-ora-proposal-v1:raw_archive"
+    }
+  ],
+  "reproduction_gaps": [
+    "Generating script missing; only code_sha256 and raw requests exist"
+  ],
+  "notes": "169 first-pass successes and 3 reduced-sampling recoveries; 2 unfinished according to diagnosis.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "ora_reranker",
+  "model": {
+    "id": "Video-ORA-4B + Qwen3-Reranker",
+    "revision": "unknown"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {},
+  "parameters": {},
+  "paths": {}
+}

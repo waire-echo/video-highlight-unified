@@ -1,0 +1,2 @@
+
+Recheck: does this clip contain ANY coherent useful visual content? Empty events is appropriate only if there is none.

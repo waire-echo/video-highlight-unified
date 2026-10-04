@@ -1,0 +1,6 @@
+{
+  "pipeline": "editing",
+  "status": "tool",
+  "default_config": "",
+  "notes": "Inspection/rendering of selected frames; source videos stay outside Git."
+}

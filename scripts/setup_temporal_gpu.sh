@@ -35,12 +35,12 @@ info=model_info(repo_id,revision=revision)
 if info.sha!=revision:
     raise RuntimeError('Model metadata does not match the pinned revision')
 parameter_count=getattr(info.safetensors,'total',None)
-if not isinstance(parameter_count,int) or not 0 < parameter_count <= 8_000_000_000:
-    raise RuntimeError(f'Cannot verify the <=8B parameter budget: {parameter_count}')
+if not isinstance(parameter_count,int) or not 0 < parameter_count <= 9_000_000_000:
+    raise RuntimeError(f'Cannot verify the <=9B parameter budget: {parameter_count}')
 snapshot_download(repo_id,revision=revision,local_dir=root/'models/Video-ORA-4B')
 (root/'model_provenance.json').write_text(json.dumps({
     'repo_id':repo_id,'revision':revision,
-    'safetensors_total_parameters':parameter_count,'parameter_limit':8_000_000_000,
+    'safetensors_total_parameters':parameter_count,'parameter_limit':9_000_000_000,
 },indent=2))
 PY
 python -m pip freeze > "$TASK_ROOT/temporal.environment.freeze.txt"

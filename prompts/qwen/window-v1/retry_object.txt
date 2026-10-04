@@ -1,0 +1,2 @@
+
+Your previous response was invalid. Return only the complete JSON object with every required key. All first seven values, including action, must be integer scores 0, 1, 2, or 3; put the action name only in action_description.

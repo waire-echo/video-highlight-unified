@@ -34,3 +34,12 @@ PROJECT_HISTORY.md
 PROJECT_LINKS.md
 TEMPSAMP_R1_ANALYSIS.md
 attachments/
+datasets/local/
+artifacts/
+experiments/artifact_locations.local.json
+*.npz
+*.npy
+*.pkl
+*.h5
+*.hdf5
+*.log

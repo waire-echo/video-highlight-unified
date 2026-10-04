@@ -1,0 +1,11 @@
+{
+  "metric_type": "engineering",
+  "videos": 174,
+  "temporal_failed": 0,
+  "spatial_input_frames": 73779,
+  "native_repair": {
+    "attempted": 84,
+    "recovered": 66,
+    "fallback": 18
+  }
+}

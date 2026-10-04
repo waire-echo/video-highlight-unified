@@ -1,0 +1,9 @@
+{
+  "test_index": "/data/highlight/test_index.json",
+  "video_dir": "/data/highlight/videos",
+  "temporal_python": "/data/highlight/runtime/temporal-env/bin/python",
+  "python_executable": "/data/highlight/runtime/spatial-env/bin/python",
+  "temporal_model": "/data/highlight/models/Video-ORA-4B",
+  "yolo_model": "/data/highlight/models/yolo11m.pt",
+  "pose_model": "/data/highlight/models/yolo11m-pose.pt"
+}

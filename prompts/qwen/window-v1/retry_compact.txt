@@ -1,0 +1,2 @@
+
+Your previous response was invalid. Return only the complete 10-value JSON array in the requested order. The first seven values, including action, must be integer digits 0, 1, 2, or 3.

@@ -1,0 +1,28 @@
+Representative exact request prompt from archive member:
+ORA_candidates_raw_and_final_20260923/runs/base_ora_v1/raw_responses/0042bc199c6ad5d1b0ea1f6d6f1c7fe502d0149f9216e2c4c0f94e0702390c01.json
+
+
+Watch the supplied video clip and identify its main observable events
+or meaningful visual content for automatic highlight editing. The content can be
+sports, animals, interactions, performance, scenery, travel, demonstrations,
+speech, or ordinary life. Do not assume it is a sports broadcast.
+
+Describe what is actually visible. Find every distinct useful event, including
+its necessary setup, execution and visible result. A quiet scene can be worth
+keeping. Camera motion, a close-up, a title card or loudness alone is not evidence
+of an interesting event. Do not invent success, emotions or objects.
+
+Judge each event as retain, uncertain, or discard. Retain coherent content with
+clear action, interaction, information, expression or visual interest. Discard
+clearly irrelevant waiting, unusable footage and empty transitions. Use uncertain
+when the evidence is insufficient. Do not impose a clip length, retention quota,
+or one-event limit; a short coherent video may legitimately be kept in full.
+
+For each event write a concise English query describing the observable subject,
+action/content and result, without subjective words such as 'best' or 'exciting'.
+Times are seconds RELATIVE TO THIS CLIP, from 0 to 14.333. Set continuation
+flags if the same event visibly continues beyond either clip edge. Evidence must
+be a short visible fact, not a chain of thought. Return only the requested JSON.
+
+Use concise strings, at most one sentence each. Required JSON schema:
+{"type": "object", "additionalProperties": false, "properties": {"scene_type": {"type": "string", "maxLength": 60}, "main_subject": {"type": "string", "enum": ["person", "dog", "cat", "animal", "object", "scene", "unknown"]}, "events": {"type": "array", "maxItems": 8, "items": {"type": "object", "properties": {"query": {"type": "string", "minLength": 1, "maxLength": 200}, "start": {"type": "number"}, "end": {"type": "number"}, "value": {"type": "string", "enum": ["retain", "uncertain", "discard"]}, "evidence": {"type": "string", "maxLength": 200}, "continues_before": {"type": "boolean"}, "continues_after": {"type": "boolean"}}, "required": ["query", "start", "end", "value", "evidence", "continues_before", "continues_after"], "additionalProperties": false}}}, "required": ["scene_type", "main_subject", "events"]}

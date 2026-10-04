@@ -1,0 +1,14 @@
+Representative exact request prompt from archive member:
+ORA_candidates_raw_and_final_20260923/runs/base_ora_v1/raw_responses/00747f6df0d8690d704ed76d9af34d223d8064ccdbadd795f6c78853717f4d63.json
+
+
+What is the main visible subject of this video clip?
+Options:
+A. A nonliving object
+B. Scenery or an environment
+C. The main subject is unclear
+D. A person or people
+E. A dog or dogs
+F. A cat or cats
+G. An animal other than a dog or cat
+Answer with the option letter only within <answer>...</answer> tags. Example: <answer>A</answer>

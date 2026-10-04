@@ -1,0 +1,34 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-pgl-sum-20260819",
+  "date": "2026-08-19",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "pgl_sum",
+  "model": {
+    "id": "Mr.HiSum/PGL-SUM"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {},
+  "config": "experiments/records/hist-pgl-sum-20260819/config.json",
+  "git_commit": "78065e4",
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "handoff",
+      "sha256": "4f4008510e947230154bf967438f9e9fd9a12bceeee6418e39a36d424e23400e",
+      "size_bytes": 87885,
+      "location_key": "hist-pgl-sum-20260819:handoff"
+    },
+    {
+      "name": "raw",
+      "sha256": "10ca6b668a1f4f7aa6d3b4764cbb92cb6981b3c9c03cb27f7fbeb5bba02a0e29",
+      "size_bytes": 6017650,
+      "location_key": "hist-pgl-sum-20260819:raw"
+    }
+  ],
+  "reproduction_gaps": [
+    "Approximate 32-point final spatial submission not located; source worktree had later modifications"
+  ],
+  "notes": "Useful negative baseline; tail-card peaks and VFR metadata risks. Retain architecture/checkpoint provenance.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

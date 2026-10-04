@@ -1,0 +1,34 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-ora-stage2-426-20261002",
+  "date": "2026-10-02",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "spatial_crop",
+  "model": {
+    "id": "YOLO11m + pose + BoT-SORT"
+  },
+  "dataset": "aic_round2_426",
+  "prompts": {},
+  "config": null,
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "prediction",
+      "sha256": "ee2a9bcb485f1efb3820d9f6fdd532a85cac49b269ed7f8e88681d12b72a647d",
+      "size_bytes": 6562138,
+      "location_key": "hist-ora-stage2-426-20261002:prediction"
+    },
+    {
+      "name": "submission_zip",
+      "sha256": "eba8583a40ddbd7f218b20b84c8fe12809316310149acf9ac115f58036f11ca4",
+      "size_bytes": 535621,
+      "location_key": "hist-ora-stage2-426-20261002:submission_zip"
+    }
+  ],
+  "reproduction_gaps": [
+    "No single original Git commit; team ZIP and helper hashes identify the run"
+  ],
+  "notes": "Team source ZIP with deployment/relay overlays; repository 8f25180 was organized afterwards.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

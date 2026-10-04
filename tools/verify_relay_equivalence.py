@@ -11,7 +11,7 @@ import time
 
 repo = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo / 'src'))
-from highlight_pipeline.config import load_config, write_resolved
+from video_highlight.config import load_config, write_resolved
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--config', type=Path, required=True)
@@ -21,8 +21,8 @@ config = load_config(options.config)
 resolved = write_resolved(config)
 os.environ['HIGHLIGHT_PIPELINE_CONFIG'] = str(resolved)
 stage = Path(config['run_root'])
-spatial = repo / 'src/highlight_pipeline/spatial'
-runtime = repo / 'src/highlight_pipeline/runtime'
+spatial = repo / 'src/video_highlight/spatial'
+runtime = repo / 'src/video_highlight/runtime'
 sys.path.insert(0, str(spatial))
 sys.path.insert(0, str(runtime))
 import run_stage2 as pipeline

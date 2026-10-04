@@ -1,0 +1,6 @@
+{
+  "pipeline": "reze",
+  "status": "comparison",
+  "default_config": "configs/pipelines/reze_yesno_v1.json",
+  "notes": "REZE-inspired generic Yes/No logits and external aggregation. This project variant does not reproduce query-based original REZE."
+}

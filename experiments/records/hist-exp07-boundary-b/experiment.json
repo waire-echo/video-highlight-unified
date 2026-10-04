@@ -1,0 +1,28 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-exp07-boundary-b",
+  "date": "unknown; documented by 2026-08-20",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "baselines",
+  "model": {
+    "id": "unknown"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {},
+  "config": null,
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "submission_zip",
+      "sha256": "6800e5a00f78659c358587433700a0405348b867448d951b59d64405cff24c2a",
+      "size_bytes": 179398,
+      "location_key": "hist-exp07-boundary-b:submission_zip"
+    }
+  ],
+  "reproduction_gaps": [
+    "Exact generating code, model, prompt, config, author, run date and commit not recovered"
+  ],
+  "notes": "Highest reported initial-dataset result. Not ground truth; output preserved in original location.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

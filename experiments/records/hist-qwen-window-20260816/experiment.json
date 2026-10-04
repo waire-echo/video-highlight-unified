@@ -1,0 +1,37 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-qwen-window-20260816",
+  "date": "2026-08-16",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "qwen_window",
+  "model": {
+    "id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "revision": "local-snapshot-unresolved"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {
+    "qwen/window-v1": "qwen/window-v1"
+  },
+  "config": null,
+  "git_commit": "27e276b",
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "handoff",
+      "sha256": "13436e02640ac9b075c0f1230a7374c3f70be85ecce1af5882499a2a6ab5ef47",
+      "size_bytes": 82599,
+      "location_key": "hist-qwen-window-20260816:handoff"
+    },
+    {
+      "name": "raw",
+      "sha256": "9bce266fd7136d2e31c7f61e4362fe79240fc48be09bce5fcaae86f72cd53e8d",
+      "size_bytes": 16206529,
+      "location_key": "hist-qwen-window-20260816:raw"
+    }
+  ],
+  "reproduction_gaps": [
+    "Worker-level resolved inference config and exact model revision are not in merged run state"
+  ],
+  "notes": "174 valid videos, 4042 windows, historical score saturation. Retained for comparison/reaggregation.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

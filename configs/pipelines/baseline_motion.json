@@ -1,0 +1,19 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "baseline_motion",
+  "model": {
+    "id": "none",
+    "revision": "none"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {},
+  "parameters": {
+    "temporal_mode": "motion",
+    "spatial_backend": "center",
+    "validate": true
+  },
+  "paths": {}
+}

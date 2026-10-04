@@ -1,0 +1,39 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "qwen_window",
+  "model": {
+    "id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "revision": "local-snapshot-unresolved"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {
+    "qwen/window-v1": "qwen/window-v1"
+  },
+  "parameters": {
+    "temporal_mode": "window_score",
+    "window_semantic_mode": "structured",
+    "window_aggregation": "current",
+    "vlm_load_in_4bit": true,
+    "window_coarse_sec": 2,
+    "window_coarse_stride_sec": 1,
+    "window_coarse_fps": 2,
+    "window_fine_sec": 2,
+    "window_fine_stride_sec": 0.5,
+    "window_fine_fps": 4,
+    "window_max_fine_regions": 6,
+    "window_batch_size": 1,
+    "window_curve_step_sec": 0.5,
+    "window_smoothing_points": 3,
+    "window_absolute_threshold": 0.45,
+    "window_growth_threshold": 0.4,
+    "window_relative_top_fraction": 0.3,
+    "window_merge_gap_sec": 1,
+    "window_boundary_expand_sec": 0.75,
+    "window_max_coverage_ratio": 0.6,
+    "window_max_coverage_sec": 30
+  },
+  "paths": {}
+}

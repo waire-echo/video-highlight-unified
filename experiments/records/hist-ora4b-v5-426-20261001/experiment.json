@@ -1,0 +1,36 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-ora4b-v5-426-20261001",
+  "date": "2026-10-01",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "ora_direct",
+  "model": {
+    "id": "OraRL/Video-ORA-4B",
+    "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+    "served_name": "Video-ORA-4B"
+  },
+  "dataset": "aic_round2_426",
+  "prompts": {
+    "ora/v5": "ora/v5"
+  },
+  "config": "experiments/records/hist-ora4b-v5-426-20261001/config.json",
+  "git_commit": "65fa242f6fbdf47c9ffdadf3dbed39fc8dbc902c",
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "handoff",
+      "sha256": "a4710be903de70f11f55416eac15b781678a0559981678d3ffbd8e75e6a635f5",
+      "size_bytes": 299137,
+      "location_key": "hist-ora4b-v5-426-20261001:handoff"
+    },
+    {
+      "name": "frames",
+      "sha256": "f063fc93750c1ad421f52e90f0edcbb77d3f51b37a2b0e1fd9dab4768a97c782",
+      "size_bytes": 791076,
+      "location_key": "hist-ora4b-v5-426-20261001:frames"
+    }
+  ],
+  "reproduction_gaps": [],
+  "notes": "426 completed; 411 grounding repairs attempted, 308 recovered, 103 discovery fallback retained. No leaderboard score.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

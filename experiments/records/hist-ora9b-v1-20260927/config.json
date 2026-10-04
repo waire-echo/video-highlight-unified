@@ -1,0 +1,10 @@
+{
+  "window": 32,
+  "stride": 24,
+  "fps": 2,
+  "refine_fps": 4,
+  "side": 448,
+  "max_frames": 128,
+  "context": 3,
+  "pad": 0.25
+}

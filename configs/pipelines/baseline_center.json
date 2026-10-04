@@ -1,0 +1,9 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "baseline_center",
+  "model": {"id": "none", "revision": "none"},
+  "dataset": {"id": "synthetic_demo", "manifest": "datasets/manifests/synthetic_demo.json"},
+  "prompts": {},
+  "parameters": {"temporal_mode": "full", "spatial_backend": "center", "validate": true},
+  "paths": {"test_index": "datasets/examples/synthetic_index.json", "video_dir": "datasets/local/demo/videos"}
+}

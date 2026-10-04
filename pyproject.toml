@@ -3,14 +3,24 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "video-highlight-pipeline"
+name = "video-highlight-unified"
 version = "0.1.0"
-description = "Video-ORA highlight localization with YOLO, Pose and parallel BoT-SORT crops"
+description = "Reproducible video highlight research pipelines and experiment registry"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["numpy>=1.24", "opencv-python>=4.8", "Pillow>=10", "tzdata; platform_system=='Windows'"]
+
+[project.scripts]
+vh = "video_highlight.runner:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "scripts"]
+testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-highlight_pipeline = ["spatial/*.yaml"]
+video_highlight = ["spatial/*.yaml"]

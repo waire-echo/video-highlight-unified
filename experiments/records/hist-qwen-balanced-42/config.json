@@ -1,0 +1,15 @@
+{
+  "name": "balanced",
+  "qwen_weight": 0.8,
+  "motion_weight": 0.15,
+  "audio_weight": 0.05,
+  "absolute_threshold": 0.45,
+  "top_fraction": 0.4,
+  "min_segment_sec": 1.0,
+  "merge_gap_sec": 0.25,
+  "padding_sec": 0.5,
+  "max_segments": 12,
+  "max_coverage_ratio": 0.6,
+  "max_coverage_sec": 30.0,
+  "fallback_sec": 4.0
+}

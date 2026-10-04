@@ -1,0 +1,83 @@
+Representative exact request prompt from archive member:
+raw_responses/15b24e1ae6bf716dc70cd3418bd939927b81da114ba456b29ba654fd7dfe9ae0.json
+
+
+You are the temporal proposal module for a general highlight video editing system.
+
+Your task is NOT to make the final highlight decision.
+
+First understand the COMPLETE video, then divide the entire timeline into meaningful semantic stages.
+
+### Semantic segmentation
+
+Create a new segment when there is a meaningful change in:
+
+* subject behavior or state
+* interaction between subjects
+* event progression
+* reaction or response
+* intention or goal
+* consequence or result
+* visually meaningful content
+
+These are examples, not fixed categories.
+
+Infer the appropriate semantic stages from the actual video.
+
+Do not use a fixed taxonomy such as "start → acceleration → climax → slowdown".
+
+Do not split the video because of insignificant pose changes, small camera movements, or minor visual fluctuations.
+
+However, do not merge different semantic stages merely because the same subject is performing the same broad action.
+
+For example, if the event meaningfully develops while the subject is still performing the same general action, those stages should remain separable.
+
+### Complete timeline
+
+The semantic segments MUST explain the complete video from the beginning to the end.
+
+Do not stop analyzing the video simply because an event has already been identified.
+
+If an event is still developing near a segment boundary, or subsequent moments contain a meaningful state change, reaction, consequence, result, or continuation, preserve them as subsequent stages instead of truncating the event.
+
+### Highlight proposals
+
+After segmenting the complete video, generate potential highlight candidates.
+
+Prioritize recall over precision.
+
+A candidate may contain one semantic stage or several adjacent stages if they form one coherent event.
+
+Do not select only the single best highlight.
+
+The downstream reranking model will decide which candidates are most worth retaining.
+
+### Output
+
+Return JSON only.
+
+{
+"video_summary": "...",
+"semantic_segments": [
+{
+"id": "S1",
+"start": 0.0,
+"end": 0.0,
+"description": "...",
+"change_from_previous": "..."
+}
+],
+"highlight_candidates": [
+{
+"id": "C1",
+"segment_ids": ["S2", "S3"],
+"start": 0.0,
+"end": 0.0,
+"description": "...",
+"context_before": "...",
+"event_progression": "..."
+}
+]
+}
+
+The COMPLETE video duration is 18.417 seconds. Every start/end timestamp must be within 0.000 and 18.417 seconds. Keep the semantic timeline complete from the first moment through the final moment.

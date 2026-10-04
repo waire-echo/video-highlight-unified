@@ -1,0 +1,5 @@
+# Separate environment from vLLM/Qwen; TensorFlow supplies YouTube-8M features.
+torch
+tensorflow
+numpy
+opencv-python

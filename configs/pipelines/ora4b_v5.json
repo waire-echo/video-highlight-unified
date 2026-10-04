@@ -1,0 +1,27 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "ora_direct",
+  "model": {
+    "id": "OraRL/Video-ORA-4B",
+    "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+    "served_name": "Video-ORA-4B"
+  },
+  "dataset": {
+    "id": "aic_round2_426",
+    "manifest": "datasets/manifests/aic_round2_426.json"
+  },
+  "prompts": {
+    "ora/v5": "ora/v5"
+  },
+  "parameters": {
+    "window": 32,
+    "stride": 24,
+    "fps": 2,
+    "refine_fps": 4,
+    "side": 448,
+    "max_frames": 128,
+    "context": 3,
+    "pad": 0.25
+  },
+  "paths": {}
+}

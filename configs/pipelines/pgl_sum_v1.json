@@ -1,0 +1,20 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "pgl_sum",
+  "model": {
+    "id": "Mr.HiSum/PGL-SUM",
+    "revision": "aeb667f71239887034c2974062a341d312762867"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {},
+  "parameters": {
+    "temporal_mode": "pgl_sum",
+    "pgl_sample_fps": 1,
+    "pgl_boundary_grid_sec": 0.25,
+    "pgl_device": "auto"
+  },
+  "paths": {}
+}

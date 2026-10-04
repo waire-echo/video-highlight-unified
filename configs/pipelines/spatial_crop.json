@@ -1,0 +1,15 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "spatial_crop",
+  "model": {
+    "id": "YOLO11m + YOLO11m-pose + BoT-SORT",
+    "revision": "ultralytics-8.4.106"
+  },
+  "dataset": {
+    "id": "aic_round2_426",
+    "manifest": "datasets/manifests/aic_round2_426.json"
+  },
+  "prompts": {},
+  "parameters": {},
+  "paths": {}
+}

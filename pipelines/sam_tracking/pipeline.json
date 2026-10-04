@@ -1,0 +1,6 @@
+{
+  "pipeline": "sam_tracking",
+  "status": "unavailable",
+  "default_config": "",
+  "notes": "No SAM implementation, checkpoint provenance or experiment was found in accessible project sources."
+}

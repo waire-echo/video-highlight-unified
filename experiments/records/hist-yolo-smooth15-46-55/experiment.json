@@ -1,0 +1,28 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-yolo-smooth15-46-55",
+  "date": "unknown",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "baselines",
+  "model": {
+    "id": "YOLO; temporal model unknown"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {},
+  "config": null,
+  "git_commit": null,
+  "status": "historical-import",
+  "artifacts": [
+    {
+      "name": "prediction",
+      "sha256": "60b31d25e2807725675e5e70d3c636b22f245cb9f23f05995e460eb3718b6d01",
+      "size_bytes": 1792543,
+      "location_key": "hist-yolo-smooth15-46-55:prediction"
+    }
+  ],
+  "reproduction_gaps": [
+    "No matched code/config/commit/score receipt"
+  ],
+  "notes": "Score appears in filename only; do not rank as independently confirmed.",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

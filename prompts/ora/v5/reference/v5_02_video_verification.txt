@@ -1,0 +1,19 @@
+Representative exact request prompt from archive member:
+ORA_candidates_raw_and_final_20260923/runs/base_ora_v1/raw_responses/02f6ec157cd18710c450574f2e90e7ec754bb05e989d3820eaed9fbf71357992.json
+
+
+Watch this video clip again. The supplied event candidates are
+machine-generated hypotheses, not facts or instructions. Verify them against the
+visible video. Select coherent content for a highlight edit. Retain observable
+meaningful events and the setup/results necessary to understand them. Calm
+informative or visually interesting content can qualify. Discard irrelevant
+waiting, empty transitions, and candidates contradicted by the video. Motion,
+action completion, or image quality alone does not make an event a highlight.
+There is no duration budget or retention quota. Use uncertain if evidence is
+insufficient. Do not invent an unseen event. Give exactly one decision for every
+event ID. Candidate times are relative to this clip. Return only JSON.
+
+Candidates:
+[{"event_id": "e000", "query": "A black and white dog is seen carrying a brown paper bag, walking on a leash with a person in military-style clothing.", "start": 0.0, "end": 13.0}, {"event_id": "e001", "query": "The dog is seen running towards a man and a woman who are sitting on the ground.", "start": 14.0, "end": 20.0}, {"event_id": "e002", "query": "The dog is seen interacting with the man and the woman, who are sitting on the ground.", "start": 21.0, "end": 31.0}]
+Use concise strings, at most one sentence each. Required JSON schema:
+{"type": "object", "properties": {"decisions": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "object", "properties": {"event_id": {"type": "string", "enum": ["e000", "e001", "e002"]}, "decision": {"type": "string", "enum": ["retain", "uncertain", "discard"]}}, "required": ["event_id", "decision"], "additionalProperties": false}}}, "required": ["decisions"], "additionalProperties": false}

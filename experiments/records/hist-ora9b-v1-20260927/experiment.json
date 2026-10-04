@@ -1,0 +1,25 @@
+{
+  "schema_version": "experiment/v1",
+  "experiment_id": "hist-ora9b-v1-20260927",
+  "date": "2026-09-27; archive date",
+  "author": "historical-team-unconfirmed",
+  "pipeline": "ora_direct",
+  "model": {
+    "id": "OraRL/Video-ORA-9B",
+    "revision": "fc14c214ed1161ad05a7911740b0f6be89d1b6b9",
+    "served_name": "Video-ORA-9B"
+  },
+  "dataset": "aic_initial174",
+  "prompts": {
+    "ora/v5": "ora/v5"
+  },
+  "config": "experiments/records/hist-ora9b-v1-20260927/config.json",
+  "git_commit": "65fa242f6fbdf47c9ffdadf3dbed39fc8dbc902c",
+  "status": "historical-import",
+  "artifacts": [],
+  "reproduction_gaps": [
+    "Final spatial result and leaderboard score not verified"
+  ],
+  "notes": "launched; final submission not yet verified",
+  "score_evidence": "historical report / user report; not re-evaluated"
+}

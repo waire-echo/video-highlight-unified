@@ -1,0 +1,6 @@
+{
+  "pipeline": "qwen_direct",
+  "status": "comparison",
+  "default_config": "configs/pipelines/qwen_direct.json",
+  "notes": "Historical direct VLM temporal localization with validation/fallback. Not recommended as sole highlight selector."
+}

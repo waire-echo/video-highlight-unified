@@ -3,7 +3,7 @@
   "repo_id": "OraRL/Video-ORA-4B",
   "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
   "safetensors_total_parameters": 5174964736,
-  "parameter_limit": 8000000000,
+  "parameter_limit": 9000000000,
   "within_limit": true,
   "source": "https://huggingface.co/api/models/OraRL/Video-ORA-4B",
   "note": "Observed public checkpoint metadata; setup_gpu.sh checks metadata again and records the revision actually downloaded. This is not a peak VRAM measurement."

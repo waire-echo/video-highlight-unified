@@ -1,0 +1,8 @@
+{
+  "dataset_id": "synthetic_demo",
+  "version": "v1",
+  "source": "tools/make_demo.py, FFmpeg testsrc2",
+  "videos": 2,
+  "purpose": "Engineering checks only; no highlight accuracy claim",
+  "index": "datasets/examples/synthetic_index.json"
+}

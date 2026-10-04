@@ -1,0 +1,22 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "reze",
+  "model": {
+    "id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "revision": "local-snapshot-unresolved"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {
+    "reze/yesno-v1": "reze/yesno-v1"
+  },
+  "parameters": {
+    "temporal_mode": "window_score",
+    "window_semantic_mode": "reze_yesno",
+    "window_aggregation": "reze_otsu",
+    "vlm_load_in_4bit": true
+  },
+  "paths": {}
+}

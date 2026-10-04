@@ -1,0 +1,4 @@
+What is the main visible subject of this video clip?
+Options:
+{options}
+Answer with the option letter only within <answer>...</answer> tags. Example: <answer>A</answer>

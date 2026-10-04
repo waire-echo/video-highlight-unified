@@ -1,0 +1,2 @@
+
+Keep each query and evidence under 20 words. Return all required fields and in-range times.

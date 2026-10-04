@@ -1,0 +1,11 @@
+{
+  "version": "ora-semantic-proposal-v1",
+  "model": "Video-ORA-4B",
+  "model_revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+  "side": 336,
+  "max_frames": 128,
+  "max_sampled_frames": 120,
+  "max_fps": 2.0,
+  "prompt_sha256": "9ecfac985f6ebd6b24411e3cdabec9fb3e607380a68dbe06a36469827c1a8763",
+  "code_sha256": "4a1feb6b721c15e831c48480bcd9c9b880a415345fef1772dec84d6022e7b57b"
+}

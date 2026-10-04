@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-04",
+  "balanced": {
+    "videos": 174,
+    "different_temporal_rows": 0
+  },
+  "unit_tests": {"passed": 251, "failed": 0},
+  "cpu_baseline": {"videos": 2, "selected_frames": 40, "invalid": 0, "dataset": "synthetic_demo"},
+  "python_compile": "passed",
+  "exp07_original_zip_hash_verified": true,
+  "note": "Reproduction equivalence, not highlight accuracy. GPU inference not rerun."
+}

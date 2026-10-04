@@ -1,0 +1,496 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-04",
+  "old_worktree_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+  "old_worktree_has_uncommitted_changes": true,
+  "files": [
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\action_description.py",
+      "destination": "src\\video_highlight\\action_description.py",
+      "source_sha256": "794b1d37c497b6b2ccd2e95834fa560ce9745403019ea632655e74c98ccbec2f",
+      "destination_sha256_at_import": "e7aeae2073ccf4cb021152be5a6b8c02f0a100a949ce97c5cb60e176d1cd6451",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "e7aeae2073ccf4cb021152be5a6b8c02f0a100a949ce97c5cb60e176d1cd6451"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\geometry.py",
+      "destination": "src\\video_highlight\\geometry.py",
+      "source_sha256": "0db9600d5106e1726d8fbf322b49c1d88602c1725f69ae7539d8e15e27efb787",
+      "destination_sha256_at_import": "4d2df359239a7f247568dc543b33bb703b6ba3272cc70739953341f32447142e",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "4cbaa5b4de3369a293d53a5724b4142fd278da8b7d87075354590cfadb9f0711"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\global_event_frontend.py",
+      "destination": "src\\video_highlight\\global_event_frontend.py",
+      "source_sha256": "7b1fa3a548cb4a0623c05ba03576218049f3a633c3bcaf9b46d9c2a25b4aa07a",
+      "destination_sha256_at_import": "7b1fa3a548cb4a0623c05ba03576218049f3a633c3bcaf9b46d9c2a25b4aa07a",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "9353e81a346b3173ef98276b682c3985647d0ce80fc45334725e97c013ce4591"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\io_utils.py",
+      "destination": "src\\video_highlight\\io_utils.py",
+      "source_sha256": "aa578625756ac8e75f107c1e1c7eae9e59b96cbd28fc34f75bd4d91dd83a5e72",
+      "destination_sha256_at_import": "5924711c06cbbb1f8d0ca926addf140b349313ef478a1de672a9c40dd719d9f1",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "fff567b1d0b28eb57db120f23b998da3e8df61711c69f2529f97a7133d57ddc1"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\pgl_sum_frontend.py",
+      "destination": "src\\video_highlight\\pgl_sum_frontend.py",
+      "source_sha256": "2071262be627ca9bf210ab6a2d0bed8e66c0ca7ce402ceb0c7c09d8b6675ddfa",
+      "destination_sha256_at_import": "2071262be627ca9bf210ab6a2d0bed8e66c0ca7ce402ceb0c7c09d8b6675ddfa",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "451ed48eb56608dae21680a0526f1b5877894b691527252189aa015a9533b107"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\pgl_sum_model.py",
+      "destination": "src\\video_highlight\\pgl_sum_model.py",
+      "source_sha256": "998cf69b9bacd645db527e90f0abd6664a8f46563fe3ea3b74b9ee23effe284c",
+      "destination_sha256_at_import": "998cf69b9bacd645db527e90f0abd6664a8f46563fe3ea3b74b9ee23effe284c",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "998cf69b9bacd645db527e90f0abd6664a8f46563fe3ea3b74b9ee23effe284c"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\reze_aggregation.py",
+      "destination": "src\\video_highlight\\reze_aggregation.py",
+      "source_sha256": "d58209fd1bf27164fa2ece3c5e3bd234dc19fb8c840948f370f174208f5c9331",
+      "destination_sha256_at_import": "d58209fd1bf27164fa2ece3c5e3bd234dc19fb8c840948f370f174208f5c9331",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "d58209fd1bf27164fa2ece3c5e3bd234dc19fb8c840948f370f174208f5c9331"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\reze_frontend.py",
+      "destination": "src\\video_highlight\\reze_frontend.py",
+      "source_sha256": "6740f4a74c36d697ec5520c9bb0c1f45900de154fb4ca1df0753e8b0131e049b",
+      "destination_sha256_at_import": "6740f4a74c36d697ec5520c9bb0c1f45900de154fb4ca1df0753e8b0131e049b",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "6740f4a74c36d697ec5520c9bb0c1f45900de154fb4ca1df0753e8b0131e049b"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\reze_scoring.py",
+      "destination": "src\\video_highlight\\reze_scoring.py",
+      "source_sha256": "d6d2471f23a6b5c19d73fb4d1adf9b5983c4f646545116ab4b257c9fa254f7b0",
+      "destination_sha256_at_import": "e326f760f29da55db10bce7968058c5c8524a4928471151048eba0df33635d8e",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "cbbab05b556a3d1a65e5eca57d2fab229d3b815477c8dd829d7690560c900b98"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\score_curve.py",
+      "destination": "src\\video_highlight\\score_curve.py",
+      "source_sha256": "8d99853a3d4576a37bd62a14905a5e9b7cf795a85cb224615e6b09a1d2fc1e2a",
+      "destination_sha256_at_import": "8d99853a3d4576a37bd62a14905a5e9b7cf795a85cb224615e6b09a1d2fc1e2a",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "8d99853a3d4576a37bd62a14905a5e9b7cf795a85cb224615e6b09a1d2fc1e2a"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\spatial.py",
+      "destination": "src\\video_highlight\\spatial_legacy.py",
+      "source_sha256": "ce040dcd478cb0fb4a2d7a704e352009447cd77fc9aafac7e6229715828d5091",
+      "destination_sha256_at_import": "c8ec14db8ca6b51a1f4c85b0a09e039a2d23c833e7d5e5a86bc89cda1c89c643",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "c8ec14db8ca6b51a1f4c85b0a09e039a2d23c833e7d5e5a86bc89cda1c89c643"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal.py",
+      "destination": "src\\video_highlight\\temporal.py",
+      "source_sha256": "1b83964a0cf66791728ea2013bb4a9ecf81bc792ab873936e2c66b01e5597a3e",
+      "destination_sha256_at_import": "871b72452c05d6804c5268b03c38d1a8ac553dd6384585857cd6133a26a22c03",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "26a996814703d6bbfea93a131cf7885d228f469c83446aa519636d5862598a35"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal_frontend.py",
+      "destination": "src\\video_highlight\\temporal_frontend.py",
+      "source_sha256": "3d60fbf46032a3a0b1bdd9fdefa78a2638a60e9d609201267ce4a59c6a64bc98",
+      "destination_sha256_at_import": "bd20d97f27859063cbcc81aaa6d03c42ffc84fec2c26c88608c348aba67e0b08",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "bd20d97f27859063cbcc81aaa6d03c42ffc84fec2c26c88608c348aba67e0b08"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal_fusion.py",
+      "destination": "src\\video_highlight\\temporal_fusion.py",
+      "source_sha256": "d3006c2524f53e41782f86399c8e65c827cf6f330b88537d50c364af639b761e",
+      "destination_sha256_at_import": "66358afe1a913388107896c84bb7dffd8867fe48749f7cd64619e283cf345ff9",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "66358afe1a913388107896c84bb7dffd8867fe48749f7cd64619e283cf345ff9"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal_handoff_validation.py",
+      "destination": "src\\video_highlight\\temporal_handoff_validation.py",
+      "source_sha256": "838eca0bce92f7fcabcea490b07cbaa49d8668035ea94663f99806516ae4185a",
+      "destination_sha256_at_import": "838eca0bce92f7fcabcea490b07cbaa49d8668035ea94663f99806516ae4185a",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "838eca0bce92f7fcabcea490b07cbaa49d8668035ea94663f99806516ae4185a"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal_merge.py",
+      "destination": "src\\video_highlight\\temporal_merge.py",
+      "source_sha256": "15aa682c97f8f6d101f43c6f60b5cd1efa1bb2a538ca411e5f745cdfd956c9d9",
+      "destination_sha256_at_import": "15aa682c97f8f6d101f43c6f60b5cd1efa1bb2a538ca411e5f745cdfd956c9d9",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "15aa682c97f8f6d101f43c6f60b5cd1efa1bb2a538ca411e5f745cdfd956c9d9"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal_reaggregation.py",
+      "destination": "src\\video_highlight\\temporal_reaggregation.py",
+      "source_sha256": "57adf21934a6cf23b3bdc37ded6fd4109c4e2330f4ec5d3cf5e3fe89a75a89b8",
+      "destination_sha256_at_import": "57adf21934a6cf23b3bdc37ded6fd4109c4e2330f4ec5d3cf5e3fe89a75a89b8",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "57adf21934a6cf23b3bdc37ded6fd4109c4e2330f4ec5d3cf5e3fe89a75a89b8"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\temporal_signals.py",
+      "destination": "src\\video_highlight\\temporal_signals.py",
+      "source_sha256": "39b0730b50c91005c41da353ab4316f2a91db4a12e03fcfc79e5e67535d81ab4",
+      "destination_sha256_at_import": "39b0730b50c91005c41da353ab4316f2a91db4a12e03fcfc79e5e67535d81ab4",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "39b0730b50c91005c41da353ab4316f2a91db4a12e03fcfc79e5e67535d81ab4"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\timelens.py",
+      "destination": "src\\video_highlight\\timelens.py",
+      "source_sha256": "0ce044047caa3f9cc849f8a9dc31eac09e70b7be07390c4742f5f47099c99c8e",
+      "destination_sha256_at_import": "9c03a7ad46c415c388a4266ff63282a4a5e06e6af6267c479402642d9c7bdfe1",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "9c03a7ad46c415c388a4266ff63282a4a5e06e6af6267c479402642d9c7bdfe1"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\validation.py",
+      "destination": "src\\video_highlight\\validation.py",
+      "source_sha256": "95682360df2873640fd6116715e3569cf6361304d7ca48ab335081465728b968",
+      "destination_sha256_at_import": "0d4420210cbe5c7519facff533ade4049dec755e8450020f25514ff09adab65c",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "0d4420210cbe5c7519facff533ade4049dec755e8450020f25514ff09adab65c"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\windowing.py",
+      "destination": "src\\video_highlight\\windowing.py",
+      "source_sha256": "842418f4219a764c6356bf722fdf6746793488b099ffa7016544f3e610e8f387",
+      "destination_sha256_at_import": "842418f4219a764c6356bf722fdf6746793488b099ffa7016544f3e610e8f387",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "842418f4219a764c6356bf722fdf6746793488b099ffa7016544f3e610e8f387"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\window_score_frontend.py",
+      "destination": "src\\video_highlight\\window_score_frontend.py",
+      "source_sha256": "a1e9cec421bf3b2e719dc7f6d9d69a7f7f9325b3f290187c2853be9602a38b4d",
+      "destination_sha256_at_import": "a1e9cec421bf3b2e719dc7f6d9d69a7f7f9325b3f290187c2853be9602a38b4d",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "a1e9cec421bf3b2e719dc7f6d9d69a7f7f9325b3f290187c2853be9602a38b4d"
+    },
+    {
+      "source": "video-highlight-editing\\src\\video_highlight_editing\\window_scoring.py",
+      "destination": "src\\video_highlight\\window_scoring.py",
+      "source_sha256": "b2ba412dd51c5a0771b3f4c4ed37c13a582622c22558123ea8e58735f0f411a1",
+      "destination_sha256_at_import": "8c6b9da1ea02755fbf51849ff6a7b154aed3fd517075a3bc6e92690f60abc0b4",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "b922df022e8c4991aa6c2fe679d59e235dbf5268d3a648d8a43fc79894489376"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\run_modified_baseline.py",
+      "destination": "scripts\\run_modified_baseline.py",
+      "source_sha256": "1e17da572cf2a7f8a7f862970b7d2428448ccd86b1a07b539f39feeba5260156",
+      "destination_sha256_at_import": "5c32342b4d1c640b3a2ac6ff16e8814d3b2e115c0fbbb26ce82674a178847961",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "9fc26b60fccab563cab8f10191c331a8899ea8378d1e8da1ff41ee3b0fa048f9"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\run_temporal_frontend.py",
+      "destination": "scripts\\run_temporal_frontend.py",
+      "source_sha256": "1d034f981033b8d8c82d013fc0af3ddda396d39c5412a7d990ae8bc951c99f9d",
+      "destination_sha256_at_import": "458b5b95bfe95ae45bcb860ae3e4ea8b18b428fca8a1a58dd1f1f4a7ee1aa054",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "cc32aeab473f451887daa8126bc8830e1573631a4046de86e1722de84d99e639"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\package_temporal_hints.py",
+      "destination": "scripts\\package_temporal_hints.py",
+      "source_sha256": "dc6dcb18209ef7dfdfa9317a331f0b640d9bdf55ea40d664bbabc4dbf1e671d1",
+      "destination_sha256_at_import": "0aa343536266754a40c0f62cddbf19e223930b27faadd2a4603bb09d55407d80",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "0aa343536266754a40c0f62cddbf19e223930b27faadd2a4603bb09d55407d80"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\merge_temporal_shards.py",
+      "destination": "scripts\\merge_temporal_shards.py",
+      "source_sha256": "970ac1bd69c1d1d60dabce8193e533138d3a2f0a22965efa52cf32795759f26b",
+      "destination_sha256_at_import": "7c51e3d38dac79ae81fc73ef53fcb050486109e0afae1512bdd1303dc38fd41c",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "7c51e3d38dac79ae81fc73ef53fcb050486109e0afae1512bdd1303dc38fd41c"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\reaggregate_temporal_handoff.py",
+      "destination": "scripts\\reaggregate_temporal_handoff.py",
+      "source_sha256": "d202174cd594aa916507eac3658fbbf989bdfbe301aaa619c6604790d0047508",
+      "destination_sha256_at_import": "82763f996b6bf608c8a27e745d56cc8a426041d7eb66bf6d9e097a20622e701c",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "82763f996b6bf608c8a27e745d56cc8a426041d7eb66bf6d9e097a20622e701c"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\preview_temporal_handoff.py",
+      "destination": "scripts\\preview_temporal_handoff.py",
+      "source_sha256": "29c64833ea57c7516213c49ff216d99a0e5cb2fee53158cd8a0dfe2a8db5d0f2",
+      "destination_sha256_at_import": "29c64833ea57c7516213c49ff216d99a0e5cb2fee53158cd8a0dfe2a8db5d0f2",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "29c64833ea57c7516213c49ff216d99a0e5cb2fee53158cd8a0dfe2a8db5d0f2"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\validate_submission.py",
+      "destination": "scripts\\validate_submission.py",
+      "source_sha256": "1ddeeb18fb8e9e53f1f1aadfe97c06e77a00cfa891981141c32c0ad9d056470b",
+      "destination_sha256_at_import": "9eca7a194db233f21ecd45e66e2765a96762ff0cbe8936c8bd2f421bbabaed5a",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "f6745ec1b4eb371ae272773d7793124520b0b5c32a7154de40e741a36d933a35"
+    },
+    {
+      "source": "video-highlight-editing\\scripts\\visualize_submission.py",
+      "destination": "scripts\\visualize_submission.py",
+      "source_sha256": "78a62c45ed7d42fe7b5b3dd70f767e3e2ffa2e439e79cd2034773476325217c1",
+      "destination_sha256_at_import": "f73a635a264a365da8d4eea079d60c660b23403a4bde61520dd7a8595d40c851",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "1508dac7463bde9ca00be6bbcb144a191a7865c9638d4554f390bbc505d79441"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_geometry.py",
+      "destination": "tests\\test_geometry.py",
+      "source_sha256": "ab59d92cef6f7a227778ec5e6b7730305aabc950cb215fc527da6b660f0c398d",
+      "destination_sha256_at_import": "5b4be66fc41b79337071bf627cf330df8088e8b1809af44fb933434cfdd6c3e9",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "5b4be66fc41b79337071bf627cf330df8088e8b1809af44fb933434cfdd6c3e9"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_global_event_frontend.py",
+      "destination": "tests\\test_global_event_frontend.py",
+      "source_sha256": "6b02e91f5bd9365007c34839794979d441e46e50665d64c807404a073bdabdd3",
+      "destination_sha256_at_import": "4d75869b8b2931b2a507abd14ddde04d3793dab600502aeb2f41f6574d561117",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "4d75869b8b2931b2a507abd14ddde04d3793dab600502aeb2f41f6574d561117"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_package_temporal_hints.py",
+      "destination": "tests\\test_package_temporal_hints.py",
+      "source_sha256": "2302d0668c126b8528f524254f4f65d09244d989cb98693788ded8733b6e7473",
+      "destination_sha256_at_import": "f5e22847c2b9819422fd24c07a027084f5b7a307ae3e3e3a5c8480dc94a94169",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "f5e22847c2b9819422fd24c07a027084f5b7a307ae3e3e3a5c8480dc94a94169"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_pgl_sum_frontend.py",
+      "destination": "tests\\test_pgl_sum_frontend.py",
+      "source_sha256": "581c66c324c3ac3aeb93db5685a3635516e498916cb66272939fc1f0bee39a07",
+      "destination_sha256_at_import": "83ecf91bd718ed5114b079792262506453189a82715c41261384584dd62785b4",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "83ecf91bd718ed5114b079792262506453189a82715c41261384584dd62785b4"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_reze_aggregation.py",
+      "destination": "tests\\test_reze_aggregation.py",
+      "source_sha256": "fbe3b56e8d161ba3535c8f624d7ac99b11871324e3334059814ee93e15bc0d20",
+      "destination_sha256_at_import": "9b6afcc284d528f78f13f0023b8db78982d3f9b37c85e7a80b52d873b79a5cdb",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "9b6afcc284d528f78f13f0023b8db78982d3f9b37c85e7a80b52d873b79a5cdb"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_reze_frontend.py",
+      "destination": "tests\\test_reze_frontend.py",
+      "source_sha256": "dfcf7e83dbcc47bc650092bbc916ebec0e80f4c393acd1288a0f1cb80916fb10",
+      "destination_sha256_at_import": "2373cfcd47da5b05026441c2dde3c9a10f527aa9a6328b999b31e8c7cde7985b",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "2373cfcd47da5b05026441c2dde3c9a10f527aa9a6328b999b31e8c7cde7985b"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_reze_scoring.py",
+      "destination": "tests\\test_reze_scoring.py",
+      "source_sha256": "9b0860a66493f23fc5c9232e82656a28620ac6491bd008b1c55b283cc591764c",
+      "destination_sha256_at_import": "3b38326ac52e036c6ac220178464c9ded24a28760622eed097c164ef35393c1b",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "3b38326ac52e036c6ac220178464c9ded24a28760622eed097c164ef35393c1b"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_runner_config.py",
+      "destination": "tests\\test_runner_config.py",
+      "source_sha256": "ba49e1490de765ba058352eda1ef700bbe618d9d8859737d11b005529665641a",
+      "destination_sha256_at_import": "139aebf071590853d9eb96eda3f43b0c87163cfe25fed9f523486308390edf04",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "a64fa051e0f2a60d7087f49a2f8c14d4d81d9379522cfad7cab0d86f0304e095"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_spatial.py",
+      "destination": "tests\\test_spatial.py",
+      "source_sha256": "b6adc7df12c51e9684f3c873d9327ce080d897394c3a4c7c689bb745b068732e",
+      "destination_sha256_at_import": "cacbc852d7a3e8dde0f70f45b3d7fd763aa862200b1ea1a5395285538c18337f",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "cacbc852d7a3e8dde0f70f45b3d7fd763aa862200b1ea1a5395285538c18337f"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_temporal.py",
+      "destination": "tests\\test_temporal.py",
+      "source_sha256": "6292e3c654c5781aa815d3a1a90ee6d5c88e3c7d426ff3a2b31e4c1434a08ffc",
+      "destination_sha256_at_import": "e765bee0f3b1ad505bcb807eff214a84c96c7c92bf97d7214b77bd468374d829",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "e765bee0f3b1ad505bcb807eff214a84c96c7c92bf97d7214b77bd468374d829"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_temporal_frontend.py",
+      "destination": "tests\\test_temporal_frontend.py",
+      "source_sha256": "f7a15ea1e8c6c1d78e92660ee807682c3653a70c3e07801b2a7018ef95f187b4",
+      "destination_sha256_at_import": "24c0df0bab9ca95226a8439e78a4227fe178f40c361a5efeacb7e115cf7d755b",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "24c0df0bab9ca95226a8439e78a4227fe178f40c361a5efeacb7e115cf7d755b"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_temporal_handoff_validation.py",
+      "destination": "tests\\test_temporal_handoff_validation.py",
+      "source_sha256": "49d4354e4d5879dbb59e08178ffec89070a6c07204b6fd81d608a1935e1638df",
+      "destination_sha256_at_import": "05f68641a05cd0ef237774bbdef92047cb244751fac74a45bed30cd4432a5a82",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "05f68641a05cd0ef237774bbdef92047cb244751fac74a45bed30cd4432a5a82"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_temporal_merge.py",
+      "destination": "tests\\test_temporal_merge.py",
+      "source_sha256": "6b7b507a84428217b6c30f8cebe9c0c2e17e0e0854ee39d60fb1c2fe88bbf39d",
+      "destination_sha256_at_import": "983f0d7352aa15dc6a5cd579c24e5dc7d893dc36ae11a6ee569955dbc2bcfb7c",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "983f0d7352aa15dc6a5cd579c24e5dc7d893dc36ae11a6ee569955dbc2bcfb7c"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_temporal_reaggregation.py",
+      "destination": "tests\\test_temporal_reaggregation.py",
+      "source_sha256": "a41f2732ab8316c591fa25d7dd4ae2a05b9be28937d25922f1eba61119c85293",
+      "destination_sha256_at_import": "e0838fbe7ac6a5726eead029ca5176c6575a793be663bb88abe7398dc34163c9",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "e0838fbe7ac6a5726eead029ca5176c6575a793be663bb88abe7398dc34163c9"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_temporal_runner.py",
+      "destination": "tests\\test_temporal_runner.py",
+      "source_sha256": "26569accc584e9ecee8054fdfc65e51511e1facf373d5c4ee8042c334e64c8db",
+      "destination_sha256_at_import": "7d3b468a2021fa4f8df0702040ebe9bc845ad36e6df13d369d1733b778a3d88d",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "7d3b468a2021fa4f8df0702040ebe9bc845ad36e6df13d369d1733b778a3d88d"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_window_qwen_scoring.py",
+      "destination": "tests\\test_window_qwen_scoring.py",
+      "source_sha256": "bfa6bad4e29a19f43fe590bf8253b003fe772d41b583585eb22663672398be6e",
+      "destination_sha256_at_import": "2ebb76e8a68326aebf7e796e4bf74a064b1a6bd0bd8e5d440cbd6e4ed43e6593",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "2ebb76e8a68326aebf7e796e4bf74a064b1a6bd0bd8e5d440cbd6e4ed43e6593"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_window_score_frontend.py",
+      "destination": "tests\\test_window_score_frontend.py",
+      "source_sha256": "032113eb6c2ad3b9f0e7dc0bbc870701be3dc041725445ebbe1270e6153088ba",
+      "destination_sha256_at_import": "c5dc11fd08cabf2779cf6aac2be3f66279bf0496accb0ecf640f9a92955a590c",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "c5dc11fd08cabf2779cf6aac2be3f66279bf0496accb0ecf640f9a92955a590c"
+    },
+    {
+      "source": "video-highlight-editing\\tests\\test_window_score_signals.py",
+      "destination": "tests\\test_window_score_signals.py",
+      "source_sha256": "ae4b5b7e44a02f396ae11485c3b7f151c0946103d61d93bced57c39b06624705",
+      "destination_sha256_at_import": "e11d28920f619a1b32e2c38f545d9144cbae2f7ba608de0c86863c58c4c14ff5",
+      "source_commit": "78065e49bf05d1b0693547bc400442918c771edb",
+      "destination_sha256_after_refactor": "e11d28920f619a1b32e2c38f545d9144cbae2f7ba608de0c86863c58c4c14ff5"
+    },
+    {
+      "source": "TempSamp-R1\\baseline\\baseline_center.py",
+      "destination": "pipelines\\baselines\\official\\baseline_center.py",
+      "source_sha256": "cf71a9dae13bd54c59bfb66d5b7b5144a54fcc77f5430c06031c799c1b1cbc1a",
+      "destination_sha256_at_import": "807eba88e4e243578ad15e7fc05f55e4c745807fc84631537a5ad4ba91671b22",
+      "source_commit": "3fd4e851aa3310156dcef1f933751c3860aa34ac",
+      "destination_sha256_after_refactor": "807eba88e4e243578ad15e7fc05f55e4c745807fc84631537a5ad4ba91671b22"
+    },
+    {
+      "source": "TempSamp-R1\\baseline\\baseline_qwen.py",
+      "destination": "pipelines\\baselines\\official\\baseline_qwen.py",
+      "source_sha256": "2ec76f9599b08d34b0d3400e0611562793973a275ce50e4c16337f88cff6c402",
+      "destination_sha256_at_import": "fe84bc2aab2bed94ee80df34c4856a99f9b5df17885a6a7693e224c724880602",
+      "source_commit": "3fd4e851aa3310156dcef1f933751c3860aa34ac",
+      "destination_sha256_after_refactor": "fe84bc2aab2bed94ee80df34c4856a99f9b5df17885a6a7693e224c724880602"
+    },
+    {
+      "source": "E:\\AI\\sources\\MR.HiSum\\LICENSE",
+      "destination": "licenses\\MR.HiSum.txt",
+      "source_sha256": "24e411dbfdf0a9ab02d4679affcd7ad4e09e85648e4074d060fdfe0d52adf467",
+      "destination_sha256_at_import": "d27d2466a47b7b1537b09dc3985c31de396882a477e08f1a16af93e6190eb6c5",
+      "source_commit": "aeb667f71239887034c2974062a341d312762867",
+      "destination_sha256_after_refactor": "f637c120f239d23a8e9ff645fd0593f43e8901e5ac483db3ab131d21f9a20619"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\new_01_semantic_proposals.txt",
+      "destination": "prompts\\ora\\proposal-v1\\discovery.txt",
+      "source_sha256": "f29c347ced625c7b92557f46580fcd098c279b9fdd2ac293080c4f9012102dc5",
+      "destination_sha256_at_import": "405bd2cffd319c00eb9a3ab7f2838868e60a6e5761c136ef42d85da06a3d1934",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "405bd2cffd319c00eb9a3ab7f2838868e60a6e5761c136ef42d85da06a3d1934"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\new_structured_schema.json",
+      "destination": "prompts\\ora\\proposal-v1\\schema.json",
+      "source_sha256": "78f299a526e8e0b6a648974527451fdd7e6f512f57e412a1e902198befd9715b",
+      "destination_sha256_at_import": "60772b28a1c26ef680eb90576c65fbef42780f240879621d8ebf2fcb1895c28a",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "a6fa5b885e8a9082715598ee79e8d07634b98ada0b0271bddb4979197993f0ec"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\v5_01_discovery.txt",
+      "destination": "prompts\\ora\\v5\\reference\\v5_01_discovery.txt",
+      "source_sha256": "82d5cbdfb90275a00c6eb49b508870415fe06e3ed5643f78accfcfbcb6453e12",
+      "destination_sha256_at_import": "0817b798c964616421ec6c9212179885492601a42e505cbee8edec2d80074f38",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "0817b798c964616421ec6c9212179885492601a42e505cbee8edec2d80074f38"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\v5_02_video_verification.txt",
+      "destination": "prompts\\ora\\v5\\reference\\v5_02_video_verification.txt",
+      "source_sha256": "dd6f0b3d914d0da6ca782cbc803c720d85ae9cc5882d59f07c32af9732914dae",
+      "destination_sha256_at_import": "f5c7fe44edd797ec012f5f46cc27c435bf0442a41161c1a2b04e587c1b033eec",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "f5c7fe44edd797ec012f5f46cc27c435bf0442a41161c1a2b04e587c1b033eec"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\v5_03_temporal_grounding.txt",
+      "destination": "prompts\\ora\\v5\\reference\\v5_03_temporal_grounding.txt",
+      "source_sha256": "2c58c81c2c2e2dbef626fb922c8065791e1b05f917d2a9b1da962ab1c3cf90cd",
+      "destination_sha256_at_import": "89ff929d8e9d43545baf840b808d19eebbcee9a14c33ffaf7806f22fa4520bf3",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "89ff929d8e9d43545baf840b808d19eebbcee9a14c33ffaf7806f22fa4520bf3"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\v5_04_subject.txt",
+      "destination": "prompts\\ora\\v5\\reference\\v5_04_subject.txt",
+      "source_sha256": "8359e25d34de516e98868349d676d5a9d7f56251ca41a1e767cd3a489042000c",
+      "destination_sha256_at_import": "2fef3f4e5a6e93255e80cef3d647eee14242e3768fd6e308b600757d958ac70f",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "2fef3f4e5a6e93255e80cef3d647eee14242e3768fd6e308b600757d958ac70f"
+    },
+    {
+      "source": "previews\\ora_prompt_comparison_20260924\\prompts\\v5_05_native_repair.txt",
+      "destination": "prompts\\ora\\v5\\reference\\v5_05_native_repair.txt",
+      "source_sha256": "50e5d7fa55988605f88bc60ad46fee9934cb6a8db2f0f32088efe38c5e81b914",
+      "destination_sha256_at_import": "8688a9087009138c6ba65a3d36984b6e35a78ddbc0a421fedcd90f8e804d6ce4",
+      "source_commit": null,
+      "destination_sha256_after_refactor": "8688a9087009138c6ba65a3d36984b6e35a78ddbc0a421fedcd90f8e804d6ce4"
+    }
+  ],
+  "base_repository": {
+    "url": "https://github.com/thekfjie/video-highlight-pipeline",
+    "commit": "8f25180d6f5ab1692b25bcd60fe8200daabc72e1",
+    "git_history_retained": true,
+    "package_rename": "src/highlight_pipeline -> src/video_highlight; temporal -> ora"
+  },
+  "partial_reference_files": [
+    {
+      "source": "tmp/ora9b_v2_contracts.py",
+      "destination": "pipelines/baselines/ora9b_flow_reference/contracts.py"
+    },
+    {
+      "source": "tmp/ora9b_v2_tracking.py",
+      "destination": "pipelines/baselines/ora9b_flow_reference/tracking.py"
+    }
+  ]
+}

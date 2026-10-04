@@ -1,0 +1,6 @@
+{
+  "pipeline": "pgl_sum",
+  "status": "comparison",
+  "default_config": "configs/pipelines/pgl_sum_v1.json",
+  "notes": "Mr.HiSum PGL-SUM with YouTube-8M Inception/PCA features. Keep the checkpoint, feature model and academic-use license together."
+}

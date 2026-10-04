@@ -9,14 +9,14 @@ from unittest.mock import patch
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / 'src'))
-sys.path.insert(0, str(REPO / 'src/highlight_pipeline/temporal'))
+sys.path.insert(0, str(REPO / 'src/video_highlight/ora'))
 
-from highlight_pipeline.config import load_config
-from highlight_pipeline import cli
-from highlight_pipeline.runtime.resource_tuning import ResourceSnapshot, choose_plan, concurrency_limit
-from highlight_pipeline.runtime.stage2_prefetch import prefetch
-from highlight_pipeline.temporal.export_submission import inclusive_ranges, selected_frames
-from highlight_pipeline.temporal.validate_export import valid_event_interval
+from video_highlight.config import load_config
+from video_highlight import cli
+from video_highlight.runtime.resource_tuning import ResourceSnapshot, choose_plan, concurrency_limit
+from video_highlight.runtime.stage2_prefetch import prefetch
+from video_highlight.ora.export_submission import inclusive_ranges, selected_frames
+from video_highlight.ora.validate_export import valid_event_interval
 
 spec = importlib.util.spec_from_file_location('build_index', REPO / 'tools/build_index.py')
 index_tool = importlib.util.module_from_spec(spec)

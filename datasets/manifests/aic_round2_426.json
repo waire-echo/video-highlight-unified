@@ -1,0 +1,12 @@
+{
+  "dataset_id": "aic_round2_426",
+  "videos": 426,
+  "target_ratio_counts": {
+    "16:9": 303,
+    "9:16": 123
+  },
+  "source": "Organizer round-2 dataset; local media and full index excluded from Git",
+  "archive_sha256": "8e4aa94f19c4e495952300ae19d37019fea4d2cbb3237120934c6b8d546c28e3",
+  "ground_truth_available": false,
+  "access": "local only"
+}

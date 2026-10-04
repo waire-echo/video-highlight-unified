@@ -1,0 +1,6 @@
+{
+  "pipeline": "spatial_crop",
+  "status": "runnable",
+  "default_config": "configs/pipelines/spatial_crop.json",
+  "notes": "YOLO11m, pose, BoT-SORT and strict frozen-frame validation. Run with --action spatial or prepare."
+}

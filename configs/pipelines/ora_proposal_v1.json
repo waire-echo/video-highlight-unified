@@ -1,0 +1,23 @@
+{
+  "schema_version": "pipeline-config/v1",
+  "pipeline": "ora_proposal",
+  "model": {
+    "id": "OraRL/Video-ORA-4B",
+    "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+    "served_name": "Video-ORA-4B"
+  },
+  "dataset": {
+    "id": "aic_initial174",
+    "manifest": "datasets/manifests/aic_initial174.json"
+  },
+  "prompts": {
+    "ora/proposal-v1": "ora/proposal-v1"
+  },
+  "parameters": {
+    "side": 336,
+    "max_frames": 128,
+    "max_sampled_frames": 120,
+    "max_fps": 2
+  },
+  "paths": {}
+}

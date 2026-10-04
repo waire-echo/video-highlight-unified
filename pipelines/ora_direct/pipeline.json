@@ -1,0 +1,6 @@
+{
+  "pipeline": "ora_direct",
+  "status": "runnable",
+  "default_config": "configs/pipelines/ora4b_v5.json",
+  "notes": "Video-ORA v5: event discovery, subject QA, video review, grounding/repair, PTS export. 4B and 9B share implementation."
+}

@@ -1,0 +1,6 @@
+# Install a CUDA-compatible torch build separately in your Qwen environment.
+transformers==5.5.4
+qwen-vl-utils==0.0.14
+accelerate
+bitsandbytes
+torchcodec==0.10.0

@@ -1,0 +1,6 @@
+{
+  "pipeline": "qwen_window",
+  "status": "comparison",
+  "default_config": "configs/pipelines/qwen_window_v1.json",
+  "notes": "Historical Qwen window scoring. Saturation and first-event bias are documented; not the recommended default."
+}

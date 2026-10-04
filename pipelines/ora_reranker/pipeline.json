@@ -1,0 +1,6 @@
+{
+  "pipeline": "ora_reranker",
+  "status": "reference",
+  "default_config": "configs/pipelines/ora_reranker_reference.json",
+  "notes": "40-point reported result and design instructions found. Actual reranker code, model revision and candidate/logit logs are missing."
+}

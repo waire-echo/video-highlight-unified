@@ -1,0 +1,9 @@
+{
+  "metric_type": "engineering",
+  "videos": 426,
+  "frames": 189844,
+  "invalid_count": 0,
+  "changed_frames": 100185,
+  "changed_videos": 255,
+  "empty_videos": 4
+}

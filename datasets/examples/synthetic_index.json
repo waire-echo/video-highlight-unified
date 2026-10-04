@@ -1,0 +1,4 @@
+[
+  {"video_id": "wide", "targetRatioWH": [16, 9]},
+  {"video_id": "portrait", "targetRatioWH": [9, 16]}
+]
