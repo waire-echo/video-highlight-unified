@@ -31,7 +31,8 @@ def release(name):
     source = (REPO / value["source_root"]).resolve()
     if not source.is_relative_to(REPO):
         raise ValueError("Release source_root must be inside the repository")
-    for relative, expected in value["source_files"].items():
+    sealed_files = {**value["source_files"], **value["provenance_files"]}
+    for relative, expected in sealed_files.items():
         file = (source / relative).resolve()
         if not file.is_relative_to(source) or sha256(file) != expected:
             raise ValueError("Release source changed: " + relative + "; register a new version")

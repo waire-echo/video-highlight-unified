@@ -28,5 +28,9 @@
   "gpu_validation": "pending: no GPU currently allocated",
   "equivalence": "new named experiment; no claim of baseline equivalence",
   "entrypoint": "experiments/scene_general_v3/temporal.py",
-  "preflight_entrypoint": "experiments/scene_general_v3/preflight.py"
+  "preflight_entrypoint": "experiments/scene_general_v3/preflight.py",
+  "provenance_files": {
+    "provenance/scene_general_v3_baseline_20261010.json": "b66f7918b8d39a49f050b5a078d38f8d5480140723abec8c9cb380e4fa304095",
+    "provenance/ora_model_provenance.json": "f392a635b430d36c8dbb783d29c8465f0a87d1f295dcced4f7553e9dd714baec"
+  }
 }

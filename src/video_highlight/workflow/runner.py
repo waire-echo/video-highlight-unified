@@ -116,6 +116,7 @@ def frozen_inputs(plan):
         source_files[file.relative_to(REPO).as_posix()] = sha256(file)
     descriptor = release(config["version"])
     source_files.update({str(Path(descriptor["source_root"]) / k): v for k, v in descriptor["source_files"].items()})
+    source_files.update({str(Path(descriptor["source_root"]) / k): v for k, v in descriptor["provenance_files"].items()})
     runtime = {}
     check = "import importlib.metadata as m,json,sys\npackages={}\nfor x in ['numpy','opencv-python-headless','scipy','requests','Pillow','torch','vllm','transformers']:\n try: packages[x]=m.version(x)\n except m.PackageNotFoundError: packages[x]=None\nprint(json.dumps({'python':sys.version,'packages':packages}))"
     for role in ("client_python", "temporal_python"):
@@ -206,6 +207,7 @@ def managed_model(command, port, state, env):
                                text=True, capture_output=True, timeout=15)
         if probe.returncode or not probe.stdout.strip():
             raise ValueError("No GPU is available; allocate a GPU before inference")
+        state.event("gpu_checked", gpu=probe.stdout.strip(), port=port)
         with socket.socket() as check:
             check.bind(("127.0.0.1", port))
         log = state.root / "logs" / (state.state["stage"] + "-model.log")
