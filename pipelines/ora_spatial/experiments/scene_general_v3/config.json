@@ -1,0 +1,12 @@
+{
+  "sample_interval_seconds": 1.0,
+  "window_intervals": 4,
+  "hold_seconds": 2.0,
+  "minimum_coverage": 0.97,
+  "minimum_width_fraction": 0.50,
+  "context_factor": 1.18,
+  "maximum_log_zoom_per_second": 0.18,
+  "maximum_ranking_candidates": 7,
+  "identity_prompt": "Images are chronological references followed by CURRENT. Green rectangles identify proposed attention regions, not verified labels. Determine whether the CURRENT green region represents the SAME main subject or evolving event as BOTH references. Allow camera motion, partial visibility, scale changes, and an event gradually becoming visible. Shared color or background alone is not identity. Do not switch to a different object when the original focus leaves view. Answer exactly SAME (same visible focus), EVOLVING (same event with changing visible extent), DIFFERENT (another object/region), ABSENT (reference focus is out of view), or UNCERTAIN (blur/occlusion/insufficient evidence).",
+  "relocalize_prompt": "The first images show the established focus inside green rectangles. In the LAST unannotated CURRENT image, locate that SAME subject or evolving event using current visible evidence. Do not replace a departing subject with an unrelated object. Distinguish visible, partial, occluded, out_of_view, and uncertain. For visible/partial, give bbox_2d for the meaningful visible extent, normalized 0..1000 relative to the LAST image only. For other states bbox_2d must be null. Return only <answer>{\"state\":\"visible|partial|occluded|out_of_view|uncertain\",\"bbox_2d\":[x1,y1,x2,y2]}</answer> with one actual state, not the list of choices."
+}

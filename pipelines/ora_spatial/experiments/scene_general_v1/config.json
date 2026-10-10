@@ -1,0 +1,21 @@
+{
+  "sample_count": 5,
+  "ora_proposal_count": 3,
+  "image_max_side": 960,
+  "motion_lag_seconds": 0.20,
+  "map_size": [160, 90],
+  "scales": [0.50, 0.75],
+  "static_range_crop_fraction": 0.12,
+  "max_pan_crop_per_second": 0.18,
+  "path_jump_penalty": 0.25,
+  "candidate_limit": 7,
+  "rank_tile_width": 256,
+  "ranking_max_pixels": 1900000,
+  "max_proposal_tokens": 256,
+  "max_choice_tokens": 32,
+  "endpoint": "http://127.0.0.1:8008/v1",
+  "model": "Video-ORA-4B",
+  "seed": 20261010,
+  "proposal_prompt": "Locate the most visually important localized subject or active event in this image. Use visible image evidence only. The region should identify the focus of attention, rather than automatically enclosing the entire background. Do not select subtitles, logos, borders, or watermarks. If the whole scene has no identifiable localized focus, return an empty list. Return only <answer>[{\"bbox_2d\":[x1,y1,x2,y2]}]</answer>, with xyxy coordinates normalized to 0..1000, or <answer>[]</answer>.",
+  "ranking_prompt": "This contact sheet compares possible crops of the SAME video segment. The ORIGINAL row provides uncropped context. Each lettered row is one candidate crop, shown at the same ordered times from left to right. Choose the crop that best preserves the main visually meaningful subject or event across time, with enough surrounding context to understand it, while removing uninformative margins. Consider visual activity, continuity, important parts cut off, unnecessary empty space, and distracting text or borders. A bright patch or motion alone is not necessarily the subject. Do not always choose the tightest crop or the widest crop. Keep a wide view when the overall scene or multiple regions are essential. Judge only these images; do not infer a target from a filename. Answer with exactly one candidate letter inside <answer>...</answer>."
+}

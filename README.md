@@ -28,8 +28,9 @@ video-highlight-unified/
 │   ├── pgl_sum/                重要度模型对照
 │   ├── baselines/              center/motion、官方与旧流程参考
 │   ├── spatial_crop/           YOLO/Pose/跟踪/裁剪
+│   ├── ora_spatial/            ORA画框、复核、SAM传播和虚拟镜头
 │   ├── editing/                预览/成片工具
-│   └── sam_tracking/           暂无实现，明确标记
+│   └── sam_tracking/           旧独立入口；实现已在ora_spatial中恢复
 ├── src/video_highlight/        公共算法、IO、校验、运行和实验管理
 ├── configs/pipelines/          JSON 实验配置
 ├── prompts/                    按任务/版本保存文本/schema/构造器
@@ -76,6 +77,8 @@ python vh.py run --config configs/pipelines/ora4b_v5.json --experiment 20261004-
 ```
 
 已有时间结果时，路径配置增加 `temporal_handoff`，使用 `spatial_crop.json` 和 `--action spatial`，无卡先用 `--action prepare`。详细操作见 [运行说明](docs/running.md)。
+
+后续 ORA 语义画框、框复核、SAM 传播和自适应虚拟镜头位于 [`pipelines/ora_spatial/`](pipelines/ora_spatial/README.md)。该路线保持高光时间帧不变，目前是服务器源码快照，49 项测试通过，但没有已确认的完整 GPU 复跑或官方分数。
 
 ## 新实验与历史实验
 

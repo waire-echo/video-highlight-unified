@@ -1,0 +1,19 @@
+{
+  "subject_context_factor": 1.8,
+  "subject_min_width_fraction": 0.45,
+  "scene_min_width_fraction": 0.60,
+  "containment_margin": 0.08,
+  "yolo_min_confidence": 0.55,
+  "yolo_max_age_seconds": 0.10,
+  "blur_relative_threshold": 0.30,
+  "bridge_seconds": 0.80,
+  "hold_seconds": 0.60,
+  "exit_min_missing_seconds": 0.40,
+  "edge_fraction": 0.04,
+  "exit_velocity_fraction": 0.06,
+  "appearance_min_similarity": 0.60,
+  "bridge_max_speed_fraction": 0.8,
+  "grid_hz": 10,
+  "smoothing_acceleration": 3.0,
+  "max_log_zoom_per_second": 0.35
+}

@@ -1,0 +1,14 @@
+{
+  "source_sha256": "6b7b200f54bafc5625aef3aa19e19d56a62384d5f03c3b09fc8e65adaf666fb0",
+  "baseline_sha256": "52dea9d6a8782423db59efb637cefaa65d785170d5921a521a4c3af50bd5a608",
+  "npz_sha256": "d0cbc1d9fad4ace91142fd2fa35d31acdfd65568fb65bcdbe3c59819d1a3d972",
+  "columns": [
+    "frame",
+    "x1",
+    "y1",
+    "x2",
+    "y2",
+    "confidence"
+  ],
+  "videos": 426
+}

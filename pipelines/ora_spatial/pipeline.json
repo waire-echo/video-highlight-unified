@@ -1,0 +1,7 @@
+{
+  "pipeline": "ora_spatial",
+  "status": "experimental-runnable",
+  "default_config": "pipelines/ora_spatial/config/default.json",
+  "entrypoint": "pipelines/ora_spatial/scripts/run_gpu.sh",
+  "notes": "Preserves temporal selections; uses ORA grounding, verification, optional SAM propagation and constrained virtual-camera reframing."
+}
