@@ -203,8 +203,11 @@ def managed_model(command, port, state, env):
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as error:
             raise ValueError("Another workflow owns the GPU") from error
-        probe = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
-                               text=True, capture_output=True, timeout=15)
+        try:
+            probe = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"],
+                                   text=True, capture_output=True, timeout=15)
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise ValueError("No GPU is available; nvidia-smi is unavailable. Allocate a GPU before inference") from error
         if probe.returncode or not probe.stdout.strip():
             raise ValueError("No GPU is available; allocate a GPU before inference")
         state.event("gpu_checked", gpu=probe.stdout.strip(), port=port)
@@ -413,6 +416,14 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Versioned temporal → handoff → scene-v3 → validation workflow")
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("versions", help="List explicit supported releases")
+    for action in ("webui", "tui"):
+        ui = sub.add_parser(action, help="Use the shared workflow controller")
+        ui.add_argument("--local", type=Path, required=True)
+        ui.add_argument("--runs-root", type=Path)
+        if action == "webui":
+            ui.add_argument("--port", type=int, default=8189)
+        else:
+            ui.add_argument("--smoke", action="store_true", help="Draw once in a real terminal, then exit")
     for action in ("plan", "run"):
         command = sub.add_parser(action)
         command.add_argument("--config", type=Path, required=True)
@@ -434,6 +445,13 @@ def main(argv=None):
     io.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
+        if args.action == "webui":
+            from .web import serve
+            serve(args.local, args.port, args.runs_root)
+            return 0
+        if args.action == "tui":
+            from .terminal import tui
+            return tui(args.local, args.runs_root, args.smoke)
         if args.action == "versions":
             result = [{k: row[k] for k in ("id", "mode", "input_modes", "io_profile", "gpu_validation")} for row in versions()]
         elif args.action in {"plan", "run"}:

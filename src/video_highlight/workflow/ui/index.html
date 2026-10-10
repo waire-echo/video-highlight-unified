@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="workflow-token" content="SESSION_TOKEN">
+  <title>ORA 工作台 · 视频高光</title><link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="#"><span class="brand-icon">◈</span><div>ORA<span>视频高光工作台</span></div></a>
+  <div class="side-label">WORKSPACE</div>
+  <button class="nav active" data-view="new">＋ 新建运行</button>
+  <button class="nav" data-view="history">◷ 运行与产物 <span id="run-count">0</span></button>
+  <button class="nav" data-view="versions">◇ 版本与基准</button>
+  <div class="sidebar-bottom"><span class="dot"></span> 本机服务 · SSH 访问<br><small>core 与冻结算法保持原样</small></div>
+</aside>
+<main>
+  <header><div class="breadcrumb">工作空间 <span>/</span> scene_general_v3</div><span class="baseline-tag">基准已冻结</span></header>
+  <div class="page-heading"><div><div class="eyebrow">VIDEO HIGHLIGHT / WORKFLOW</div><h1 id="page-title">新建运行</h1><p id="page-subtitle">选择版本，检查执行计划，再开始处理。</p></div><button id="refresh" class="button secondary">↻ 刷新状态</button></div>
+  <section class="metrics" aria-label="服务器资源">
+    <div><span>GPU</span><strong id="gpu-name">检查中</strong><small id="gpu-detail">—</small></div>
+    <div><span>CPU 配额</span><strong id="cpu">—</strong><small id="cpu-detail">—</small></div>
+    <div><span>可用内存</span><strong id="ram">—</strong><small>容器实际资源</small></div>
+    <div><span>可用磁盘</span><strong id="disk">—</strong><small>运行目录所在磁盘</small></div>
+  </section>
+  <div id="notice" class="notice" role="status">读取服务器状态…</div>
+  <section id="view-new">
+    <div class="workflow-strip"><span><b>01</b> 时间选择</span><i>→</i><span><b>02</b> PTS 交接</span><i>→</i><span><b>03</b> 空间裁剪</span><i>→</i><span><b>04</b> 校验与交付</span></div>
+    <div class="workspace-grid">
+      <form id="run-form" class="card">
+        <div class="card-heading"><div><h2>配置本次运行</h2><p>各个版本使用独立目录，帧号和 PTS 原样保留。</p></div><span class="step">1 / 2</span></div>
+        <label>流程版本<select id="version" required></select></label>
+        <div id="version-note" class="hint"></div>
+        <div class="form-row"><label>输入方式<select id="input-mode"><option value="baseline">已有 baseline · 只跑空间</option><option value="handoff">已有时间交接 · 接入空间</option><option value="temporal">原视频 · 完整时间→空间</option></select></label><label>视频 IDs<input id="ids" value="all" placeholder="all 或 0,1,4"><small>按原 manifest 顺序；交接文件 IDs 必须与此列表一致。全量交接请选 all。</small></label></div>
+        <label>本次运行目录<input id="run-root" required spellcheck="false"><small>必须使用全新目录。历史任务请在“运行与产物”续跑。</small></label>
+        <label>原视频目录<input id="video-dir" required spellcheck="false"></label>
+        <details><summary>输入、模型与外部数据路径 <span>展开编辑</span></summary>
+          <label>外部数据根目录<input id="data-root" required spellcheck="false"></label>
+          <label>模型运行环境目录<input id="runtime-root" required spellcheck="false"></label>
+          <label>模型权重目录<input id="model-dir" spellcheck="false"></label>
+          <label id="baseline-field">baseline ZIP<input id="baseline" spellcheck="false"></label>
+          <div id="handoff-fields"><label>时间交接 JSONL<input id="temporal-handoff" spellcheck="false"></label><label>精确高光帧 JSONL<input id="highlight-frames" spellcheck="false"></label></div>
+          <label id="index-field">时间阶段 test_index<input id="test-index" spellcheck="false"></label>
+        </details>
+        <button class="button primary" type="submit" id="plan-button">生成执行计划 <span>→</span></button>
+      </form>
+      <div class="right-column">
+        <section class="card plan-card"><div class="card-heading"><div><h2>执行计划</h2><p>计划展开为实际路径和命令。</p></div><span class="step">2 / 2</span></div>
+          <div id="plan-empty" class="empty"><span>◇</span><h3>先确认本次配置</h3><p>生成计划后，可以查看阶段、运行命令与正式输出位置。</p></div>
+          <div id="plan-content" hidden><div id="plan-stages"></div><div class="output-path"><small>最终提交</small><code id="submission-path"></code></div><details><summary>完整执行计划 JSON</summary><pre id="plan-json"></pre></details></div>
+          <div class="actions"><button id="prepare-button" class="button secondary" disabled>准备输入 · CPU</button><button id="start-button" class="button primary" disabled>开始全流程</button></div>
+          <button id="temporal-button" class="button text-button" hidden disabled>只完成时间阶段</button>
+        </section>
+        <section class="card baseline-card"><div class="eyebrow">REPRODUCIBILITY</div><h3>清楚知道自己运行哪个版本</h3><p>兼容版保留原 v3 算法和参数。优化版单独登记；每次运行都保存源码、输入、模型和配置指纹。</p><div><span>原始帧集合</span><b>严格校验</b></div><div><span>GPU 新推理验证</span><b class="pending">待申请 GPU</b></div></section>
+      </div>
+    </div>
+  </section>
+  <section id="view-history" hidden><div class="card"><div class="card-heading"><div><h2>运行记录</h2><p>新任务与历史 v3 结果在同一个地方查看。</p></div><span id="history-count" class="step"></span></div><div id="runs" class="run-list"></div></div></section>
+  <section id="view-versions" hidden><div class="card"><div class="card-heading"><div><h2>可选择的版本</h2><p>版本选择不会修改 core。源文件与服务参数由清单锁定。</p></div></div><div id="version-cards"></div></div></section>
+  <section id="run-detail" class="card" hidden><div class="card-heading"><div><h2 id="detail-title"></h2><p id="detail-path"></p></div><button class="button secondary" id="close-detail">收起</button></div><div id="detail-status"></div><div class="actions"><button id="resume-prepare" class="button secondary">续跑准备输入</button><button id="resume-full" class="button primary">续跑全流程</button><button id="stop-job" class="button danger" hidden>停止本界面任务</button></div><div id="detail-artifacts" class="actions"></div><pre id="detail-log" class="log"></pre><details><summary>状态与产物记录</summary><pre id="detail-json"></pre></details></section>
+  <footer>本机自托管 · 原视频与模型保留在服务器 · 新 GPU 全链路结果待验收</footer>
+</main>
+</body></html>

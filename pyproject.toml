@@ -24,3 +24,4 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 video_highlight = ["spatial/*.yaml"]
+"video_highlight.workflow" = ["ui/*.html", "ui/*.css", "ui/*.js"]

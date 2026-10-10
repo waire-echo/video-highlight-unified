@@ -32,7 +32,7 @@ python vh.py workflow plan --config configs/workflows/compat.json \
 
 相对路径以对应配置文件所在目录为起点，虚拟环境解释器的符号链接保持原样。`run_root` 必须与历史数据、视频、模型和运行环境分开。`plan` 打印实际路径、完整命令、阶段、端口与资源策略，不创建运行目录、不启动模型。
 
-`ids` 为 `all` 或按原 manifest 顺序的字符串列表。小样本复制运行配置并填写 IDs、新 run_root；前半阶段的 `test_index` 必须仅包含同一组、同一顺序的 IDs。
+`ids` 为 `all` 或按原 manifest 顺序的字符串列表。小样本复制运行配置并填写 IDs、新 run_root；前半阶段的 `test_index` 必须仅包含同一组、同一顺序的 IDs。已有 handoff 与 highlight_frames 必须恰好包含所选 IDs；现有全量交接配 `all`，小样本先准备对应的交接文件。
 
 ## 四种输入与运行方式
 
@@ -114,6 +114,6 @@ python vh.py workflow validate --data-root /data/scene-general-inputs \
 
 `spatial/performance.json` 记录解码量、decoder 打开次数、缓存内存和导出耗时。CPU 验证证明受检样本的解码字节及缓存重导出关系；申请 GPU 后仍需以新目录对比请求、模型回答和最终 JSONL。全量 GPU 耗时和比赛成绩尚无新结论。
 
-TUI、三路同步对比和其他时间模型自动适配仍在后续计划中，之后应复用此状态机和契约。
+TUI 与 WebUI 已通过同一个 Controller 接入此状态机。使用 `workflow tui --local ...` 或 `workflow webui --local ...`，详见 [界面使用说明](scene_workflow_ui.md)。三路同步对比、预计剩余时间和其他时间模型自动适配仍在后续计划中。
 
 本次实际检查范围与证据见 [验证记录](scene_workflow_validation.md)。

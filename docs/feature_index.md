@@ -14,4 +14,6 @@
 | 解码性能与等价检查 | `workflow verify-io` | 实际样本通过 |
 | 其他研究路线 | `vh.py run --config configs/pipelines/...` | 保留 |
 | 旧 E1/E2/E3 | `pipelines/ora_spatial/scripts/run_gpu.sh` | 历史入口 |
-| TUI / 三路同步对比 | 产品化计划 | 待开发 |
+| TUI | `workflow tui --local ...` | SSH 终端与 CPU 准备实测通过 |
+| WebUI | `workflow webui --local ...` | 已部署，浏览器、CPU 准备/续跑、ZIP 下载通过 |
+| 三路同步对比 / 预计剩余时间 | 产品化计划 | 待开发 |
