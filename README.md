@@ -84,6 +84,8 @@ python vh.py run --config configs/pipelines/ora4b_v5.json --experiment 20261004-
 
 后续两阶段 TUI、文件识别、错误查看、三路对比视频和文档整理按 [`pipelines/ora_spatial/PRODUCTIZATION_PLAN.md`](pipelines/ora_spatial/PRODUCTIZATION_PLAN.md) 实施，所有功能先保持基准兼容模式。
 
+服务器交接、当前运行状态、完整结果位置和重跑命令见 [`pipelines/ora_spatial/SERVER_HANDOFF.md`](pipelines/ora_spatial/SERVER_HANDOFF.md)。
+
 ## 新实验与历史实验
 
 先提交代码、配置和 Prompt，再登记。模型填写确切 revision，作者填实际运行的人。
