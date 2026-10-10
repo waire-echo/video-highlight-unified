@@ -78,7 +78,11 @@ python vh.py run --config configs/pipelines/ora4b_v5.json --experiment 20261004-
 
 已有时间结果时，路径配置增加 `temporal_handoff`，使用 `spatial_crop.json` 和 `--action spatial`，无卡先用 `--action prepare`。详细操作见 [运行说明](docs/running.md)。
 
-后续 ORA 语义画框、框复核、SAM 传播和自适应虚拟镜头位于 [`pipelines/ora_spatial/`](pipelines/ora_spatial/README.md)。该路线保持高光时间帧不变，目前是服务器源码快照，49 项测试通过，但没有已确认的完整 GPU 复跑或官方分数。
+后续 ORA 语义画框、框复核、SAM 传播和自适应虚拟镜头位于 [`pipelines/ora_spatial/`](pipelines/ora_spatial/README.md)。该路线保持高光时间帧不变，49 项测试通过；`scene_general_v3` 已在 RTX 4090 上完成 426 个视频的全量运行和结果合并，目前尚无官方分数。
+
+2026-10-10 至 2026-10-11 完成的 `scene_general_v3` 已固定为后续工程优化基准；源码、环境、模型、非 Git 输入、实际结果指纹和空服务器恢复方法见 [`pipelines/ora_spatial/REPRODUCE_SCENE_GENERAL_V3.md`](pipelines/ora_spatial/REPRODUCE_SCENE_GENERAL_V3.md)。
+
+后续两阶段 TUI、文件识别、错误查看、三路对比视频和文档整理按 [`pipelines/ora_spatial/PRODUCTIZATION_PLAN.md`](pipelines/ora_spatial/PRODUCTIZATION_PLAN.md) 实施，所有功能先保持基准兼容模式。
 
 ## 新实验与历史实验
 

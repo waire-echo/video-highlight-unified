@@ -1,6 +1,10 @@
 # ORA spatial reframing
 
-状态：`experimental-runnable`。这是 2026-10-10 从授权 GPU 服务器取得的源码快照，代码可测试；尚无官方成绩，也没有在本机重跑 426 条完整 GPU 流程。
+状态：`experimental-runnable`。这是 2026-10-10 从授权 GPU 服务器取得并逐文件核对的源码快照。49 项测试通过，`scene_general_v3` 已在 RTX 4090 服务器完成 426 个视频的全量运行和合并；目前尚无官方成绩。
+
+`scene_general_v3` 当前服务器基准的源码、运行环境、模型和外部输入恢复方式见 [`REPRODUCE_SCENE_GENERAL_V3.md`](REPRODUCE_SCENE_GENERAL_V3.md)。后续线程、TUI、README 和性能优化均以该基准为起点。
+
+两阶段控制、路径选择、进度/错误查看、文件识别、三路对比视频和 README 收口的实施顺序见 [`PRODUCTIZATION_PLAN.md`](PRODUCTIZATION_PLAN.md)。
 
 ## 输入、处理和输出
 
