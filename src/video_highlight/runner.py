@@ -162,8 +162,13 @@ def execute(config, experiment_id, *, local=None, dry_run=False, action="tempora
 
 
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "workflow":
+        from .workflow.runner import main as workflow_main
+        return workflow_main(argv[1:])
     parser = argparse.ArgumentParser(description="Unified video highlight experiment entry")
     sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("workflow", help="Versioned temporal, handoff and scene-v3 workflow; workflow --help for actions")
     run = sub.add_parser("run")
     run.add_argument("--config", type=Path)
     run.add_argument("--experiment", required=True)

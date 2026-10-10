@@ -1,0 +1,7 @@
+{
+  "schema_version": "scene-workflow/v1",
+  "version": "scene-general-v3-io-v1",
+  "input_mode": "baseline",
+  "ids": "all",
+  "paths": {}
+}

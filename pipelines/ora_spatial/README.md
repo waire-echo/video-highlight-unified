@@ -1,5 +1,7 @@
 # ORA spatial reframing
 
+规范化开发与版本切换使用根目录 `vh.py workflow`，见 [统一运行说明](../../docs/scene_workflow.md)。固定 v3 源码继续保留，优化在外部适配层中显式选择。
+
 状态：`experimental-runnable`。这是 2026-10-10 从授权 GPU 服务器取得并逐文件核对的源码快照。49 项测试通过，`scene_general_v3` 已在 RTX 4090 服务器完成 426 个视频的全量运行和合并；目前尚无官方成绩。
 
 第一次接手服务器或准备重跑时，先读 [`SERVER_HANDOFF.md`](SERVER_HANDOFF.md)。它说明当前服务器状态、权威结果、目录用途、全量运行、续跑、验收和禁止事项。

@@ -1,0 +1,7 @@
+{
+  "schema_version": "scene-workflow/v1",
+  "version": "scene-general-v3-unified-v1",
+  "input_mode": "handoff",
+  "ids": "all",
+  "paths": {}
+}

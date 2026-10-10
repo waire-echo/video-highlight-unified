@@ -1,5 +1,9 @@
 # 通用视频高光剪辑
 
+当前服务器 `scene_general_v3` 整理从交接提交 `81f2257` 开始。统一入口 `python vh.py workflow` 支持固定兼容版、完整时间→空间流程和独立 I/O 实验。先读 [START_HERE.md](START_HERE.md) 与 [版本化工作流](docs/scene_workflow.md)。原始基线及结果保留，新入口的 GPU 端到端验证待申请 GPU 后完成。
+
+[功能索引](docs/feature_index.md) 登记推荐入口。下文 ORA v5→YOLO/Pose 与本次 v3 空间流程分别通过配置选择。
+
 输入原视频和目标画幅，程序选择高光时间，并为入选的每一帧生成裁剪框。比赛交付是 JSONL：`video_id`、`targetRatioWH`、逐帧 `frame` 与 `[x,y,w]`。MP4 用于预览效果。
 
 **唯一维护入口：[thekfjie/video-highlight-unified](https://github.com/thekfjie/video-highlight-unified)**。不同路线同时存在于 `main`，实验用配置区分。旧仓库暂时保留历史。
