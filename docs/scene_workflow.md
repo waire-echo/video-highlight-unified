@@ -1,5 +1,7 @@
 # scene_general_v3 统一运行与版本管理
 
+维护代码统一在 main；默认版本由 configs/project_policy.json 登记，功能分支只用于一次开发。管理与发布规则见 [项目管理](project_management.md)。
+
 本次整理对象是交接提交 `81f2257` 的 `scene_general_v3`。算法来自 `36695a2`，固定标签为 `ora-spatial-v3-baseline-20261011`。旧 E1/E2/E3 和 YOLO/Pose 空间路线保留各自入口，不能当作 v3。
 
 ## 一个入口，明确选择版本

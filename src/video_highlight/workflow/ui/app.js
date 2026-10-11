@@ -311,7 +311,7 @@ for (const node of document.querySelectorAll(".nav"))
         return option;
       }),
     );
-    $("version").value = "scene-general-v3-compat-20261010";
+    $("version").value = boot.default_version;
     for (const key in boot.paths) {
       const input = $(key.replaceAll("_", "-"));
       if (input) input.value = boot.paths[key];

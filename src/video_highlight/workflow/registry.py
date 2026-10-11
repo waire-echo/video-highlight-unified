@@ -96,3 +96,15 @@ def resolve(config_path, local_path=None):
         raise ValueError("run_root must be separate from code, baseline data, videos and runtime")
     return {"schema_version": value["schema_version"], "version": descriptor["id"],
             "input_mode": value["input_mode"], "ids": ids, "paths": paths}, descriptor
+
+
+def default_version():
+    """One declared default for both interfaces; experiments remain opt-in."""
+    policy = read_json(REPO / "configs/project_policy.json")
+    if policy.get("schema_version") != "video-highlight-project/v1":
+        raise ValueError("Invalid project policy")
+    name = policy["default_version"]
+    descriptor = release(name)
+    if descriptor["mode"] != "compat" or descriptor["io_profile"] != "original":
+        raise ValueError("Default UI version must preserve frozen compatibility")
+    return name

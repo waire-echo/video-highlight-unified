@@ -105,7 +105,8 @@ def tui(local, runs_root=None, smoke=False):
                     boot = controller.bootstrap()
                     choices = boot["versions"]
                     menu = ["选择版本：", *[f"{i+1} = {row['id']}" for i, row in enumerate(choices)]]
-                    choice = int(prompt(menu, "1")) - 1
+                    default = next(i + 1 for i, row in enumerate(choices) if row["id"] == boot["default_version"])
+                    choice = int(prompt(menu, str(default))) - 1
                     if not 0 <= choice < len(choices):
                         raise ValueError("无效版本编号")
                     release = choices[choice]

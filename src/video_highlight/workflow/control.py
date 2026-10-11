@@ -13,7 +13,7 @@ import time
 import uuid
 
 from .contracts import fingerprint, read_json, stamp, write_json
-from .registry import REPO, PATHS, resolve, versions
+from .registry import REPO, PATHS, resolve, versions, default_version
 from .runner import make_plan, stop_process
 
 EDITABLE_PATHS = PATHS - {"client_python", "temporal_python"}
@@ -61,7 +61,7 @@ class Controller:
     def bootstrap(self):
         paths = dict(self.defaults)
         paths["run_root"] = str(self.runs_root / ("scene-v3-" + time.strftime("%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex[:6]))
-        return {"versions": versions(), "paths": paths, "resources": self.resources(),
+        return {"versions": versions(), "default_version": default_version(), "paths": paths, "resources": self.resources(),
                 "core_policy": "冻结的 v3、ORA core、Prompt、帧号与 PTS 保持原样",
                 "verification": "CPU 工程验证已通过；新入口 GPU 推理待验收"}
 

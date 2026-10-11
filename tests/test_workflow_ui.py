@@ -179,3 +179,11 @@ def test_no_gpu_driver_fails_before_launch(monkeypatch, error):
     with pytest.raises(ValueError, match="No GPU is available"):
         with runner.managed_model(["never-start"], 8008, None, {}):
             pytest.fail("Inference must not start without GPU")
+
+
+def test_ui_default_comes_from_shared_project_policy(controller):
+    boot = controller.bootstrap()
+    assert boot["default_version"] == "scene-general-v3-compat-20261010"
+    release = next(row for row in boot["versions"] if row["id"] == boot["default_version"])
+    assert release["mode"] == "compat"
+    assert release["io_profile"] == "original"

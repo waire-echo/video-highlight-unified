@@ -1,6 +1,6 @@
 # TUI 与 WebUI 使用说明
 
-两个界面调用同一个 `workflow` CLI 和 Controller。当前默认是 `scene-general-v3-compat-20261010`。切换实验版本时生成新计划，使用全新的运行目录；已有任务通过原计划续跑。core、冻结的 v3、Prompt、FPS、帧号和 PTS 没有修改。
+两个界面调用同一个 `workflow` CLI 和 Controller。两个界面的默认版本均从 configs/project_policy.json 读取，当前是 `scene-general-v3-compat-20261010`。切换实验版本时生成新计划，使用全新的运行目录；已有任务通过原计划续跑。core、冻结的 v3、Prompt、FPS、帧号和 PTS 没有修改。
 
 ## WebUI
 

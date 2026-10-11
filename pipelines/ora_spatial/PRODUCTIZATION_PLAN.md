@@ -1,5 +1,7 @@
 # 视频高光两阶段工作台与 TUI 计划
 
+> 历史计划：统一状态机、版本清单、TUI/WebUI、输入准备、续跑、日志和正式产物下载已经实现；GPU 新推理验收、三路同步对比和预计剩余时间仍待完成。当前状态以根目录 [功能索引](../../docs/feature_index.md) 和 [README](../../README.md) 为准。下面保留原计划，不把其中的计划名称当作实际 CLI/版本 ID。
+
 基准：`ora-spatial-scene-general-v3-20261010`
 计划日期：2026-10-11（Asia/Hong_Kong）
 

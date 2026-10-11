@@ -1,5 +1,7 @@
 # 功能入口索引
 
+唯一维护主线为 main，默认版本与工作流配置见 [项目策略](../configs/project_policy.json)。默认 scene_general_v3 兼容版；主线、算法版本、运行目录关系见 [项目管理](project_management.md)。
+
 | 功能 | 推荐入口 | 状态 |
 |---|---|---|
 | 服务器接手 | `START_HERE.md` | 可用 |
@@ -17,3 +19,5 @@
 | TUI | `workflow tui --local ...` | SSH 终端与 CPU 准备实测通过 |
 | WebUI | `workflow webui --local ...` | 已部署，浏览器、CPU 准备/续跑、ZIP 下载通过 |
 | 三路同步对比 / 预计剩余时间 | 产品化计划 | 待开发 |
+
+[README](../README.md) · [唯一入口](../START_HERE.md) · [分支约束](branch_policy.md) · [界面使用](scene_workflow_ui.md)

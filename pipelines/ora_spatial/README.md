@@ -4,11 +4,11 @@
 
 状态：`experimental-runnable`。这是 2026-10-10 从授权 GPU 服务器取得并逐文件核对的源码快照。49 项测试通过，`scene_general_v3` 已在 RTX 4090 服务器完成 426 个视频的全量运行和合并；目前尚无官方成绩。
 
-第一次接手服务器或准备重跑时，先读 [`SERVER_HANDOFF.md`](SERVER_HANDOFF.md)。它说明当前服务器状态、权威结果、目录用途、全量运行、续跑、验收和禁止事项。
+第一次接手或重跑先读根目录 [START_HERE](../../START_HERE.md) 和 [功能索引](../../docs/feature_index.md)。维护工作区检出 main。[`SERVER_HANDOFF.md`](SERVER_HANDOFF.md) 是原快照的历史交接资料，保留原结果、原路径和原运行来源，不作为当前维护入口。
 
-`scene_general_v3` 当前服务器基准的源码、运行环境、模型和外部输入恢复方式见 [`REPRODUCE_SCENE_GENERAL_V3.md`](REPRODUCE_SCENE_GENERAL_V3.md)。后续线程、TUI、README 和性能优化均以该基准为起点。
+`scene_general_v3` 当前服务器基准的源码、运行环境、模型和外部输入恢复方式见 [`REPRODUCE_SCENE_GENERAL_V3.md`](REPRODUCE_SCENE_GENERAL_V3.md)。现有 TUI/WebUI 与独立 I/O 优化均从该基准起步，默认兼容版不改变原算法。
 
-两阶段控制、路径选择、进度/错误查看、文件识别、三路对比视频和 README 收口的实施顺序见 [`PRODUCTIZATION_PLAN.md`](PRODUCTIZATION_PLAN.md)。
+两阶段控制、版本选择、TUI/WebUI、日志与产物下载已实现，见 [界面说明](../../docs/scene_workflow_ui.md)。三路同步对比和预计剩余时间仍未实现；原 [产品化计划](PRODUCTIZATION_PLAN.md) 保留历史目标，当前完成状态以 [功能索引](../../docs/feature_index.md) 为准。
 
 ## 输入、处理和输出
 
@@ -39,7 +39,7 @@ ora_spatial/
 └── SERVER_README_20261010.md
 ```
 
-服务器原始说明完整保存在 `SERVER_README_20261010.md`。源码布局保持原样，因此命令应在本目录执行。
+服务器原始说明完整保存在 `SERVER_README_20261010.md`。以下命令属于本目录保留的历史入口；当前维护流程从仓库根目录的 `vh.py workflow` 执行。
 
 ## 环境
 
