@@ -1,0 +1,28 @@
+{
+  "interpretation": "Reference agreement and retention; not official accuracy or leaderboard score.",
+  "reference_sha256": "9408deb8fcc1b39fe02688756bbd735a3799145f4c340d3e30012241c3c7fb38",
+  "ora_frames_sha256": "f063fc93750c1ad421f52e90f0edcbb77d3f51b37a2b0e1fd9dab4768a97c782",
+  "source_hashes_paired": true,
+  "aggregate": {
+    "ora_frames": 189844,
+    "reference_frames": 77198,
+    "shared_frames": 68594,
+    "ora_only_frames": 121250,
+    "reference_only_frames": 8604,
+    "videos": 426,
+    "source_frames": 234159,
+    "source_seconds": 8472.163907999995,
+    "ora_retention_frames": 0.8107482522559457,
+    "reference_retention_frames": 0.32968196823525897,
+    "ora_retention_seconds": 0.8141969412898662,
+    "reference_retention_seconds": 0.33160078682462624,
+    "ora_stages_frames": {
+      "all_discovered_candidates": 188057,
+      "discovery_not_discard": 185924,
+      "after_review": 187072,
+      "grounded_without_padding": 185692,
+      "exported": 189844
+    }
+  },
+  "metrics_type": "historical temporal retention and local editorial reference agreement; no official score"
+}

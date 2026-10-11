@@ -1,0 +1,19 @@
+{
+  "imported_from": "/root/rivermind-data/aic_spatial_trials_20261008/experiments/temporal_editor_v1",
+  "snapshot_date": "2026-10-11",
+  "original_files_sha256": {
+    "README.md": "3fc8ce9ac21829314a8ecf4268c3c73e0e53f684aeebd9efbf37f75c597d2461",
+    "check_media_cpu.py": "186ba7b47a998ce428c4ccde4b176b08cc22de5b25dfdca114044ebf5075e144",
+    "config.json": "38c2f9fd16affddfc1d2ec2877207568c5fd6d96bef94bbf539bde973e21637f",
+    "engine.py": "72f7793de261327cbffb5118ed17b1df667adf06e2a5f82e25e7e7c98dff42a3",
+    "launch.py": "fb205626a8ee3d37246ec6db337b2d6b8fe63e73a7bbcb0d3d67dde030000102",
+    "prompts.py": "cd59fa9c4372d171fe8a2f6a980c488e82218b5fb82e7c35012a60373136a92f",
+    "protocol_smoke.py": "42431ea93cd53b918d9c4d6de98a335c95f21e01b9804a55052186151efc2da9",
+    "run.py": "c34d0876956e685ec54783d9d1a71029a3861cc64ca824d331f30b0e917065dd",
+    "serve_ora.sh": "00f13d89af91d77c7a5722f947463616e964e74e624c7a619eed37ce9d75c8c0",
+    "test_editor.py": "e9fca652c1627c94acdb7d5f8482c8bd858c3f5a5eed1abb10d03c57ec943dbc"
+  },
+  "source_git_status": "temporary prototype outside maintained Git",
+  "retained_local_original": "artifacts/verification/server_temporal_editor_v1_20261011/temporal_editor_v1",
+  "changes_document": "docs/temporal_reference_test.md"
+}

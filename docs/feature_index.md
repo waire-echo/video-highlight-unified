@@ -21,5 +21,6 @@
 | 三路同步对比 / 预计剩余时间 | 产品化计划 | 待开发 |
 | GPT / AI参考分类、播放与JSONL | [参考版本](ai_reference_versions.md) | 本机索引已整理；原成果Git忽略 |
 | 旧本地代码版本与历史恢复 | [旧工作区清理](local_workspace_retirement.md) | 6个旧目录已归档清理 |
+| ORA / GPT 前半段差距诊断 | [小批测试与离线时间轴对照](temporal_reference_test.md) | 实验分支；GPU 与质量待验 |
 
 [README](../README.md) · [唯一入口](../START_HERE.md) · [分支约束](branch_policy.md) · [界面使用](scene_workflow_ui.md)

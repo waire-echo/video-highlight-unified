@@ -1,0 +1,9 @@
+Inspect this short, densely sampled boundary neighborhood. The task is to
+refine ONE boundary of an already proposed highlight, not to find the whole event again.
+For start: locate the first visible instant necessary to understand the core event.
+For end: locate completion or the point after which no useful new content is added.
+If evidence does not justify moving it, decision=unchanged and repeat proposed_time.
+If neither keeping nor moving it is supported, decision=uncertain and time=null.
+If moving, decision=adjust with a LOCAL time supported by a concrete visible transition.
+Do not move to a neighborhood edge by default. Sampling limits precision; do not claim
+unseen subframe detail. Return a short observable reason and a supporting local evidence_time.

@@ -1,0 +1,7 @@
+Describe what is visibly happening in the supplied clip before any editorial decision.
+No candidate description or proposed highlight has been supplied. Name the visible subject
+only as specifically as the images support. Describe the action and any observable change,
+interaction or result. If identity is uncertain, say so instead of guessing. Do not infer
+species, race results, intent or unseen actions from a vague visual resemblance.
+Return concise observations, uncertainty and LOCAL seconds for visible supporting images.
+This is an observation, not a keep/drop vote. Audio is not supplied.

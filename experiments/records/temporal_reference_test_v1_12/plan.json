@@ -1,0 +1,14 @@
+{
+  "experiment_id": "temporal_reference_test_v1_12",
+  "date": "2026-10-12",
+  "author": "thekfjie / Codex",
+  "pipeline": "ora_temporal_editor_test",
+  "model": "Video-ORA-4B",
+  "dataset": "aic_semifinal426, metadata-stratified pilot12",
+  "prompt_version": "ora/temporal-editor-test-v1",
+  "config": "configs/experiments/ora-temporal-editor-test-v1.json",
+  "status": "gpu-pending",
+  "git_commit": "Assigned from the deployed commit in frozen.json when inference starts.",
+  "metrics": null,
+  "notes": "Diagnostic front half only. Reference stays offline. Historical reference generation checkpoint/commit unknown."
+}

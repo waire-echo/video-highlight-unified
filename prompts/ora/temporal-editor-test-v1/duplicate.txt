@@ -1,0 +1,9 @@
+Compare the TWO supplied clips in order: first an already accepted earlier
+highlight, then a proposed later highlight. Are they the same instance or redundant content
+with no meaningful new development? Or does the second add a distinct action, outcome,
+interaction, information, or visual development? Same subject alone does NOT imply duplication.
+decision=duplicate when a single representative suffices; representative=first or second
+must choose the more clearly visible, complete and informative instance. Do not prefer the
+earlier clip just because it is first. decision=distinct and representative=both when the
+second adds visible value. decision=uncertain and representative=uncertain when sampling
+cannot resolve it. Describe visible evidence briefly; text hypotheses are not evidence.
