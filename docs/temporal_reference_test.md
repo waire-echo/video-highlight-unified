@@ -78,7 +78,7 @@ log316 不支持时，仅临时缩放把 transfer metadata 标为 unknown，日�
   --video-dir /root/rivermind-data/ora4b_v5_20261001/videos \
   --runtime-root /root/rivermind-data/ora4b_v5_20261001 \
   --model-path /root/rivermind-data/ora4b_v5_20261001/models/Video-ORA-4B \
-  --output /root/rivermind-data/aic_spatial_trials_20261008/output/temporal_reference_test_v1_12 \
+  --output /root/rivermind-data/aic_spatial_trials_20261008/output/temporal_reference_test_v3_12 \
   --check-only
 ```
 
@@ -113,3 +113,17 @@ py -3.11 -X utf8 tools/compare_temporal_reference.py `
 Linux 批处理失败恢复合同由服务器验收；主线冻结文件/版本与项目策略检查通过。
 本机 Windows 全套 pytest 被已有 curses 依赖阻止收集，不能记为全套通过；Linux CI 另行记录。
 服务器暂未挂载 GPU，真实协议、实际推理、质量与分数均 pending。实际验收记录见试验目录 output 与 deployment 收据。
+
+
+## 实际 GPU 启动后的修正（本节更新前面的准备状态）
+
+2026-10-12 GPU 已挂载，RTX4090 24GB。v1 首次 GPU 协议因数字占据描述字段而失败；
+v2 通过协议，但正式视频又出现数字证据、越界及重复候选 overflow，已停止该批，原始错误保留。
+原因包括 JSON Schema 只交给结构解码器，而没有把完整字段含义交给模型阅读。
+新代码提交 e0d948e127ac9b28d37d4f11b89c6d999a8e60c4 明确传入 Schema 与本地时间范围，
+Prompt ora/temporal-editor-test-v3 明确一个连续动作只记一个候选、overflow 的真实条件。
+仍然校验可见文字证据和时间范围，没有用参考答案填充、改结果或降低证据要求。
+
+活动配置 configs/experiments/ora-temporal-editor-test-v3.json；新输出 temporal_reference_test_v3_12。
+服务器 run_pilot.sh 默认已指向这批。旧目录 temporal_reference_test_v1_12 为失败试验，不能当有效对照。
+GPU 质量仍需看实际结果；本节不宣称改完就已提升质量。

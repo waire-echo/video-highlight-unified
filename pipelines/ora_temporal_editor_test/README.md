@@ -6,8 +6,8 @@
 只验证时间选段。默认同一批 12 条，无自动全量。GPT 参考由离线工具读取，推理程序没有参考答案参数。
 
 - 代码来源：云端临时 `temporal_editor_v1`，2026-10-11 下载的原文快照。
-- 新版本：`temporal-editor-test-v1`；[配置](../../configs/experiments/ora-temporal-editor-test-v1.json)。
-- Prompt：[`ora/temporal-editor-test-v1`](../../prompts/ora/temporal-editor-test-v1/README.md)。
+- 新版本：`temporal-editor-test-v3`；[配置](../../configs/experiments/ora-temporal-editor-test-v3.json)。
+- Prompt：[`ora/temporal-editor-test-v3`](../../prompts/ora/temporal-editor-test-v3/README.md)。
 - 启动：`launch.py --data-root ... --video-dir ... --runtime-root ... --model-path ... --output ...`。
 - CPU 验收：同上添加 `--check-only`；指定视频：`--ids 20,21,313`。
 - 按原 PTS 导出 `temporal_handoff.jsonl`，此文件是试验对照接口，尚未注册到生产 workflow。
