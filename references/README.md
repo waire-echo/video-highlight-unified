@@ -2,6 +2,14 @@
 
 这里保存资料目录和阅读说明。原始赛题、个人历史分析、测试集相关截图、论文 PDF 和报告保存在 `local/`，被 Git 忽略。本机可以打开以下链接；从 GitHub 克隆的成员需要自行取得原文件，查看 [目录规范](../docs/workspace_cleanup.md)。
 
+## GPT / AI 编辑参考
+
+[版本、用途与边界](../docs/ai_reference_versions.md)；本机版本目录与播放入口在 `references/local/ai_references/README.md`。
+
+本机索引 `local/ai_references/registry.local.json` 记录3组独立标注、2个局部备选与1份JSONL导出的路径、父版本和指纹。当前全量是426条；JSONL为同一参考的格式转换，不能把每份预览或ZIP都算作新标答。历史174条GPT原文件尚未找到。
+
+旧工作区已完成本地清理，Git历史和未提交内容的恢复方法见 [清理记录](../docs/local_workspace_retirement.md)。
+
 ## 赛题与交付
 
 | 资料 | 位置 |
