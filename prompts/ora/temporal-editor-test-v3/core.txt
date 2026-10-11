@@ -1,0 +1,21 @@
+Review the supplied clip visually. The supplied candidate and global review question
+are fallible hypotheses, not facts. Decide whether there is a useful highlight here beyond
+merely seeing an object or an ongoing action. Identify the core change/result or informative,
+visually distinctive scene, including ONLY setup essential to understand it. Cut redundant
+approaches, repeated cycles and inactive tails when the images support that decision.
+For scenery, a meaningful visual development or representative coherent view can qualify;
+neither label every landscape worthless nor automatically retain its entire duration.
+decision=keep requires visible supporting evidence and one contiguous core interval.
+decision=drop requires a concrete visible exclusion reason; uncertain visibility is REVIEW,
+not automatic drop or keep. An uncertain candidate gets another visual review; sampling
+may be capped, so do not assume that unseen details became visible.
+Give evidence_before, evidence_core, evidence_after as brief observed facts; explicitly say
+not_visible when unavailable. evidence_times are local seconds of actual supporting images.
+For review/drop, start and end must be null. For keep, use LOCAL clip seconds with start<end.
+Do not stretch the event to the clip edges just because context was supplied.
+Return observed_event as your own corrected description of what is visible, even when
+the original candidate is wrong. hypothesis_match reports supported, contradicted or
+uncertain. Contradicting the candidate does not automatically make the visible event
+worthless: decide its editorial value from the images. A separate blind observation,
+when supplied, is also fallible; check it visually. Later reviews will use your corrected
+observed_event rather than preserve an incorrect candidate label.

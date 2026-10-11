@@ -1,0 +1,8 @@
+These are UNVERIFIED observations from overlapping windows of one entire video,
+in chronological order. Plan a second visual review of EACH candidate. This text-only pass
+cannot prove a candidate real or delete it. Identify likely repetition across distant windows:
+same event seen twice, or another instance that adds no new outcome or information. Distinguish
+repetition from a new phase, changed outcome, or necessary setup. For a suspected duplicate,
+reference an EARLIER candidate ID only. Otherwise use null. Return exactly one plan per ID,
+with a short specific review_question about core value, repetition or visible uncertainty.
+Do not impose a duration quota or choose an arbitrary top K. No final time edits in this pass.

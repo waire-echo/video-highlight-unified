@@ -4,7 +4,7 @@ from pathlib import Path
 from engine import read
 
 REPO = Path(__file__).resolve().parents[2]
-DEFAULT_CONFIG = REPO / 'configs/experiments/ora-temporal-editor-test-v2.json'
+DEFAULT_CONFIG = REPO / 'configs/experiments/ora-temporal-editor-test-v3.json'
 
 
 def data_arguments(parser):

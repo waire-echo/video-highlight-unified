@@ -1,6 +1,6 @@
 """Versioned evidence contracts for the isolated temporal test."""
 from pathlib import Path
-PROMPT_DIR = Path(__file__).resolve().parents[2] / "prompts/ora/temporal-editor-test-v2"
+PROMPT_DIR = Path(__file__).resolve().parents[2] / "prompts/ora/temporal-editor-test-v3"
 for name in ("DISCOVER", "GLOBAL", "CORE", "BOUNDARY", "VERIFY", "DUPLICATE", "OBSERVE"):
     globals()[name] = (PROMPT_DIR / (name.lower() + ".txt")).read_text(encoding="utf-8").strip()
 

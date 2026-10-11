@@ -127,6 +127,9 @@ class Client:
         content=[{'type':'video_url','video_url':{'url':Path(m['path']).as_uri()}} for m in media]
         media_note=[{k:m[k] for k in ('start','end','requested_fps','effective_fps','frames')} for m in media]
         prompt+='\nCLIP METADATA (seconds in original video; answers use local seconds): '+json.dumps(media_note)
+        if len(media)==1:
+            prompt+=f"\nThis supplied clip has LOCAL time 0 to {media[0]['end']-media[0]['start']:.9f} seconds. All answer times MUST stay in that LOCAL range."
+        prompt+='\nOUTPUT JSON CONTRACT: Read the field descriptions below. Descriptive evidence is observed facts in words; timestamps belong only in numeric time fields. Return ONLY the JSON object matching this schema:\n'+json.dumps(schema,ensure_ascii=False)
         payload={'model':self.cfg['model'],'messages':[{'role':'user','content':content+[{'type':'text','text':prompt}]}],
                  'temperature':0,'seed':self.cfg['seed'],'max_tokens':tokens,
                  'chat_template_kwargs':{'enable_thinking':False},

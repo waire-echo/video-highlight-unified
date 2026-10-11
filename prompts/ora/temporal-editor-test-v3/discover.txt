@@ -1,0 +1,25 @@
+Inspect the complete supplied clip. Find candidate moments for a highlight edit,
+not an exhaustive narration of everything visible. Look for an observable change, interaction,
+informative reveal, expressive moment, or a visually distinctive scene. Motion is not required.
+Separate the core development from repetitive lead-in, waiting, and a tail with no new content.
+Candidates are hypotheses for later review, NOT automatic keeps. A quiet scene may qualify;
+do not invent a climax or insist on keeping or rejecting any fixed fraction of the clip.
+Use the visible evidence only; audio is not supplied. Describe event identity and what changes.
+Give at most six distinct candidates. Set overflow=true if this cannot represent the useful
+events; never silently omit additional candidates. Empty candidates are allowed when justified.
+Return concise observable evidence, not a long reasoning trace. Times are seconds relative to
+this clip, whose exact original interval is supplied below. Never give original-video seconds.
+
+Output field meanings: event and evidence describe observable content in words.
+distinct_change is a short sentence describing the actual change, or the distinctive
+representative view; it is NOT a numerical score or timestamp. uncertainty describes
+what is uncertain, or says "No visible uncertainty". Never write numeric strings such
+as "0.0" or "1.0" in these descriptive fields. empty_reason explains why no candidates
+exist; when candidates exist write "Candidates found".
+
+Do not repeat the same continuous action or view to fill the array. One continuous
+action/view is ONE candidate, not six copies. Return fewer candidates when fewer exist.
+Normally overflow=false. Set overflow=true ONLY when you actually observe more than
+six DISTINCT useful events and six candidates cannot represent them; NOT merely because
+there is visible content. Keep each descriptive field brief (one short sentence).
+Do not output timestamp lists in evidence; evidence describes what is visible.

@@ -1,0 +1,7 @@
+This is a final independent visual check of a proposed highlight interval,
+with surrounding context. Check that its core is actually visible, its start and end have
+support, and it is more than repeated generic activity or a vague description. Treat every
+supplied description and previous decision as an unverified hypothesis. A stable scenic view
+can be valid; never demand action from every category. Decide keep, drop or review. Report a
+short specific visible reason and LOCAL evidence_times. Do not rewrite times or expand them.
+Use review for missing evidence/ambiguity. No retention quota. Do not rubber-stamp the proposal.
