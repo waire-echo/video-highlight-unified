@@ -12,6 +12,7 @@
 - 官方center/qwen baseline来自TempSamp-R1的3fd4e85，作为参考保留。
 - PGL沿用Mr.HiSum aeb667f71239887034c2974062a341d312762867的架构与权重键；学术非商业许可保留在licenses/MR.HiSum.txt，不改授Apache许可。
 - partial ORA9B光流参考来自本机历史脚本，依赖缺失，仅保留可复用部分。weighted F1为题面参考，不是主办方评分脚本。
+- ORA空间重构来自2026-10-10授权GPU服务器的`aic_spatial_trials_20261008`源码快照。它补齐ORA稀疏画框、可见性复核、SAM 2.1传播、自适应虚拟镜头和scene_general v1/v2/v3实验；服务器目录没有Git历史，因此用源码压缩包SHA256、模型revision、依赖版本和迁移commit共同追踪。旧Stage 2快照经比较后没有重复导入，维护版本仍是`src/video_highlight/spatial/`。
 
 相关官方来源：[Video-ORA模型](https://huggingface.co/OraRL/Video-ORA-4B)、[OraRL](https://github.com/HVision-NKU/OraRL)、[TempSamp-R1](https://github.com/HVision-NKU/TempSamp-R1)、[Ultralytics](https://github.com/ultralytics/ultralytics)。
 

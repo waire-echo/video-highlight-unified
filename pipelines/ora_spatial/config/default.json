@@ -1,0 +1,49 @@
+{
+  "parameter_limit": 9000000000,
+  "ora_repo": "OraRL/Video-ORA-4B",
+  "ora_revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+  "ora_parameters": 5174964736,
+  "inherited_spatial_parameter_reserve": 100000000,
+  "partial_hints": ["scene", "object", "unknown"],
+  "camera": {
+    "grid_hz": 10,
+    "acceleration_weight": 20,
+    "static_fraction": 0.025,
+    "static_min_reliability": 0.75,
+    "reliable_threshold": 0.6,
+    "outlier_fraction": 0.18,
+    "max_speed_crop_per_sec": 0.6
+  },
+  "stage1": {
+    "cache_nearest_seconds": 0.15,
+    "low_detection_confidence": 0.15,
+    "high_detection_confidence": 0.45,
+    "unknown_evidence_reliability": 1.0
+  },
+  "ora": {
+    "max_chunk_seconds": 16,
+    "max_chunk_frames": 240,
+    "input_fps": 2,
+    "image_max_side": 960,
+    "video_total_pixels": 16777216,
+    "image_max_pixels": 1048576,
+    "spatial_coordinates": "norm1000",
+    "tracking_coordinates": "norm1000",
+    "tracking_first_key_seconds": 0.0,
+    "tracking_key_base": 0,
+    "review_interval_seconds": 2,
+    "anchor_min_iou": 0.2,
+    "request_timeout": 240,
+    "request_retries": 2,
+    "max_new_tokens": 2048
+  },
+  "sam": {
+    "config": "configs/sam2.1/sam2.1_hiera_l.yaml",
+    "work_max_side": 960,
+    "min_mask_fraction": 0.0001,
+    "max_mask_fraction": 0.9,
+    "max_center_jump_fraction": 0.18,
+    "anchor_min_iou": 0.1,
+    "max_unverified_seconds": 3
+  }
+}

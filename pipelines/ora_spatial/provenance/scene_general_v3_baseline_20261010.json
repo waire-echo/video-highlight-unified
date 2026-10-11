@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "baseline_id": "ora-spatial-scene-general-v3-20261010",
+  "captured_at_utc": "2026-10-10T17:29:54Z",
+  "captured_at_asia_hong_kong": "2026-10-11T01:29:54+08:00",
+  "source_repository": "https://github.com/thekfjie/video-highlight-unified.git",
+  "source_commit": "36695a2ad796b21623a9f7f8e759f9b21cf4ea91",
+  "source_branch": "feat/import-ora-spatial-server-20261010",
+  "pipeline_root": "pipelines/ora_spatial",
+  "entrypoint": "experiments/scene_general_v3/temporal.py",
+  "model": {
+    "repo_id": "OraRL/Video-ORA-4B",
+    "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+    "provenance_file": "provenance/ora_model_provenance.json"
+  },
+  "runtime": {
+    "python": "3.11.13",
+    "torch": "2.10.0+cu128",
+    "vllm": "0.19.1",
+    "transformers": "5.5.4",
+    "numpy": "2.2.6",
+    "opencv_python_headless": "5.0.0.93",
+    "scipy": "1.17.1",
+    "requests": "2.34.2",
+    "pillow": "12.3.0",
+    "safetensors": "0.8.0",
+    "qwen_vl_utils": "0.0.14",
+    "gpu": "NVIDIA GeForce RTX 4090 24564 MiB",
+    "driver": "595.91.07",
+    "client_lock": "provenance/scene_general_v3_client_pip_freeze_20261010.txt",
+    "vllm_lock": "provenance/scene_general_v3_vllm_pip_freeze_20261010.txt",
+    "system_record": "provenance/scene_general_v3_system_20261010.txt"
+  },
+  "vllm_flags": [
+    "--served-model-name", "Video-ORA-4B",
+    "--host", "127.0.0.1",
+    "--port", "8008",
+    "--dtype", "bfloat16",
+    "--tensor-parallel-size", "1",
+    "--max-model-len", "16384",
+    "--max-num-seqs", "1",
+    "--max-num-batched-tokens", "8192",
+    "--enforce-eager",
+    "--gpu-memory-utilization", "0.85",
+    "--mm-processor-cache-gb", "0",
+    "--limit-mm-per-prompt", "{\"image\":3,\"video\":0}",
+    "--mm-processor-kwargs", "{\"size\":{\"shortest_edge\":65536,\"longest_edge\":1900000}}"
+  ],
+  "source_files": {
+    "experiments/scene_general_v1/config.json": "88c595953a0abab893234aa2cd785a0519ad41d33d8bd4a301762d1e0435e48c",
+    "experiments/scene_general_v1/pipeline.py": "a91340aa1f45370eb40f0fc1a0191c0a0b0befb9dc938494438e9c3bd724a2ba",
+    "experiments/scene_general_v3/README.md": "6167b572234788a08b0478d3f91c38bc63765ab88aa42bbed3059d10956f32ab",
+    "experiments/scene_general_v3/config.json": "f26264d3dc183ecf09e3a122d42379a4c0e5280aa59a689ebbe7fd1dd009af57",
+    "experiments/scene_general_v3/preflight.py": "8b2e426dcad8ace8af1f40edbbf358b5322f5e3b36dae2325720992611dc7bf4",
+    "experiments/scene_general_v3/serve_ora.sh": "5b21982747a2bd65f32441e92bf5905124811339d075b47a75f6ff7bf3a3c4a4",
+    "experiments/scene_general_v3/temporal.py": "73dff218ab4c1722daeba191cc537cb44c2e2778721076c86c25a3a866f5e332",
+    "experiments/scene_general_v3/test_temporal.py": "bd13e8242fcb16027e48e8216b05628880709b07717fdb4ffb91f86f8d4aa64e",
+    "src/common.py": "ac1afc4eef55872e5c353e505b504216cea77bbf677b3184c9a7d6d9ffa91622",
+    "src/ora_tools.py": "2d0eb78ab6b7a883f5ddd912fc6016aff89c86c08c076dc239061f8921836fcc"
+  },
+  "external_inputs": {
+    "baseline_zip_sha256": "52dea9d6a8782423db59efb637cefaa65d785170d5921a521a4c3af50bd5a608",
+    "manifest_json_sha256": "e11381ecd7105bd7ba1de8716d3a1614ff7b1dff42ce68a8b34ffd6ac332db58",
+    "timestamps_npz_sha256": "8739ad7519c5fcac7e41f42c67506c31806a7f8cb5b1f891db6c2972aec74f85",
+    "parameter_ledger_sha256": "2a829005ad4b7c8299a41441c075d045f39b99cb6889e885725a732b39c39712",
+    "local_archive": "artifacts/source_archives/ora_spatial_v3_repro_20261011/ora_v3_inputs_20261011.tar.gz",
+    "local_archive_sha256": "4c17da08fc45a68dfd6022d9d04895bf5c5f1fd2da4f42e0e932a61898dfb249",
+    "archive_committed_to_git": false,
+    "videos_committed_to_git": false,
+    "video_hashes_are_in_manifest": true
+  },
+  "determinism": {
+    "temperature": 0,
+    "seed": 20261010,
+    "opencv_threads": 2,
+    "opencv_rng_seed": 0,
+    "expected_equivalence": "same pipeline and normally the same output on the recorded runtime",
+    "limit": "bitwise model output is not guaranteed after GPU, driver, CUDA, PyTorch or vLLM changes"
+  }
+}

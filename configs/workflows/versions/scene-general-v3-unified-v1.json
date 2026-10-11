@@ -1,0 +1,36 @@
+{
+  "schema_version": "workflow-release/v1",
+  "id": "scene-general-v3-unified-v1",
+  "mode": "experiment",
+  "source_root": "pipelines/ora_spatial",
+  "source_files": {
+    "experiments/scene_general_v1/config.json": "88c595953a0abab893234aa2cd785a0519ad41d33d8bd4a301762d1e0435e48c",
+    "experiments/scene_general_v1/pipeline.py": "a91340aa1f45370eb40f0fc1a0191c0a0b0befb9dc938494438e9c3bd724a2ba",
+    "experiments/scene_general_v3/README.md": "6167b572234788a08b0478d3f91c38bc63765ab88aa42bbed3059d10956f32ab",
+    "experiments/scene_general_v3/config.json": "f26264d3dc183ecf09e3a122d42379a4c0e5280aa59a689ebbe7fd1dd009af57",
+    "experiments/scene_general_v3/preflight.py": "8b2e426dcad8ace8af1f40edbbf358b5322f5e3b36dae2325720992611dc7bf4",
+    "experiments/scene_general_v3/serve_ora.sh": "5b21982747a2bd65f32441e92bf5905124811339d075b47a75f6ff7bf3a3c4a4",
+    "experiments/scene_general_v3/temporal.py": "73dff218ab4c1722daeba191cc537cb44c2e2778721076c86c25a3a866f5e332",
+    "experiments/scene_general_v3/test_temporal.py": "bd13e8242fcb16027e48e8216b05628880709b07717fdb4ffb91f86f8d4aa64e",
+    "src/common.py": "ac1afc4eef55872e5c353e505b504216cea77bbf677b3184c9a7d6d9ffa91622",
+    "src/ora_tools.py": "2d0eb78ab6b7a883f5ddd912fc6016aff89c86c08c076dc239061f8921836fcc"
+  },
+  "baseline_commit": "36695a2ad796b21623a9f7f8e759f9b21cf4ea91",
+  "baseline_tag": "ora-spatial-v3-baseline-20261011",
+  "model_revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+  "input_modes": [
+    "baseline",
+    "handoff",
+    "temporal"
+  ],
+  "io_profile": "original",
+  "checkpoint_interval": 25,
+  "gpu_validation": "pending: no GPU currently allocated",
+  "equivalence": "new named experiment; no claim of baseline equivalence",
+  "entrypoint": "experiments/scene_general_v3/temporal.py",
+  "preflight_entrypoint": "experiments/scene_general_v3/preflight.py",
+  "provenance_files": {
+    "provenance/scene_general_v3_baseline_20261010.json": "b66f7918b8d39a49f050b5a078d38f8d5480140723abec8c9cb380e4fa304095",
+    "provenance/ora_model_provenance.json": "f392a635b430d36c8dbb783d29c8465f0a87d1f295dcced4f7553e9dd714baec"
+  }
+}

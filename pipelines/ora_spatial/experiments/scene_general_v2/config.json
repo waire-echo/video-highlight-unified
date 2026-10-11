@@ -1,0 +1,16 @@
+{
+  "minimum_coverage": 0.95,
+  "minimum_support_fraction": 0.60,
+  "maximum_area_ratio": 6.0,
+  "minimum_histogram_intersection": 0.12,
+  "minimum_pair_iou": 0.10,
+  "position_base_fraction": 0.08,
+  "position_fraction_per_second": 0.04,
+  "position_max_fraction": 0.45,
+  "target_context_factor": 1.12,
+  "minimum_width_fraction": 0.50,
+  "area_cost": 0.55,
+  "centering_cost": 0.30,
+  "movement_cost": 0.15,
+  "maximum_ranking_candidates": 7
+}

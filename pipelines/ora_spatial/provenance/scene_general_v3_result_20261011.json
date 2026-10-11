@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "baseline_id": "ora-spatial-scene-general-v3-20261010",
+  "result_id": "ora-spatial-scene-general-v3-full-426-20261011",
+  "status": "complete",
+  "official_score": null,
+  "source_commit": "36695a2ad796b21623a9f7f8e759f9b21cf4ea91",
+  "videos": 426,
+  "frames": 189844,
+  "empty_video_ids": [
+    "97",
+    "176",
+    "285",
+    "367"
+  ],
+  "temporal_mask_unchanged": true,
+  "invalid_count": 0,
+  "sources": [
+    {
+      "run": "output/scene_temporal_240_330_20261010_v3",
+      "videos": 91,
+      "jsonl_sha256": "9823f13e4b21cb4f87204846a891466b5db38b59385b735f439012125b7dd0a8",
+      "frozen_sha256": "819cf7870fc733f2b8ac7dee7c4a7347e9fc38e235a5c537d1e2cc65c824f750",
+      "bundle_sha256": "1e8b923dedb70684b0a24e27ffd4ca035bcba893505cb13df12642f5744a8f29"
+    },
+    {
+      "run": "output/scene_temporal_remaining_335_20261010_v3",
+      "videos": 335,
+      "jsonl_sha256": "170fca0c451c18329faf575c3200b6b33fec06552557d1fffa6c5d5628e5779c",
+      "frozen_sha256": "3adb809c52587e04727528baebc8fdae0adf7e7754c40bd4dcc532c84fd21b37",
+      "bundle_sha256": "5c1a72e0d543d67ac10cacd3a7fdb509e4678a766f59fa9bc04da3a152092ebd"
+    }
+  ],
+  "artifacts": {
+    "local_delivery": "artifacts/deliveries/scene_general_v3_full_426_20261011",
+    "result_bundle": "scene_general_v3_full_426_results.zip",
+    "result_bundle_sha256": "163e28d6b6ac2cad3a64ae84e446626ecf44e9c1fdfb763e1faf27cad6b16f55",
+    "jsonl_sha256": "138cc1fe848c23877f83acb0d9732a8531eafce1292f91ffbcb784a3c0c0e70a",
+    "submission_zip_sha256": "bc0aa160e96571be54e3406796804b013ceb53b889763f780e736c8eaafde284",
+    "merge_report_sha256": "e995ff42423feecb1e64729ad3677cd8f7fa7c8b31d8df1499c598e963d19711",
+    "committed_to_git": false
+  },
+  "verification": {
+    "source_files": "10/10 byte-identical to server",
+    "runtime_environment": "passed on server",
+    "external_inputs_and_shots": "passed: 14 files plus 426 shot records",
+    "model_weight_shards": "5/5 size and SHA256 matched",
+    "result_bundle_zip_test": "passed",
+    "result_rows": "426 unique video IDs",
+    "result_frames": 189844,
+    "result_empty_videos": 4
+  },
+  "notes": "This preserves the actual merged server result. It has no official competition score yet."
+}

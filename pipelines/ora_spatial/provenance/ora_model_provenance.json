@@ -1,0 +1,35 @@
+{
+  "repo_id": "OraRL/Video-ORA-4B",
+  "revision": "01850297d5ab2adaaf130f700ed7cec52993d956",
+  "safetensors_total_parameters": 5174964736,
+  "parameter_limit": 8000000000,
+  "download_endpoint": "https://hf-mirror.com",
+  "source": "original_v5_parameter_reference",
+  "weight_files": [
+    {
+      "filename": "model-00001-of-00005.safetensors",
+      "size_bytes": 1271398528,
+      "sha256": "c76539c8db29c9a48dacbb2d92db040a6d19e47ff2ae1af0f6ef9f945e01c8fa"
+    },
+    {
+      "filename": "model-00002-of-00005.safetensors",
+      "size_bytes": 2474053512,
+      "sha256": "5aef3f77725e8971a9320ae5b326f36d91fa4525073029a9dfa9d2ac9cb23615"
+    },
+    {
+      "filename": "model-00003-of-00005.safetensors",
+      "size_bytes": 2472678384,
+      "sha256": "1fa049729c02e2e5ad9c61eb033f6a95fcc6c8e83e083259c2f5c2cb0caa0b0f"
+    },
+    {
+      "filename": "model-00004-of-00005.safetensors",
+      "size_bytes": 2477924456,
+      "sha256": "73f9d3f7d2bd18d15a486352dd5deb0f3d0eefa7e9fae9b7b11809940526f222"
+    },
+    {
+      "filename": "model-00005-of-00005.safetensors",
+      "size_bytes": 1653963896,
+      "sha256": "0efef653624c683615049e9dfbe122bdc675a388f8c21a2a0160e532b6b8e884"
+    }
+  ]
+}

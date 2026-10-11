@@ -21,6 +21,7 @@
 | 微信归档semantic_proposals_partial、ORA_candidates_raw_and_final、新版35空间包、ORA_RUN_v2 | 检查ZIP条目与请求证据，登记必要hash，原回答/预测留原位置 |
 | submit/、exp07 ZIP、Qwen命名结果、根目录方案文档 | 成绩证据、失败结论、生成缺口汇总到history；不提交逐视频测试结果/个人背景 |
 | TempSamp-R1/docs的56.43报告、E:/AI/tmp的论文及上传残留 | 原报告/论文集中到references/local；保留缺引用的Git对象资料；56.43报告参数独立登记 |
+| GPU服务器`aic_spatial_trials_20261008`，2026-10-10源码快照 | 迁入ORA画框、复核、SAM传播、虚拟镜头及scene_general v1-v3；不迁移权重、视频、预测、日志、环境和服务器认证信息 |
 
 逐文件来源与原始SHA256：`docs/migration/source_manifest.json`。起点保留代码来自8f25180，Git能追踪文件移动。历史实验从registry进入详细来源记录。
 
@@ -36,9 +37,9 @@
 
 ## 当前路线
 
-可执行：center/motion baseline、ORA4B/9B共用时间流程、Qwen direct/window、REZE-inspired、PGL-SUM、YOLO/Pose/BoT-SORT空间及预览。
+可执行：center/motion baseline、ORA4B/9B共用时间流程、Qwen direct/window、REZE-inspired、PGL-SUM、YOLO/Pose/BoT-SORT空间及预览。2026-10-10补入的ORA空间重构包含ORA语义框、复核、可选SAM传播和自适应虚拟镜头，状态为`experimental-runnable`。
 
-参考资产：ORA proposal、ORA+Text Reranker、旧9B光流partial。SAM没有发现实现；复杂editing没有发现独立算法。可执行不代表本轮已验证所有GPU推理或语义准确率。
+参考资产：ORA proposal、ORA+Text Reranker、旧9B光流partial。复杂editing没有发现独立算法。可执行不代表本轮已验证所有GPU推理或语义准确率；新增ORA空间代码只完成49项本地测试，没有重跑全量GPU或得到官方分数。
 
 ## 验证
 
@@ -63,6 +64,6 @@
 5. ORA9B最终空间/榜单；9B v2只找到partial。
 6. Qwen候选窗口v1-v7独立脚本/结果、合并前worker精确配置。
 7. 本地Qwen确切revision、PGL特征环境freeze与32分最终空间产物。
-8. SAM/复杂editing实现、三个队友尚未提供的其他仓库。
+8. 独立复杂editing实现、三个队友尚未提供的其他仓库。SAM 2.1调用与空间传播实现已从服务器恢复，但全量结果和官方效果仍未确认。
 
 这些资产没有判成垃圾。补齐后沿用统一机制迁入，保留来源，不新建长期算法分支。

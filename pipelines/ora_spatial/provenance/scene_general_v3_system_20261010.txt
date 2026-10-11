@@ -1,0 +1,6 @@
+date_utc=2026-10-10T17:29:54Z
+uname=Linux jupyter-7mdlzlxq3gez6sga 6.8.0-138-generic #138~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:43:15 UTC  x86_64 x86_64 x86_64 GNU/Linux
+client_python=Python 3.11.13
+server_python=Python 3.11.13
+nvcc=
+NVIDIA GeForce RTX 4090, 595.91.07, 24564 MiB

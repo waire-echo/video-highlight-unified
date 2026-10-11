@@ -1,0 +1,50 @@
+{
+  "schema_version": "video-highlight-project/v1",
+  "maintained_branch": "main",
+  "maintained_workflow": "scene_general_v3",
+  "default_version": "scene-general-v3-compat-20261010",
+  "default_config": "configs/workflows/compat.json",
+  "workflow_configs": {
+    "configs/workflows/compat.json": {
+      "version": "scene-general-v3-compat-20261010",
+      "input_mode": "baseline",
+      "role": "default-compat"
+    },
+    "configs/workflows/spatial.json": {
+      "version": "scene-general-v3-unified-v1",
+      "input_mode": "handoff",
+      "role": "experiment"
+    },
+    "configs/workflows/full.json": {
+      "version": "scene-general-v3-unified-v1",
+      "input_mode": "temporal",
+      "role": "experiment"
+    },
+    "configs/workflows/optimized.json": {
+      "version": "scene-general-v3-io-v1",
+      "input_mode": "baseline",
+      "role": "experiment"
+    }
+  },
+  "frozen_contracts": "configs/workflows/frozen_contracts.json",
+  "entry_documents": [
+    "README.md",
+    "START_HERE.md",
+    "docs/feature_index.md",
+    "docs/project_management.md",
+    "docs/branch_policy.md",
+    "docs/scene_workflow.md",
+    "docs/scene_workflow_ui.md",
+    "docs/scene_workflow_validation.md"
+  ],
+  "gpu_validation": "pending",
+  "pending_features": [
+    "GPU end-to-end rerun",
+    "fresh-inference I/O equivalence",
+    "three-way synchronized preview",
+    "ETA"
+  ],
+  "historical_entrypoints": [
+    "pipelines/ora_spatial/scripts/run_gpu.sh"
+  ]
+}

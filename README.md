@@ -1,108 +1,101 @@
 # 通用视频高光剪辑
 
-输入原视频和目标画幅，程序选择高光时间，并为入选的每一帧生成裁剪框。比赛交付是 JSONL：`video_id`、`targetRatioWH`、逐帧 `frame` 与 `[x,y,w]`。MP4 用于预览效果。
+**唯一维护主线是 `main`。当前整理和推荐入口是 `scene_general_v3`，统一命令为 `python vh.py workflow`。** 新人先读 [START_HERE.md](START_HERE.md)，再按 [功能索引](docs/feature_index.md) 找入口；不要从历史 E1/E2/E3 脚本开始。
 
-**唯一维护入口：[thekfjie/video-highlight-unified](https://github.com/thekfjie/video-highlight-unified)**。不同路线同时存在于 `main`，实验用配置区分。旧仓库暂时保留历史。
+当前默认版本为 `scene-general-v3-compat-20261010`：使用冻结的 baseline，只运行原空间算法和原 I/O。完整时间→空间与 I/O 优化属于明确命名的实验版本。**工程和 CPU 自动化已通过，新启动器的真实 GPU 推理仍待验收。** 历史 426 视频结果不等于新启动器已经完成 GPU 复跑。
 
-## 推荐主线与最好结果
+## 主线包含哪些功能
 
-工程主线：**Video-ORA-4B v5 → 原视频 PTS 选帧 → YOLO11m → Pose → BoT-SORT → 校验/打包**。ORA 发现事件、复看视频筛选、定位时间；这里没有文本 Reranker或大模型训练。
+| 功能 | 入口 | 状态 |
+|---|---|---|
+| 版本、配置、完整执行计划 | `vh.py workflow versions/plan` | 可用 |
+| 时间→精确 PTS 交接→空间→校验→交付 | `workflow run` | 已接入；新 GPU 推理待验收 |
+| 已有 baseline / 时间交接的输入准备 | `workflow run ... --until handoff` | CPU 实测通过 |
+| 只执行时间阶段 | `workflow run ... --until temporal` | 已接入；GPU 待验收 |
+| 断点续跑、阶段状态、错误与来源检查 | `workflow resume/status` | CPU 与故障恢复测试通过 |
+| TUI、WebUI、资源与日志、正式产物下载 | [界面使用说明](docs/scene_workflow_ui.md) | 终端和浏览器实测通过 |
+| 帧集合与提交 ZIP 校验 | `workflow validate` | 历史 426 视频通过 |
+| 独立 I/O 优化与逐视频检查点 | `optimized.json` / `workflow verify-io` | CPU 像素和缓存重导出通过；新 GPU 等价性待验收 |
+| 三路同步对比、预计剩余时间 | [后续计划](pipelines/ora_spatial/PRODUCTIZATION_PLAN.md) | 未实现 |
 
-原流程完成过复赛 426 视频、189,844 帧空间输出，非法框为 0，保留 4 条空预测。没有已确认的复赛排行榜分数。重构后的入口、Prompt 加载和实验登记只通过本地工程验证，尚未重跑 GPU 全链路。
+## 三个版本，四个运行配置
 
-已知初赛最高报告分数是 **56.43**。新找到的 YOLO/Pose 报告记载 48,895 帧，现有 exp07 ZIP 为 45,234 帧，尚不能确认两者是同一版本。它们不是已确认分数的 ORA v5。完整生成代码、Prompt、commit 和结果对应关系仍待补齐，见 [历史结果](docs/history.md)。
+| 版本 ID | 配置 | 输入 | I/O |
+|---|---|---|---|
+| `scene-general-v3-compat-20261010` | `configs/workflows/compat.json` | 冻结 baseline | 原始 I/O，默认 |
+| `scene-general-v3-unified-v1` | `spatial.json` / `full.json` | 已有精确交接 / 新时间推理 | 原始 I/O，实验 |
+| `scene-general-v3-io-v1` | `optimized.json` | 配置中指定的输入 | 顺序解码与检查点，实验 |
 
-## 目录结构
+代码主线、算法版本、一次运行是三个不同概念：`main` 保存维护代码；`configs/workflows/versions/` 选择算法版本；每次运行使用自己的 `run_root`。不为每个算法长期维护一个 Git 分支。
 
-```text
-video-highlight-unified/
-├── vh.py                       实验与路线统一入口
-├── pipeline.py                 ORA/Spatial 的分阶段入口
-├── pipelines/
-│   ├── ora_direct/             ORA v5，4B/9B 共用代码
-│   ├── ora_proposal/           Prompt/schema，完整代码缺失
-│   ├── ora_reranker/           结果/设计证据，完整代码缺失
-│   ├── qwen_direct/            历史直接定位
-│   ├── qwen_window/            窗口评分/融合/聚合
-│   ├── reze/                   Yes/No 曲线实验
-│   ├── pgl_sum/                重要度模型对照
-│   ├── baselines/              center/motion、官方与旧流程参考
-│   ├── spatial_crop/           YOLO/Pose/跟踪/裁剪
-│   ├── editing/                预览/成片工具
-│   └── sam_tracking/           暂无实现，明确标记
-├── src/video_highlight/        公共算法、IO、校验、运行和实验管理
-├── configs/pipelines/          JSON 实验配置
-├── prompts/                    按任务/版本保存文本/schema/构造器
-├── datasets/manifests/         数据描述，不含真实视频与完整索引
-├── experiments/records/        配置快照、commit、指标、来源指纹
-├── experiments/registry.csv    实验索引，可重建
-├── tools/                      索引、预览、权重下载、审计
-├── scripts/                    共用 runner、部署与合并脚本
-├── tests/                      回归测试
-├── licenses/                   第三方源码许可
-├── references/                 资料目录；原始本机资料放 local/，不提交Git
-├── artifacts/                  本机历史结果/交付/预览/来源快照，不提交Git
-└── docs/                       运行、历史、迁移和协作说明
+## 从哪里运行
+
+本服务器的唯一维护工作区：
+
+```bash
+cd /root/rivermind-data/development/video-highlight-unified
+cat START_HERE.md
+/root/rivermind-data/development/vh workflow versions
+/root/rivermind-data/development/vh workflow plan \
+  --config configs/workflows/compat.json --local configs/workflows/server.local.json
 ```
 
-Git 不保存权重、视频、缓存、大量回答与预测。它们留在 `runs/`、`datasets/local/` 或外部目录，通过路径与哈希定位。
-
-## 安装与一次 Baseline
-
-Python 3.11+，准备 `ffmpeg` / `ffprobe`，从仓库运行：
+其他机器先准备 Python 3.11+，从仓库运行：
 
 ```bash
 python -m pip install -e ".[dev]"
-python tools/make_demo.py
-python vh.py run --config configs/pipelines/baseline_center.json --experiment demo-center-yourname-001 --author yourname
+cp configs/workflows/paths.example.json configs/workflows/paths.local.json
+# 填写真实路径、解释器和全新的 run_root，再生成计划
+python vh.py workflow plan --config configs/workflows/compat.json \
+  --local configs/workflows/paths.local.json
 ```
 
-生成两条合成视频，执行全片居中裁剪；结果在 `runs/demo-center-yourname-001/predictions.jsonl`，实验在 `experiments/records/demo-center-yourname-001/`。把yourname换成自己的名字，并为新实验选未使用的ID。这检查读视频、稠密输出和边界，不代表高光成绩。已有ID只用于原源码版本的续跑；历史 `demo-center-20261004` 绑定重构时的commit，不在当前源码上复用。
+`*.local.json` 只放机器路径，不进入 Git，不保存 SSH 密码或 token。视频、模型、输入和运行结果留在服务器外部数据目录。完整说明见 [统一工作流](docs/scene_workflow.md)；界面启动、SSH 转发、服务重启见 [TUI / WebUI](docs/scene_workflow_ui.md)。
 
-CPU baseline 不需要 Torch、CUDA 或大模型。模型路线用独立环境，见 [环境与模型](docs/environments.md)。回归测试还需要 PyTorch，因为它覆盖 PGL 网络结构。
+正式提交来自新运行的 `final/submission.zip`。历史正式结果位于：
 
-## 真实数据与 ORA
-
-```bash
-python tools/build_index.py --videos /data/videos --configs /data/configs --output datasets/local/test_index.json
-cp configs/paths.example.json configs/paths.local.json
+```text
+/root/rivermind-data/aic_spatial_trials_20261008/output/scene_temporal_full_426_20261011_v3/
 ```
 
-填写自己的机器路径和解释器。相对路径以仓库根目录为起点。`paths.local.json` 被忽略，仅放路径，禁止放密码/token；算法参数放 `configs/pipelines/`。换数据时同步修改 dataset ID/manifest。
+该目录及原视频、模型和基准输入保留。旧快照只提供数据与历史溯源；维护代码在上面的 Git 工作区。
+
+## 怎样约束后续开发
+
+- 一次改动建一个 `feat/`、`fix/` 或 `exp/` 分支，经过 PR 和自动检查合入 `main`，再删除已经合并的开发分支。
+- 默认版本和功能入口由 [项目策略](configs/project_policy.json) 登记；README、唯一入口与界面使用同一个默认版本。
+- core、原 v3、Prompt、FPS、帧号和 PTS 保持原样。CI 检查 41 个冻结文件及所有版本指纹。
+- 新算法放独立源码目录、增加新清单；旧版本清单不覆盖。每次实验使用新的运行目录。
+- 续跑核对提交、配置、输入、模型和已完成阶段产物，变化后拒绝混用旧缓存。
+- GPU 未验收保持 pending，CPU 检查通过不自动改成 GPU 等价性通过。
+- GitHub 当前私有仓库套餐不支持强制分支保护；自动检查能发现违规，但不能阻止有写权限者绕过检查。详见 [分支规则](docs/branch_policy.md)。
+
+[项目管理说明](docs/project_management.md) 说明主线、版本、发布、服务器部署和临时文件清理规则。
+
+## 其他研究路线与历史资料
+
+以下路线保留在 `main`，通过 `vh.py run --config configs/pipelines/...` 选择。它们不是本次 v3 默认流程，新 GPU 推理状态按各自文档判断。
+
+| 目录 | 用途 |
+|---|---|
+| `pipelines/ora_direct/` | ORA v5 时间选择，4B / 9B |
+| `pipelines/spatial_crop/` | YOLO / Pose / BoT-SORT 空间路线 |
+| `pipelines/ora_spatial/` | 本次 v3 源码、历史基准与早期 E1/E2/E3 |
+| `pipelines/qwen_direct/`、`qwen_window/` | Qwen 定位 / 窗口评分 |
+| `pipelines/reze/`、`pgl_sum/` | 其他时间模型研究 |
+| `pipelines/ora_proposal/`、`ora_reranker/` | 历史设计与证据，完整性见各自 README |
+| `pipelines/baselines/`、`editing/`、`sam_tracking/` | 基线、预览与历史跟踪入口 |
+
+历史报告的初赛 56.43 分并非本次 v3 已确认成绩。当前 v3 没有已确认的官方排行榜分数。[历史结果](docs/history.md)、[实验登记](docs/experiments.md)、[环境](docs/environments.md)、[来源许可](docs/sources.md) 保存各自背景。
+
+## 自动化检查
 
 ```bash
-python vh.py run --config configs/pipelines/ora4b_v5.json --experiment 20261004-yourname-ora4b-v5 --local configs/paths.local.json --dry-run --action all
-python vh.py run --config configs/pipelines/ora4b_v5.json --experiment 20261004-yourname-ora4b-v5 --author yourname --local configs/paths.local.json --action all
-```
-
-已有时间结果时，路径配置增加 `temporal_handoff`，使用 `spatial_crop.json` 和 `--action spatial`，无卡先用 `--action prepare`。详细操作见 [运行说明](docs/running.md)。
-
-## 新实验与历史实验
-
-先提交代码、配置和 Prompt，再登记。模型填写确切 revision，作者填实际运行的人。
-
-```bash
-python vh.py experiment create --id 20261004-yourname-qwen-window-v2 --author yourname --config configs/pipelines/qwen_window_v1.json --notes "公开开发集，聚合阈值对比"
-python vh.py run --experiment 20261004-yourname-qwen-window-v2 --local configs/paths.local.json
-python vh.py experiment metrics --id 20261004-yourname-qwen-window-v2 --file /path/to/metrics.json
-python vh.py experiment list
-python vh.py experiment show --id hist-exp07-boundary-b
-```
-
-登记保存配置快照、Prompt 文件 hash、数据 manifest hash 与代码 commit；运行记录实际输入文件/权重 hash 和命令。`metric_type` 区分榜单、代理评测与工程统计。见 [实验规范](docs/experiments.md)。
-
-Prompt 如 `prompts/ora/v5/`、`prompts/qwen/window-v1/`。修改语义时新建版本目录并在配置指定，保留旧版本；不使用 `final2` 命名。
-
-## 协作与验证
-
-```bash
+python tools/check_scene_baseline.py
+python tools/check_project_policy.py
 python -m pytest -q
 python -m compileall -q src scripts tools pipelines prompts pipeline.py vh.py
 python tools/audit_repo.py
 ```
 
-分支用于一次开发：`feat/xxx`、`fix/xxx`、`exp/xxx`。值得留下的实现、配置、Prompt 和结论合入 `main`，完成后删除开发分支；算法不使用永久分支隔离。
-
-[迁移报告](docs/migration_report.md) 说明迁移/舍弃/Archive 建议与历史缺口；[来源许可](docs/sources.md) 说明第三方代码；[协作规范](docs/workflow.md) 说明团队流程。
-
-[参考资料索引](references/README.md) 集中赛题、历史方案和论文；[本地整理说明](docs/workspace_cleanup.md) 记录原目录归位、重复删除、旧路径查找和保留原则。
+GitHub 的 Engineering contracts 在 push / PR 时自动执行编译、常规 pytest（含冻结契约、项目策略、原 v3 测试）和仓库审计。回归还需 CPU Torch，CI 已安装。验证范围、历史产物 SHA256 和 GPU 待办见 [验收记录](docs/scene_workflow_validation.md)。

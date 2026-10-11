@@ -1,0 +1,37 @@
+{
+  "snapshot_date": "2026-10-10",
+  "source_type": "authorized_gpu_server_directory_without_git_history",
+  "source_directories": [
+    "/root/rivermind-data/aic_spatial_trials_20261008",
+    "/root/rivermind-data/ora4b_v5_20261001/stage2_new426_20261001"
+  ],
+  "ora_spatial_source_archive_sha256": "9ca2e6c677c8087c74fdb4d1f7db2a56d9b1536a7f5214dd7dd8c5ca9998ce5b",
+  "stage2_reference_archive_sha256": "aa45c804d9a86ef3b478bf5dbbaa9cb629adf7d91c504bcfd3ffd5836380cc73",
+  "stage2_import_decision": "not duplicated; the maintained implementation is already under src/video_highlight/spatial",
+  "copied": [
+    "source code",
+    "configs",
+    "tests",
+    "experiment implementations",
+    "prompts embedded in source or config",
+    "upstream licenses",
+    "model and artifact provenance"
+  ],
+  "excluded": [
+    "model weights",
+    "videos and dataset indexes",
+    "baseline and prediction archives",
+    "generated JSONL and previews",
+    "logs and caches",
+    "Python environments",
+    "server credentials"
+  ],
+  "validation": {
+    "unit_and_contract_tests": 49,
+    "failures": 0,
+    "compileall": "passed",
+    "gpu_full_run": "not rerun during migration",
+    "official_score": null
+  },
+  "active_run_at_snapshot": "scene_general_v3 batch 240-330 was still running; no generated output was copied"
+}

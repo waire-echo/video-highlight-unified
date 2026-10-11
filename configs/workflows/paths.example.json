@@ -1,0 +1,12 @@
+{
+  "data_root": "/data/scene-general-inputs",
+  "video_dir": "/data/videos",
+  "runtime_root": "/data/ora-runtime",
+  "model_dir": "/data/ora-runtime/models/Video-ORA-4B",
+  "client_python": "/data/scene-client/env/bin/python",
+  "temporal_python": "/data/ora-runtime/env/bin/python",
+  "run_root": "/data/runs/your-unique-experiment",
+  "test_index": "/data/test_index.json",
+  "temporal_handoff": "/data/temporal/export_grounded/temporal_handoff.jsonl",
+  "highlight_frames": "/data/temporal/export_grounded/highlight_frames.jsonl"
+}

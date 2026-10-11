@@ -1,0 +1,10 @@
+{
+  "transnet_architecture_repo": "https://github.com/soCzech/TransNetV2",
+  "transnet_architecture_revision": "85cef72af9a916bdfd7cc94a670c9cdfbf12d1ed",
+  "architecture_sha256": "f7c1d437465579a8ec28a5add19853d2cb2755248ea4a4207678210a609428e1",
+  "transnet_converted_weight_repo": "magnusdtd/TransNetV2",
+  "weight_revision": "1c0e86a1a6333ff57c4458a44fe4b5b4a0faae2a",
+  "weight_sha256": "eed5336d5d6a013c67f5863505a26e7e835053e64a9ce413d6b089ccba07bb53",
+  "sam2_repo": "https://github.com/facebookresearch/sam2",
+  "sam2_revision": "2b90b9f5ceec907a1c18123530e92e794ad901a4"
+}
