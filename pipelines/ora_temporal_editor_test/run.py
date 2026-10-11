@@ -211,7 +211,7 @@ def main():
     if args.ids and args.all:parser.error('Choose ids or all, not both')
     ROOT=args.data_root.resolve()
     cfg=read(args.config);manifest=read(ROOT/'inputs/manifest.json');provenance=read(ROOT/'inputs/ora_model_provenance.json')
-    if cfg['prompt_version']!='ora/temporal-editor-test-v1':raise ValueError('Prompt version does not match this test implementation')
+    if cfg['prompt_version']!='ora/temporal-editor-test-v2':raise ValueError('Prompt version does not match this test implementation')
     ids=[i.strip() for i in args.ids.split(',')] if args.ids else (sorted(manifest['videos'],key=int) if args.all else cfg.get('pilot_ids',pilot_ids(manifest,cfg['pilot_count'])))
     if len(set(ids))!=len(ids) or any(i not in manifest['videos'] for i in ids):raise ValueError('Invalid or duplicate video IDs')
     ts_path=ROOT/'inputs/timestamps.npz'

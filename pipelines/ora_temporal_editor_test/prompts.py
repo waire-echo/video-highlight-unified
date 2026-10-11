@@ -1,13 +1,14 @@
 """Versioned evidence contracts for the isolated temporal test."""
 from pathlib import Path
-PROMPT_DIR = Path(__file__).resolve().parents[2] / "prompts/ora/temporal-editor-test-v1"
+PROMPT_DIR = Path(__file__).resolve().parents[2] / "prompts/ora/temporal-editor-test-v2"
 for name in ("DISCOVER", "GLOBAL", "CORE", "BOUNDARY", "VERIFY", "DUPLICATE", "OBSERVE"):
     globals()[name] = (PROMPT_DIR / (name.lower() + ".txt")).read_text(encoding="utf-8").strip()
 
 def obj(properties):
     return {'type':'object','properties':properties,'required':list(properties),'additionalProperties':False}
 
-def text(limit=240): return {'type':'string','minLength':1,'maxLength':limit}
+def text(limit=240): return {'type':'string','minLength':1,'maxLength':limit,
+    'description':'Describe the requested visible fact, uncertainty or reason in words. Not a timestamp, numeric score or numeric placeholder.'}
 def enum(*values): return {'type':'string','enum':list(values)}
 NUMBER={'type':'number'}
 NULLABLE={'type':['number','null']}

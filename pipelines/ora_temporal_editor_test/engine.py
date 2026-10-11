@@ -54,7 +54,7 @@ def frame_ids(timestamps,spans):
 
 def visible_text(s):
     if not isinstance(s,str) or sum(c.isalpha() for c in s)<4:
-        raise ValueError('Evidence must describe visible content, not only timestamps')
+        raise ValueError(f'Descriptive evidence must use words, not numeric placeholders or timestamps; received {s!r}')
 
 def check_times(values,duration):
     for v in values:
@@ -138,9 +138,10 @@ class Client:
         if cache.exists():
             saved=read(cache);obj=saved['parsed'];jsonschema.validate(obj,schema);validator(obj)
             self.hits+=1;return obj,key
+        last_error=None
         for attempt in range(2):
             request=json.loads(json.dumps(payload))
-            if attempt:request['messages'][0]['content'][-1]['text']+='\nPrevious response violated the output contract. Return concise valid JSON with supported local times.'
+            if attempt:request['messages'][0]['content'][-1]['text']+='\nPrevious response violated the output contract: '+str(last_error)+'\nUse real descriptive words in event/evidence/distinct_change/uncertainty/reason fields, never numeric placeholders. Return concise valid JSON with supported local times.'
             response=self.session.post(self.cfg['endpoint']+'/chat/completions',json=request,timeout=self.cfg['timeout_seconds'])
             response.raise_for_status();body=response.json();self.calls+=1
             entry={'video_id':self.video_id,'tag':tag,'request':request,'media':media,'response':body,'attempt':attempt,
@@ -151,6 +152,7 @@ class Client:
                 if choice.get('finish_reason')!='stop':raise ValueError('Generation did not finish normally')
                 obj=parse(choice['message']['content']);jsonschema.validate(obj,schema);validator(obj)
             except (ValueError,KeyError,TypeError,jsonschema.ValidationError) as error:
+                last_error=str(error)
                 entry['validation_error']=str(error);save(rawfile,entry)
                 if attempt:raise RuntimeError(f'{tag}: invalid model answer; see {rawfile}') from error
             else:
