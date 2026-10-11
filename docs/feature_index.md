@@ -19,5 +19,7 @@
 | TUI | `workflow tui --local ...` | SSH 终端与 CPU 准备实测通过 |
 | WebUI | `workflow webui --local ...` | 已部署，浏览器、CPU 准备/续跑、ZIP 下载通过 |
 | 三路同步对比 / 预计剩余时间 | 产品化计划 | 待开发 |
+| GPT / AI参考分类、播放与JSONL | [参考版本](ai_reference_versions.md) | 本机索引已整理；原成果Git忽略 |
+| 旧本地代码版本与历史恢复 | [旧工作区清理](local_workspace_retirement.md) | 6个旧目录已归档清理 |
 
 [README](../README.md) · [唯一入口](../START_HERE.md) · [分支约束](branch_policy.md) · [界面使用](scene_workflow_ui.md)

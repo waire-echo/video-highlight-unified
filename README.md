@@ -88,6 +88,8 @@ python vh.py workflow plan --config configs/workflows/compat.json \
 
 历史报告的初赛 56.43 分并非本次 v3 已确认成绩。当前 v3 没有已确认的官方排行榜分数。[历史结果](docs/history.md)、[实验登记](docs/experiments.md)、[环境](docs/environments.md)、[来源许可](docs/sources.md) 保存各自背景。
 
+本机旧工作区已经归档并清理，恢复方法见 [本地旧版本清理](docs/local_workspace_retirement.md)。GPT/AI编辑参考按5条示范、10条示范、全量426条、局部备选和JSONL导出登记，见 [参考版本说明](docs/ai_reference_versions.md) 与 [本机播放和文件索引](references/local/ai_references/README.md)。原始标注、视频、预测和归档包均不进入 Git。
+
 ## 自动化检查
 
 ```bash
