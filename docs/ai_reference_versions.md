@@ -2,7 +2,7 @@
 
 整理日期：2026-10-11。这里登记独立编辑参考与它们的派生文件。原始标注、视频与完整预测只保存在本机，Git 中只保存说明。历史实验成绩仍查 [实验记录](experiments.md) 和 [历史结果](history.md)。
 
-**本机统一入口：[参考版本目录](../references/local/ai_references/README.md)**。机器可读索引为 `references/local/ai_references/registry.local.json`，含路径、覆盖范围、父版本和 SHA256。所有路径相对于仓库根目录；从 GitHub 克隆后需要另外取得本地成果。
+**本机统一入口：`references/local/ai_references/README.md`**。机器可读索引为 `references/local/ai_references/registry.local.json`，含路径、覆盖范围、父版本和 SHA256。所有路径相对于仓库根目录；从 GitHub 克隆后需要另外取得本地成果。
 
 ## 已找到的版本
 

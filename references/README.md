@@ -4,7 +4,7 @@
 
 ## GPT / AI 编辑参考
 
-[版本、用途与边界](../docs/ai_reference_versions.md) · [本机版本目录与播放入口](local/ai_references/README.md)
+[版本、用途与边界](../docs/ai_reference_versions.md)；本机版本目录与播放入口在 `references/local/ai_references/README.md`。
 
 本机索引 `local/ai_references/registry.local.json` 记录3组独立标注、2个局部备选与1份JSONL导出的路径、父版本和指纹。当前全量是426条；JSONL为同一参考的格式转换，不能把每份预览或ZIP都算作新标答。历史174条GPT原文件尚未找到。
 
