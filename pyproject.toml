@@ -13,7 +13,7 @@ dependencies = ["numpy>=1.24", "opencv-python>=4.8", "Pillow>=10", "tzdata; plat
 vh = "video_highlight.runner:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "requests>=2.31", "scipy>=1.10"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src", "scripts"]
