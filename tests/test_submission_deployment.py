@@ -61,6 +61,18 @@ def test_environment_probe_does_not_hide_import_failure(monkeypatch):
         setup.probe_environment(Path(sys.executable), "0,1")
 
 
+@pytest.mark.parametrize("requirements", [[], ["nvidia-cuda-runtime-cu12==12.8.90", "triton==3.6.0"]])
+def test_cuda_runtime_install_uses_wheel_metadata(requirements, monkeypatch):
+    monkeypatch.setattr(setup.subprocess, "check_output", lambda *args, **kwargs: json.dumps(requirements))
+    calls = []
+    monkeypatch.setattr(setup.subprocess, "run", lambda command, **kwargs: calls.append(command))
+    setup.install_cuda_runtime(Path(sys.executable), "https://download.pytorch.org/whl/cu128")
+    assert len(calls) == bool(requirements)
+    if requirements:
+        assert calls[0][4] == "--no-deps"
+        assert calls[0][5:5 + len(requirements)] == requirements
+
+
 def test_real_venv_interpreter_survives_config_and_executable_resolution(tmp_path):
     folder = tmp_path / "isolated runtime"
     venv.EnvBuilder(with_pip=False, symlinks=os.name != "nt").create(folder)

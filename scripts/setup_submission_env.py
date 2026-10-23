@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 from pathlib import Path
 import shutil
 import subprocess
@@ -87,6 +88,16 @@ def make_config(template: dict, config_dir: Path, *, python: Path, model: Path,
     return config
 
 
+def install_cuda_runtime(python: Path, index_url: str) -> None:
+    """Use the GPU wheel's exact runtime requirements, not a second CUDA guess."""
+    code = ("import importlib.metadata as m,json; print(json.dumps([r.split(';')[0].strip() "
+            "for r in m.requires('torch') or [] if r.split(';')[0].strip().lower().startswith(('nvidia-','triton=='))]))")
+    requirements = json.loads(subprocess.check_output([str(python), "-I", "-B", "-c", code], text=True))
+    if requirements:
+        subprocess.run([str(python), "-m", "pip", "install", "--no-deps", *requirements,
+                        "--index-url", index_url], check=True)
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--python", type=Path, default=Path(sys.executable), help="Python 3.11 used to create the venv")
@@ -133,6 +144,8 @@ def main(argv=None) -> int:
         subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip"], check=True)
         subprocess.run([str(python), "-m", "pip", "install", "torch==2.10.0", "torchvision==0.25.0",
                         "--no-deps", "--index-url", args.torch_index_url], check=True)
+        if sys.platform == "linux" and platform.machine().lower() in ("x86_64", "amd64"):
+            install_cuda_runtime(python, args.torch_index_url)
         subprocess.run([str(python), "-m", "pip", "install", "-r", str(requirements)], check=True)
         if args.with_tests:
             subprocess.run([str(python), "-m", "pip", "install", "pytest>=8"], check=True)
