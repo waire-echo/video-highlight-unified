@@ -114,6 +114,32 @@ def test_prepared_clip_tampering_is_rejected(example):
         inputs.prepare_inputs(args)
 
 
+@pytest.mark.parametrize("rotation_metadata", [{"tags": {"rotate": "90"}},
+                                               {"side_data_list": [{"rotation": -90}]}])
+def test_probe_preserves_rotation_checks_without_new_ffprobe_sections(monkeypatch, rotation_metadata):
+    def probe(command, **kwargs):
+        assert "-show_streams" in command and "-show_entries" not in command
+        return json.dumps({"streams": [{"width": 96, "height": 64, **rotation_metadata}]})
+
+    monkeypatch.setattr(inputs.subprocess, "check_output", probe)
+    with pytest.raises(ValueError, match="Rotated source"):
+        inputs.probe_video(Path("rotated.mp4"), Path("ffprobe"))
+
+
+def test_probe_rejects_real_rotated_media_with_available_ffprobe(example):
+    rotated = example.data / "rotated.mp4"
+    # FFmpeg 8 no longer writes rotation from the legacy metadata option;
+    # older FFmpeg versions do not yet implement display_rotation.
+    modern = subprocess.run([shutil.which("ffmpeg"), "-v", "error", "-display_rotation:v:0", "90",
+                             "-i", str(example.data / "video/81.mp4"), "-c", "copy", str(rotated)],
+                            capture_output=True)
+    if modern.returncode:
+        subprocess.run([shutil.which("ffmpeg"), "-v", "error", "-y", "-i", str(example.data / "video/81.mp4"),
+                        "-c", "copy", "-metadata:s:v:0", "rotate=90", str(rotated)], check=True)
+    with pytest.raises(ValueError, match="Rotated source"):
+        inputs.probe_video(rotated, inputs.executable("ffprobe"))
+
+
 def test_dry_run_does_not_prepare_or_start_a_gpu(example):
     assert pipeline.main(["--config", str(example.config), "--dry-run"]) == 0
     assert not (example.root / "runs").exists()

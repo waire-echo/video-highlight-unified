@@ -166,16 +166,22 @@ def run_lock(folder: Path):
 
 
 def probe_video(path: Path, ffprobe: Path) -> dict:
+    # Use a separate unfiltered stream probe: old FFprobe builds reject the
+    # stream_side_data selector, and frame-only filters on newer builds can
+    # omit display matrices even with -show_streams. Never lose rotation data.
     raw = json.loads(subprocess.check_output([
-        str(ffprobe), "-v", "error", "-select_streams", "v:0", "-show_frames",
-        "-show_entries", "stream=width,height,duration,avg_frame_rate:stream_tags=rotate:stream_side_data=rotation:frame=best_effort_timestamp_time,pkt_duration_time",
+        str(ffprobe), "-v", "error", "-select_streams", "v:0", "-show_streams",
         "-of", "json", str(path)], text=True, encoding="utf-8", timeout=900))
     stream = raw["streams"][0]
     rotations = [float(stream.get("tags", {}).get("rotate", 0)),
                  *[float(data.get("rotation", 0)) for data in stream.get("side_data_list", [])]]
     if any(not math.isfinite(value) or value % 360 != 0 for value in rotations):
         raise ValueError(f"Rotated source requires a verified original-coordinate mapping; refusing to guess: {path}")
-    frames = raw.get("frames", [])
+    frame_data = json.loads(subprocess.check_output([
+        str(ffprobe), "-v", "error", "-select_streams", "v:0", "-show_frames",
+        "-show_entries", "frame=best_effort_timestamp_time,pkt_duration_time",
+        "-of", "json", str(path)], text=True, encoding="utf-8", timeout=900))
+    frames = frame_data.get("frames", [])
     if not frames or any("best_effort_timestamp_time" not in frame for frame in frames):
         raise ValueError(f"Video has missing decoded frame timestamps: {path}")
     origin = Decimal(frames[0]["best_effort_timestamp_time"])
