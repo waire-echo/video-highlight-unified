@@ -46,8 +46,10 @@ def validate_assets(model: Path, adapter: Path, spatial: Path) -> str:
     if not list(model.glob("*.safetensors")):
         raise ValueError("Base-model safetensors are missing")
     asset = read_json(spatial / "configs/v7e_b_4109.json")["assets"]["yolo"]
-    from package_submission import inside
-    if digest(inside(spatial, asset["path"])) != asset["sha256"]:
+    detector = (spatial / asset["path"]).resolve()
+    if not detector.is_relative_to(spatial.resolve()):
+        raise ValueError("Detector asset path escapes the spatial package")
+    if digest(detector) != asset["sha256"]:
         raise ValueError("Stage-2 detector weights differ from the supplied manifest")
     return digest(adapter / "adapter_model.safetensors")
 

@@ -39,6 +39,16 @@ def test_deployment_checks_actual_asset_hashes(example):
         setup.validate_assets(example.model, example.adapter, example.spatial)
 
 
+def test_asset_validation_works_without_sibling_import_paths(example):
+    code = ("import importlib.util,sys; s=importlib.util.spec_from_file_location('bootstrap',sys.argv[1]); "
+            "m=importlib.util.module_from_spec(s); s.loader.exec_module(m); "
+            "print(m.validate_assets(*map(m.Path,sys.argv[2:])))")
+    result = subprocess.run([sys.executable, "-I", "-B", "-c", code, setup.__file__,
+                             str(example.model), str(example.adapter), str(example.spatial)],
+                            check=True, text=True, capture_output=True)
+    assert result.stdout.strip() == inputs.digest(example.adapter / "adapter_model.safetensors")
+
+
 def test_environment_probe_excludes_development_pythonpath(monkeypatch):
     monkeypatch.setenv("PYTHONPATH", "must-not-leak")
     monkeypatch.setenv("PYTHONHOME", "must-not-leak")
