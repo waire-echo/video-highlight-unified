@@ -15,7 +15,7 @@
 > 本 `video-highlight-unified-new` 目录当前的 SFT-v2 比赛推理/交付入口是
 > `scripts/run_submission_pipeline.py`。先读 [可搬移输入、运行与打包说明](docs/submission_portability.md)
 > 和 [容错审查采纳及待验项](docs/robustness_review_response.md)。下方 `scene_general_v3`
-> 是继承主线说明，不是本次 new 推理包的默认启动方式。新入口 CPU/故障注入已验证，打包后真实 GPU 待验收。
+> 是继承主线说明，不是本次 new 推理包的默认启动方式。新入口 CPU/故障注入、两卡公开小样本全流程及真实中断续跑已验证；不代表官方成绩。
 
 **唯一维护主线是 `main`。当前整理和推荐入口是 `scene_general_v3`，统一命令为 `python vh.py workflow`。** 新人先读 [START_HERE.md](START_HERE.md)，再按 [功能索引](docs/feature_index.md) 找入口；不要从历史 E1/E2/E3 脚本开始。
 
