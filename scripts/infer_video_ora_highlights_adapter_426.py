@@ -21,6 +21,7 @@ import os
 from pathlib import Path
 import re
 import socket
+import sys
 import time
 import traceback
 from typing import Any
@@ -28,6 +29,7 @@ from typing import Any
 
 EMPTY_THINK = re.compile(r"\A\s*<think>\s*</think>\s*", re.IGNORECASE)
 REQUIRED_ROW_KEYS = {"messages", "videos"}
+WINDOW_LOCKS = {}
 REQUIRED_SAMPLE_KEYS = {
     "source_video_id",
     "source_video",
@@ -77,9 +79,18 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def acquire_window_claim(failed_dir: Path, window_id: str) -> Path | None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from video_highlight.submission_inputs import run_lock
+    lock = run_lock(failed_dir / ".window-locks" / window_id)
+    try:
+        lock.__enter__()
+    except RuntimeError:
+        return None
     claim = failed_dir / f".{window_id}.claim"
     try:
-        with claim.open("x", encoding="ascii", newline="\n") as handle:
+        # The OS lock, not this receipt, establishes ownership. A killed process
+        # releases its lock automatically, so its stale receipt is recoverable.
+        with claim.open("w", encoding="ascii", newline="\n") as handle:
             handle.write(
                 json.dumps(
                     {
@@ -91,14 +102,21 @@ def acquire_window_claim(failed_dir: Path, window_id: str) -> Path | None:
                 )
                 + "\n"
             )
-    except FileExistsError:
-        return None
+    except BaseException:
+        lock.__exit__(None, None, None)
+        raise
+    WINDOW_LOCKS[claim.resolve()] = lock
     return claim
 
 
 def release_window_claim(claim: Path | None) -> None:
     if claim is not None:
-        claim.unlink(missing_ok=True)
+        try:
+            claim.unlink(missing_ok=True)
+        finally:
+            lock = WINDOW_LOCKS.pop(claim.resolve(), None)
+            if lock is not None:
+                lock.__exit__(None, None, None)
 
 
 def interval_union(intervals: list[list[float]]) -> list[list[float]]:
@@ -222,15 +240,15 @@ def load_plan(
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("answer_contract") != "highlights-only/v1":
         raise ValueError("unexpected answer contract")
-    if manifest.get("source_counts") != {"train": 383, "val": 43}:
-        raise ValueError("unexpected source split")
     samples_by_split = manifest.get("samples")
     if not isinstance(samples_by_split, dict):
         raise ValueError("manifest.samples is missing")
+    if not samples_by_split or set(samples_by_split) - {"train", "val", "test"}:
+        raise ValueError("unexpected inference sample splits")
     rows_by_window: dict[str, dict[str, Any]] = {}
     source_rows: dict[str, list[dict[str, Any]]] = {}
     windows: list[dict[str, Any]] = []
-    for split in ("train", "val"):
+    for split in samples_by_split:
         rows = read_jsonl(materialized_root / f"{split}.windows.jsonl")
         samples = samples_by_split.get(split)
         if not isinstance(samples, list) or len(rows) != len(samples):
@@ -251,13 +269,15 @@ def load_plan(
             if (
                 not isinstance(messages, list)
                 or not messages
-                or messages[-1].get("role") != "assistant"
+                or not any(message.get("role") == "user" for message in messages)
             ):
-                raise ValueError(f"{split}: expected assistant target at end")
+                raise ValueError(f"{split}: expected a user video request")
             videos = row["videos"]
             if not isinstance(videos, list) or len(videos) != 1:
                 raise ValueError(f"{split}: expected exactly one window video")
             window_video = Path(videos[0])
+            if not window_video.is_absolute():
+                window_video = materialized_root / window_video
             if not window_video.is_file():
                 raise FileNotFoundError(window_video)
             source_id = str(sample["source_video_id"])
@@ -314,8 +334,9 @@ def load_plan(
             windows.append(item)
             rows_by_window[window_id] = item
             source_rows.setdefault(source_id, []).append(item)
-    expected_source_ids = {str(index) for index in range(426)}
-    if len(source_rows) != 426 or set(source_rows) != expected_source_ids:
+    expected_source_ids = set(map(str, manifest.get("source_ids", source_rows)))
+    expected_count = sum(manifest.get("source_counts", {}).values())
+    if not expected_source_ids or len(source_rows) != expected_count or set(source_rows) != expected_source_ids:
         missing = sorted(expected_source_ids - set(source_rows))
         extra = sorted(set(source_rows) - expected_source_ids)
         raise ValueError(
@@ -330,7 +351,7 @@ def load_plan(
                     f"duplicate/non-increasing window start: {source_id}"
                 )
     source_index = []
-    for source_id in sorted(source_rows, key=int):
+    for source_id in sorted(source_rows, key=lambda value: (not value.isdecimal(), int(value) if value.isdecimal() else value)):
         source_windows = source_rows[source_id]
         source_index.append(
             {
@@ -365,13 +386,14 @@ def build_engine(
 ):
     os.environ.update(
         CUDA_VISIBLE_DEVICES=visible_devices,
-        FPS="2",
+        FPS=os.environ.get("FPS", "2"),
         FPS_MAX_FRAMES=str(max_frames),
-        VIDEO_MAX_TOKEN_NUM="196",
-        VIDEO_MIN_TOKEN_NUM="128",
+        VIDEO_MAX_TOKEN_NUM=os.environ.get("VIDEO_MAX_TOKEN_NUM", "196"),
+        VIDEO_MIN_TOKEN_NUM=os.environ.get("VIDEO_MIN_TOKEN_NUM", "128"),
         HF_HUB_OFFLINE="1",
         TRANSFORMERS_OFFLINE="1",
         TOKENIZERS_PARALLELISM="false",
+        FORCE_QWENVL_VIDEO_READER="decord",
         PYTORCH_ALLOC_CONF="expandable_segments:True",
     )
     import torch
@@ -471,7 +493,11 @@ def infer_all(
     start_index: int,
     end_index: int | None,
     resume: bool,
+    window_ids: list[str] | None = None,
+    window_timeout_sec: float = 0,
 ) -> dict[str, Any]:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from video_highlight.submission_recovery import inference_deadline
     adapter_hash = sha256_file(adapter / "adapter_model.safetensors")
     manifest_hash = sha256_file(materialized_root / "manifest.json")
     if output.exists() and not output.is_dir():
@@ -506,6 +532,15 @@ def infer_all(
             f"end-index must be within {start_index + 1}..{len(windows)}"
         )
     selected_windows = windows[start_index:stop_index]
+    if window_ids is not None:
+        wanted = set(window_ids)
+        if len(wanted) != len(window_ids) or not wanted or wanted - {w["window_id"] for w in windows}:
+            raise ValueError("window-ids must be a nonempty, unique subset of the input windows")
+        selected_windows = [w for w in windows if w["window_id"] in wanted]
+    selected_ids = {w["window_id"] for w in selected_windows}
+    selected_sources = [dict(source, windows=[w for w in source["windows"] if w["window_id"] in selected_ids])
+                        for source in source_index]
+    selected_sources = [source for source in selected_sources if source["windows"]]
     plan = {
         "schema": "video-ora-adapter426-inference/v1",
         "created_at": utc_now(),
@@ -517,6 +552,8 @@ def infer_all(
         "video_root": str(video_root),
         "windows": len(windows),
         "selected_window_count": len(selected_windows),
+        "selected_window_ids": [w["window_id"] for w in selected_windows],
+        "window_timeout_sec": window_timeout_sec,
         "start_index": start_index,
         "end_index": stop_index,
         "start_window_id": selected_windows[0]["window_id"],
@@ -529,10 +566,11 @@ def infer_all(
         "prompt": windows[0]["messages"],
         "assistant_answers_passed_to_model": False,
         "generation": {
-            "fps": 2,
+            "video_reader_backend": "decord",
+            "fps": float(os.environ.get("FPS", "2")),
             "max_frames": max_frames,
-            "video_max_token_num": 196,
-            "video_min_token_num": 128,
+            "video_max_token_num": int(os.environ.get("VIDEO_MAX_TOKEN_NUM", "196")),
+            "video_min_token_num": int(os.environ.get("VIDEO_MIN_TOKEN_NUM", "128")),
             "max_tokens": max_tokens,
             "temperature": 0,
             "seed": 42,
@@ -543,8 +581,8 @@ def infer_all(
         "reuse_policy": "Existing per-window raw/record files are reused only "
         "when their request hash and adapter hash match.",
         "concurrency_policy": "Each window is claimed with an exclusive "
-        "pid-hostname claim file. Claims are released after finalization; "
-        "stale claims are never stolen automatically.",
+        "OS-owned per-window lock plus pid-hostname receipt. A crash releases "
+        "the OS lock; a stale receipt does not block recovery. Live locks are never stolen.",
     }
     if not plan_path.exists():
         write_json(plan_path, plan)
@@ -559,6 +597,8 @@ def infer_all(
             "video_root",
             "windows",
             "selected_window_count",
+            "selected_window_ids",
+            "window_timeout_sec",
             "start_index",
             "end_index",
             "start_window_id",
@@ -575,6 +615,7 @@ def infer_all(
             if previous.get(key) != plan.get(key):
                 raise ValueError(f"resume plan mismatch: {key}")
     write_json(output / "source_index.json", source_index)
+    write_json(status_path, {"state": "LOADING_MODEL", "updated_at": utc_now()})
     model, engine, request_config, adapter_tensor_count, environment = build_engine(
         model_path=model_path,
         adapter=adapter,
@@ -641,8 +682,11 @@ def infer_all(
             "raw_json_valid": False,
             "assistant_answer_passed_to_model": False,
         }
+        write_json(status_path, {"state": "running", "active_window_id": item["window_id"],
+                                 "active_started_monotonic": time.monotonic(), "updated_at": utc_now()})
         try:
-            response = engine.infer(
+            with inference_deadline(window_timeout_sec):
+                response = engine.infer(
                 [
                     InferRequest(
                         messages=deepcopy(item["messages"]),
@@ -651,7 +695,7 @@ def infer_all(
                     )
                 ],
                 request_config,
-            )[0]
+                )[0]
             choice = response.choices[0]
             raw_content = choice.message.content
             record["raw_response"] = asdict(response)
@@ -732,16 +776,18 @@ def infer_all(
             flush=True,
         )
     records_by_source: dict[str, list[dict[str, Any]]] = {
-        item["video_id"]: [] for item in source_index
+        item["video_id"]: [] for item in selected_sources
     }
     for path in record_dir.glob("*.json"):
         record = json.loads(path.read_text(encoding="utf-8"))
+        if record["window_id"] not in selected_ids:
+            raise ValueError(f"record outside assigned window set: {record['window_id']}")
         video_id = str(record["source_video_id"])
         if video_id not in records_by_source:
             raise ValueError(f"record has unknown source video: {video_id}")
         records_by_source[video_id].append(record)
     by_source: dict[str, list[list[float]]] = {
-        item["video_id"]: [] for item in source_index
+        item["video_id"]: [] for item in selected_sources
     }
     failures = []
     for source_id in by_source:
@@ -750,7 +796,7 @@ def infer_all(
             key=lambda record: record["window_start_sec"],
         )
         expected_source = next(
-            item for item in source_index if item["video_id"] == source_id
+            item for item in selected_sources if item["video_id"] == source_id
         )
         if [
             window["window_id"] for window in expected_source["windows"]
@@ -773,7 +819,7 @@ def infer_all(
                 ]
             )
     highlight_rows = []
-    for item in source_index:
+    for item in selected_sources:
         intervals = interval_union(by_source[item["video_id"]])
         highlight_rows.append(
             {
@@ -811,7 +857,7 @@ def infer_all(
         "adapter": str(adapter),
         "adapter_sha256": plan["adapter_sha256"],
         "assistant_answers_passed_to_model": False,
-        "source_videos": len(source_index),
+        "source_videos": len(selected_sources),
         "windows": len(windows),
         "assigned_windows": len(selected_windows),
         "valid_windows": sum(
@@ -839,6 +885,7 @@ def infer_all(
         "peak_memory": peak,
         "elapsed_seconds": time.monotonic() - started_run,
         "failures": failures,
+        "record_files_sha256": {path.name: sha256_file(path) for path in sorted(record_dir.glob("*.json"))},
     }
     write_json(output / "summary.json", summary)
     write_json(
@@ -873,6 +920,8 @@ def main() -> int:
     parser.add_argument("--reverse", action="store_true")
     parser.add_argument("--start-index", type=int, default=0)
     parser.add_argument("--end-index", type=int)
+    parser.add_argument("--window-ids", nargs="+", help="Exact sparse window IDs; never widen to an index range")
+    parser.add_argument("--window-timeout-sec", type=float, default=0)
     args = parser.parse_args()
     if not 1 <= args.expect_gpus <= 4:
         raise ValueError("expect-gpus must be between 1 and 4")
@@ -895,6 +944,8 @@ def main() -> int:
         start_index=args.start_index,
         end_index=args.end_index,
         resume=args.resume,
+        window_ids=args.window_ids,
+        window_timeout_sec=args.window_timeout_sec,
     )
     print(json.dumps(summary, ensure_ascii=False), flush=True)
     return 0

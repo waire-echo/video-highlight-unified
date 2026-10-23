@@ -1,0 +1,21 @@
+# Isolated inference environment; Python 3.11, FFmpeg and an NVIDIA driver required.
+# Install the CUDA-appropriate torch/torchvision wheels separately first.
+torch==2.10.0
+torchvision==0.25.0
+ms-swift==4.6.0
+transformers==5.19.0
+peft==0.20.0
+tokenizers==0.23.1
+qwen-vl-utils==0.0.14
+# Video readers and adapter dispatch used by the retained successful temporal run.
+decord==0.6.0
+av==18.1.0
+accelerate==1.15.0
+einops==0.8.2
+safetensors>=0.7.0
+ultralytics==8.4.106
+numpy>=1.26,<3
+opencv-python-headless>=4.8
+Pillow>=10
+requests>=2.31
+scipy>=1.10

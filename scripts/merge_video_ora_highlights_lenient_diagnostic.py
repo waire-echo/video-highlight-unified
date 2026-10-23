@@ -15,6 +15,7 @@ from video_highlight.highlight_output import (
     POLICY,
     lenient_normalized_answer,
 )
+from video_highlight.submission_recovery import recover_intervals, POLICY as RECOVERY_POLICY
 
 
 EMPTY_THINK = re.compile(r"\A\s*<think>\s*</think>\s*", re.IGNORECASE)
@@ -95,6 +96,7 @@ def map_to_source(
     *,
     window_start: float,
     source_duration: float,
+    intersect: bool = False,
 ) -> list[list[float]]:
     mapped = []
     duration = Decimal(str(source_duration))
@@ -102,6 +104,11 @@ def map_to_source(
     for start, end in spans:
         source_start = window_origin + Decimal(str(start))
         source_end = window_origin + Decimal(str(end))
+        if intersect:
+            source_start = max(Decimal(0), source_start)
+            source_end = min(duration, source_end)
+            if source_start >= source_end:
+                continue
         if source_end > duration and source_end - duration <= Decimal(
             "0.000000001"
         ):
@@ -116,6 +123,8 @@ def map_to_source(
 
 
 def merge(args: argparse.Namespace) -> dict[str, Any]:
+    intersection = getattr(args, "recovery_policy", "diagnostic") == "intersection"
+    policy = RECOVERY_POLICY if intersection else POLICY
     strict_dir = args.strict_merged.resolve()
     output = args.output.resolve()
     if output == strict_dir:
@@ -143,7 +152,7 @@ def merge(args: argparse.Namespace) -> dict[str, Any]:
         audit: dict[str, Any] = {
             "window_id": window_id,
             "source_video_id": str(failure["video_id"]),
-            "policy": POLICY,
+            "policy": policy,
             "strict_error": failure.get("error"),
             "record_path": str(record_path),
             "accepted": False,
@@ -170,16 +179,22 @@ def merge(args: argparse.Namespace) -> dict[str, Any]:
 
         body = EMPTY_THINK.sub("", raw)
         try:
-            obj, spans, normalization = lenient_normalized_answer(
-                body,
-                record["window_duration_sec"],
-                lenient=True,
-                end_tolerance_sec=args.end_tolerance_sec,
-            )
+            if intersection:
+                obj, spans, normalization = recover_intervals(body, record["window_duration_sec"])
+            else:
+                obj, spans, normalization = lenient_normalized_answer(
+                    body, record["window_duration_sec"], lenient=True,
+                    end_tolerance_sec=args.end_tolerance_sec,
+                )
+            if intersection and record.get("finish_reason") in ("length", "max_tokens", "error"):
+                if not spans:
+                    raise ValueError("Truncated/error generation cannot establish a no-highlights judgment")
+                normalization.update(status="partial", finish_reason=record["finish_reason"])
             source_spans = map_to_source(
                 spans,
                 window_start=float(record["window_start_sec"]),
                 source_duration=float(record["source_duration_sec"]),
+                intersect=intersection,
             )
         except Exception as error:
             audit["error"] = f"{type(error).__name__}: {error}"
@@ -197,9 +212,10 @@ def merge(args: argparse.Namespace) -> dict[str, Any]:
             raw_json_valid=True,
             strict_raw_json_valid=False,
             accepted_by_lenient=True,
-            lenient_policy=POLICY,
+            lenient_policy=policy,
             lenient_window_highlights=spans,
             source_highlights=source_spans,
+            recovery_status=normalization.get("status", "repaired"),
         )
         audit.update(
             accepted=True,
@@ -249,9 +265,12 @@ def merge(args: argparse.Namespace) -> dict[str, Any]:
         "state": (
             "complete_with_failures" if unresolved else "complete"
         ),
-        "policy": POLICY,
+        "policy": policy,
         "diagnostic_only": True,
         "strict_merged_input": str(strict_dir),
+        "strict_inputs_sha256": {name: file_sha256(strict_dir / name) for name in
+                                  ("summary.json", "windows.jsonl", "failures.jsonl", "highlights.jsonl")
+                                  if (strict_dir / name).is_file()},
         "end_tolerance_sec": args.end_tolerance_sec,
         "source_videos": len(final_highlights),
         "total_windows": len(window_rows),
@@ -274,18 +293,21 @@ def merge(args: argparse.Namespace) -> dict[str, Any]:
     write_jsonl(output / "windows.jsonl", window_rows)
     write_jsonl(output / "failures.jsonl", unresolved)
     write_jsonl(output / "lenient_repairs.jsonl", repairs)
+    summary["artifacts_sha256"] = {name: file_sha256(output / name) for name in
+                                   ("highlights.jsonl", "windows.jsonl", "failures.jsonl", "lenient_repairs.jsonl")}
     write_json(output / "summary.json", summary)
     (output / "README.md").write_text(
         "# Video-ORA 高光结果：宽容诊断版\n\n"
         "本目录基于严格版已保存的模型回答做离线宽容修复，"
         "没有重新推理或训练。\n\n"
-        f"- 策略：`{POLICY}`\n"
+        f"- 策略：`{policy}`\n"
         f"- 片尾越界容差：`{args.end_tolerance_sec}` 秒\n"
         f"- 严格有效窗口：`{strict_valid_windows}`\n"
         f"- 本次修复窗口：`{repaired_windows}`\n"
-        f"- 仍未解决窗口：`{len(unresolved)}`\n\n"
-        "修复仅允许把片尾最多超出容差的结束时间裁到窗口末尾，"
-        "不会补写缺失回答，也不会修复语义错误。每个窗口的原始回答、"
+        f"- 仍未解决窗口：`{len(unresolved)}`\n\n" +
+        ("修复按显式策略取时间范围交集并隔离坏条目。" if intersection else
+         "修复仅允许把片尾最多超出容差的结束时间裁到窗口末尾。") +
+        "不会补写缺失回答，也不保证修复语义错误。每个窗口的原始回答、"
         "修复动作、局部时间和源视频时间均记录在 "
         "`lenient_repairs.jsonl`。\n",
         encoding="utf-8",
@@ -312,6 +334,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--strict-merged", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--recovery-policy", choices=("diagnostic", "intersection"), default="diagnostic")
     parser.add_argument(
         "--end-tolerance-sec",
         type=float,

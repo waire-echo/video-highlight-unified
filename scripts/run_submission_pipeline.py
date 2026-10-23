@@ -1,26 +1,29 @@
 #!/usr/bin/env python3
 """Run the frozen Video-ORA, lenient repair, spatial, and submission pipeline.
 
-This entry point orchestrates existing, already-tested components. It never
-trains, retries model inference with different settings, or treats a failed
-window as an empty prediction. Every stage is bound to the same 426-video
-materialized dataset and LoRA adapter through SHA256 receipts.
+This entry point is inference only. Normal model settings remain frozen;
+bounded retries and explicit degraded states are recorded separately. Every stage is bound to the current
+input dataset and LoRA adapter through SHA256 receipts.
 """
 
 from __future__ import annotations
 
 import argparse
+from functools import lru_cache
 from datetime import datetime, timezone
-from decimal import Decimal
+from math import isfinite
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import sys
 import time
 import traceback
+import uuid
 from typing import Any
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -31,42 +34,25 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from video_highlight.validation import validate_submission
+from video_highlight.submission_inputs import (
+    discover_input, executable, frame_spans, index_rows, prepare_inputs,
+    prepared_metadata, resolve_config, run_lock, sort_id,
+)
+from video_highlight.submission_recovery import (
+    RUNTIME_POLICIES, SPATIAL_FAILURE_POLICY, TIME_FAILURE_POLICY, TIME_RECOVERY_POLICY,
+    repair_spatial_row, runtime_policy,
+)
 
 
-SERVER_ROOT = Path("/media/kubevolume/teacher1/video-highlight")
-DEFAULT_MODEL = (
-    SERVER_ROOT
-    / "models/Video-ORA-4B/01850297d5ab2adaaf130f700ed7cec52993d956"
-)
-DEFAULT_ADAPTER = (
-    SERVER_ROOT
-    / "runtime/sft426-doubao237-continue-adapter118-lr3e5-world3-v13-e1-20261023"
-    / "trainer/checkpoint-228"
-)
-DEFAULT_ADAPTER_SHA256 = (
-    "37b5d75def0c4c9061efc405495c3d5bcc6ace4b60c509657a68c0d90678c790"
-)
-DEFAULT_MATERIALIZED = (
-    SERVER_ROOT
-    / "datasets/sft/highlights-20261022"
-    / "data-highlights-window32s-v1style-w8-20261022"
-)
-DEFAULT_VIDEOS = SERVER_ROOT / "datasets/aic426/videos"
-DEFAULT_PYTHON = (
-    SERVER_ROOT
-    / "envs/vh-sft-capacity-tf519-20261021/bin/python"
-)
-DEFAULT_SPATIAL_PYTHON = (
-    SERVER_ROOT
-    / "envs/vh-spatial-ora426-20261021/bin/python"
-)
-DEFAULT_SPATIAL_PACKAGE = (
-    SERVER_ROOT
-    / "development/event-review-20261019-v1/repro-packages"
-    / "V7E_B_4109_REPRO_20261022_v1"
-)
-DEFAULT_PIPELINE_DIR = SERVER_ROOT / "runtime/submission-pipeline-new-20261023"
-DEFAULT_INDEX = SERVER_ROOT / "datasets/aic426/test_index.normalized.json"
+DEFAULT_MODEL = REPO / "models/ora"
+DEFAULT_ADAPTER = REPO / "models/adapter"
+DEFAULT_MATERIALIZED = None
+DEFAULT_VIDEOS = REPO / "input/video"
+DEFAULT_PYTHON = Path(sys.executable)
+DEFAULT_SPATIAL_PYTHON = Path(sys.executable)
+DEFAULT_SPATIAL_PACKAGE = REPO / "models/spatial"
+DEFAULT_PIPELINE_DIR = REPO / "outputs/submission"
+DEFAULT_INDEX = REPO / "input/jsonl"
 STAGES = (
     "infer",
     "merge",
@@ -82,16 +68,57 @@ class PipelineError(RuntimeError):
     """The run cannot continue without violating its input contract."""
 
 
+class WindowTimeoutError(TimeoutError):
+    """The active inference worker must be reaped before continuing."""
+
+
+def expected_ids(args) -> list[str]:
+    return [row["video_id"] for row in index_rows(args.index)]
+
+
+def expected_window_count(args) -> int:
+    manifest = read_json(args.materialized / "manifest.json")
+    return sum(len(samples) for samples in manifest["samples"].values())
+
+
+def load_request_plan(args):
+    spec = importlib.util.spec_from_file_location("submission_request_plan", REPO / "scripts/infer_video_ora_highlights_adapter_426.py")
+    inference = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(inference)
+    return inference.load_plan(args.materialized, args.videos)
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
 def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
     with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
+        return stream_sha256(handle)
+
+
+def stream_sha256(handle) -> str:
+    digest = hashlib.sha256()
+    for block in iter(lambda: handle.read(1024 * 1024), b""):
+        digest.update(block)
     return digest.hexdigest()
+
+
+@lru_cache(maxsize=128)
+def _weight_sha256(path: str, size: int, modified_ns: int) -> str:
+    return sha256_file(Path(path))
+
+
+def weight_hashes(model: Path) -> dict:
+    paths = set(model.glob("*.safetensors"))
+    for index in model.glob("*.safetensors.index.json"):
+        for name in set(read_json(index)["weight_map"].values()):
+            path = model / name
+            if not path.resolve().is_relative_to(model.resolve()):
+                raise PipelineError("Model shard path escapes the model directory")
+            paths.add(path)
+    return {str(path.relative_to(model)): _weight_sha256(str(path.resolve()), path.stat().st_size, path.stat().st_mtime_ns)
+            for path in sorted(paths)}
 
 
 def canonical_sha256(value: Any) -> str:
@@ -144,12 +171,7 @@ def command_env() -> dict[str, str]:
     environment = os.environ.copy()
     environment.update(
         {
-            "PYTHONPATH": str(SRC)
-            + (
-                os.pathsep + environment["PYTHONPATH"]
-                if environment.get("PYTHONPATH")
-                else ""
-            ),
+            "PYTHONPATH": str(SRC),
             "TOKENIZERS_PARALLELISM": "false",
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",
@@ -164,7 +186,12 @@ def run_command(
     command: list[str],
     output: Path,
     environment: dict[str, str] | None = None,
+    timeout_sec: float | None = None,
+    progress_path: Path | None = None,
+    window_timeout_sec: float = 0,
 ) -> dict[str, Any]:
+    if timeout_sec is None:
+        timeout_sec = float(os.environ.get("VH_COMMAND_TIMEOUT_SEC", "86400"))
     output.mkdir(parents=True, exist_ok=True)
     command_dir = (
         output
@@ -181,20 +208,52 @@ def run_command(
         process = subprocess.Popen(
             command,
             cwd=REPO,
-            stdout=subprocess.PIPE,
+            stdout=output_handle,
             stderr=subprocess.STDOUT,
             text=True,
             encoding="utf-8",
             errors="replace",
             bufsize=1,
             env=environment,
+            start_new_session=True,
         )
-        assert process.stdout is not None
-        for line in process.stdout:
-            output_handle.write(line)
-            output_handle.flush()
-            print(line, end="", flush=True)
-        return_code = process.wait()
+        try:
+            with stdout_path.open("r", encoding="utf-8", errors="replace") as reader:
+                while process.poll() is None:
+                    chunk = reader.read()
+                    if chunk:
+                        print(chunk, end="", flush=True)
+                    if timeout_sec and time.monotonic() - started > timeout_sec:
+                        raise TimeoutError(f"{name} exceeded {timeout_sec:g}s; see {stdout_path}")
+                    if progress_path and progress_path.is_file() and window_timeout_sec:
+                        progress = read_json(progress_path)
+                        active_started = progress.get("active_started_monotonic")
+                        if active_started and time.monotonic() - active_started > window_timeout_sec:
+                            raise WindowTimeoutError(f"Window {progress.get('active_window_id')} exceeded {window_timeout_sec:g}s")
+                    time.sleep(0.1)
+                print(reader.read(), end="", flush=True)
+            return_code = process.wait()
+        except BaseException as error:
+            if process.poll() is None:
+                if os.name == "nt":
+                    subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False, timeout=10)
+                else:
+                    os.killpg(process.pid, signal.SIGTERM)
+                try:
+                    process.wait(timeout=25)
+                except subprocess.TimeoutExpired:
+                    if os.name == "nt":
+                        process.kill()
+                    else:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    process.wait(timeout=5)
+            receipt = {"stage": name, "command": command, "return_code": process.poll(),
+                       "state": "INTERRUPTED", "error": f"{type(error).__name__}: {error}",
+                       "seconds": time.monotonic() - started, "stdout_log": str(stdout_path)}
+            atomic_json(command_dir / "COMMAND.json", receipt)
+            atomic_json(output / "COMMAND.json", receipt)
+            raise
     receipt = {
         "stage": name,
         "command": command,
@@ -255,16 +314,13 @@ def verify_paths(args: argparse.Namespace) -> None:
     if args.index.is_dir():
         raise PipelineError("--index must be a single JSON/JSONL index file")
     model_revision = read_json(args.model / "config.json").get("_commit_hash")
-    if (
-        args.model.name != "01850297d5ab2adaaf130f700ed7cec52993d956"
-        or model_revision
-        not in (None, "01850297d5ab2adaaf130f700ed7cec52993d956")
-    ):
+    revision = getattr(args, "expected_model_revision", None)
+    if revision and model_revision not in (None, revision):
         raise PipelineError(
             f"unexpected base model revision: {model_revision!r}"
         )
     adapter_sha = sha256_file(args.adapter / "adapter_model.safetensors")
-    if adapter_sha != args.expected_adapter_sha256:
+    if args.expected_adapter_sha256 and adapter_sha != args.expected_adapter_sha256:
         raise PipelineError(
             f"unexpected adapter SHA256: {adapter_sha}; "
             f"expected {args.expected_adapter_sha256}"
@@ -273,29 +329,25 @@ def verify_paths(args: argparse.Namespace) -> None:
     manifest = read_json(args.materialized / "manifest.json")
     if manifest.get("answer_contract") != "highlights-only/v1":
         raise PipelineError("unexpected materialized answer contract")
-    if manifest.get("source_counts") != {"train": 383, "val": 43}:
-        raise PipelineError("materialized source split is not 383/43")
-    if manifest.get("training_data_ready") is not True:
-        raise PipelineError("materialized windows are not ready")
-    if manifest.get("training_started") is not False:
-        raise PipelineError("materialized manifest has training_started=true")
-    if manifest["samples"].keys() != {"train", "val"}:
-        raise PipelineError("unexpected materialized sample splits")
-    total_windows = sum(len(manifest["samples"][split]) for split in ("train", "val"))
-    if total_windows != 523:
-        raise PipelineError(f"expected 523 test windows, found {total_windows}")
-
-    index_rows = read_json(args.index) if args.index.suffix == ".json" else read_jsonl(args.index)
-    index_ids = {str(row["video_id"]) for row in index_rows}
-    if len(index_rows) != 426 or index_ids != {str(value) for value in range(426)}:
-        raise PipelineError("test index must contain exactly video IDs 0..425")
-    expected_ratios = {
-        str(row["video_id"]): row["targetRatioWH"] for row in index_rows
-    }
-    if any(ratio not in ([16, 9], [9, 16]) for ratio in expected_ratios.values()):
-        raise PipelineError("test index contains an unsupported target ratio")
-    if len(list(args.videos.glob("*.mp4"))) != 426:
-        raise PipelineError("video directory must contain 426 MP4 files")
+    if not expected_window_count(args):
+        raise PipelineError("materialized input contains no windows")
+    ids = set(expected_ids(args))
+    sample_ids = {str(sample["source_video_id"]) for samples in manifest["samples"].values() for sample in samples}
+    if ids != sample_ids or sum(manifest["source_counts"].values()) != len(ids):
+        raise PipelineError("materialized source IDs differ from the input index")
+    if {path.stem for path in args.videos.glob("*.mp4") if not path.name.startswith("._")} != ids:
+        raise PipelineError("video directory IDs differ from the input index")
+    if not (args.materialized / "source_metadata.json").is_file():
+        raise PipelineError("Missing current source metadata; prepare the input with --input-root first")
+    metadata = prepared_metadata(args.materialized)
+    if len(metadata) != len(ids) or {str(row["video_id"]) for row in metadata} != ids:
+        raise PipelineError("Prepared source metadata IDs differ from the input index")
+    for row in metadata:
+        if sha256_file(args.videos / (str(row["video_id"]) + ".mp4")) != row["source_sha256"]:
+            raise PipelineError(f"Source video content changed: {row['video_id']}")
+    for name, expected in manifest.get("prepared_files", {}).items():
+        if sha256_file(args.materialized / name) != expected:
+            raise PipelineError(f"Prepared inference input changed: {name}")
 
 
 def build_pipeline_id(args: argparse.Namespace) -> str:
@@ -313,8 +365,11 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
         "model": str(args.model.resolve()),
         "model_revision": model_config.get("_commit_hash"),
         "model_config_sha256": sha256_file(args.model / "config.json"),
+        "model_weights_sha256": weight_hashes(args.model),
         "adapter": str(args.adapter.resolve()),
         "adapter_sha256": sha256_file(args.adapter / "adapter_model.safetensors"),
+        "adapter_config_sha256": (sha256_file(args.adapter / "adapter_config.json")
+                                   if (args.adapter / "adapter_config.json").is_file() else None),
         "materialized": str(args.materialized.resolve()),
         "materialized_manifest_sha256": sha256_file(
             args.materialized / "manifest.json"
@@ -324,6 +379,7 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
         "test_index_sha256": sha256_file(args.index),
         "video_names": sorted(path.name for path in args.videos.glob("*.mp4")),
         "inference": {
+            "video_reader_backend": "decord",
             "fps": args.fps,
             "max_frames": args.max_frames,
             "max_tokens": args.inference_max_tokens,
@@ -331,6 +387,25 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
             "video_min_token_num": video_min_token_num,
             "temperature": 0,
             "seed": 42,
+        },
+        "unresolved_policy": TIME_FAILURE_POLICY,
+        "recovery": {"recovery_policy": TIME_RECOVERY_POLICY,
+                     "spatial_failure_policy": SPATIAL_FAILURE_POLICY,
+                     **{key: getattr(args, key, default) for key, default in (
+            ("recovery_attempts", 0),
+            ("window_timeout_sec", 0), ("command_timeout_sec", 86400),
+            ("spatial_video_timeout_sec", 1800))}},
+        "model_processor_sha256": {str(path.relative_to(args.model)): sha256_file(path)
+                                    for path in sorted([*args.model.iterdir(), *(args.model / "chat_templates").rglob("*")])
+                                    if path.is_file() and path.suffix in (".json", ".model", ".txt", ".tiktoken", ".vocab", ".jinja", ".jinja2")},
+        "source_files_sha256": {
+            str(path.relative_to(REPO)): sha256_file(path)
+            for path in [REPO / "scripts/infer_video_ora_highlights_adapter_426.py",
+                         REPO / "scripts/merge_video_ora_highlights_inference.py",
+                         REPO / "scripts/merge_video_ora_highlights_lenient_diagnostic.py",
+                         *sorted((SRC / "video_highlight").glob("submission_*.py")),
+                         *[SRC / "video_highlight" / name for name in
+                           ("highlight_output.py", "timing.py", "validation.py", "io_utils.py")]]
         },
         "lenient_end_tolerance_sec": args.end_tolerance_sec,
         "strict_seed": (
@@ -354,6 +429,13 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
         "spatial_weights_sha256": sha256_file(
             args.spatial_package / "assets/yolo11m.pt"
         ),
+        "spatial_python_sha256": {
+            str(path.relative_to(args.spatial_package)): sha256_file(path)
+            for folder in ("pipeline", "modules", "vendor")
+            for path in sorted((args.spatial_package / folder).rglob("*.py"))
+        },
+        "spatial_config_sha256": (sha256_file(args.spatial_package / "configs/v7e_b_4109.json")
+                                   if (args.spatial_package / "configs/v7e_b_4109.json").is_file() else None),
         "spatial_runner": str(SPATIAL_RUNNER_SOURCE.resolve()),
         "spatial_runner_sha256": sha256_file(SPATIAL_RUNNER_SOURCE),
         "pipeline_runner": str(Path(__file__).resolve()),
@@ -417,7 +499,12 @@ def prepare_run(
     pipeline_id: str,
 ) -> tuple[Path, dict[str, Any], bool]:
     args.pipeline_dir.mkdir(parents=True, exist_ok=True)
-    run_root = args.pipeline_dir / f"run-{pipeline_id}"
+    existing_run = getattr(args, "existing_run_root", None)
+    run_root = (
+        existing_run.resolve()
+        if existing_run is not None
+        else args.pipeline_dir / f"run-{pipeline_id}"
+    )
     lock = args.pipeline_dir / "CURRENT.json"
     legacy_run = args.pipeline_dir / f"run-{legacy_pipeline_id(args)}"
     if not run_root.exists() and legacy_run.is_dir():
@@ -508,11 +595,7 @@ def stage_inference(
     output = stage / "run"
     if not execute:
         return output
-    if (stage / "COMMAND.json").exists():
-        command_receipt = read_json(stage / "COMMAND.json")
-        if command_receipt.get("return_code") != 0:
-            raise PipelineError("previous inference command failed")
-    else:
+    if not (output / "summary.json").is_file():
         command = [
             str(args.python),
             "-B",
@@ -539,6 +622,7 @@ def stage_inference(
             "--per-gpu-gib",
             str(args.per_gpu_gib),
             "--resume",
+            "--window-timeout-sec", str(getattr(args, "window_timeout_sec", 0)),
         ]
         environment = command_env()
         environment.update(
@@ -549,18 +633,62 @@ def stage_inference(
                 "VIDEO_MIN_TOKEN_NUM": str(args.video_min_token_num),
             }
         )
-        run_command(
-            name="infer",
-            command=command,
-            output=stage,
-            environment=environment,
-        )
+        run_inference_command(args, command, stage, output, environment, name="infer")
     summary_path = output / "summary.json"
     if not summary_path.is_file():
         raise PipelineError(
             f"inference did not reach a complete summary: {summary_path}"
         )
+    for name, expected in read_json(summary_path).get("record_files_sha256", {}).items():
+        if sha256_file(output / "records" / name) != expected:
+            raise PipelineError(f"Inference checkpoint was modified: {name}")
     return summary_path
+
+
+def run_inference_command(args, command, stage, output, environment, *, name):
+    """A crashed active request is one failed window, not a lost whole shard.
+
+    Initialization failures have no active-window marker and remain fatal.
+    The failed request is saved, the owned worker is reaped, and a fresh
+    process resumes the other windows. The later recovery queue has one
+    separately frozen retry budget.
+    """
+    deadline = time.monotonic() + getattr(args, "command_timeout_sec", 86400)
+    handled = set()
+    while True:
+        atomic_json(output / "status.json", {"state": "STARTING"})
+        try:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Inference shard exhausted its wall-clock budget")
+            run_command(name=name, command=command, output=stage, environment=environment,
+                        timeout_sec=remaining, progress_path=output / "status.json",
+                        window_timeout_sec=getattr(args, "window_timeout_sec", 0))
+            return
+        except (PipelineError, WindowTimeoutError) as error:
+            status = read_json(output / "status.json")
+            window_id = status.get("active_window_id")
+            if not window_id or window_id in handled:
+                raise
+            handled.add(window_id)
+            _, windows, _, _ = load_request_plan(args)
+            item = next((w for w in windows if w["window_id"] == window_id), None)
+            if item is None:
+                raise PipelineError("Worker active window is outside the current input") from error
+            record_path = output / "records" / f"{window_id}.json"
+            if record_path.is_file() and read_json(record_path).get("raw_json_valid"):
+                continue  # Died after publishing this success; resume the rest.
+            record = read_json(record_path) if record_path.is_file() else dict(item)
+            request_hash = hashlib.sha256(json.dumps(
+                {"messages": item["messages"], "video": item["window_video"]},
+                ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+            record.update(request_sha256=request_hash, raw_json_valid=False,
+                          validation_error=f"worker_failed: {type(error).__name__}: {error}",
+                          assistant_answer_passed_to_model=False)
+            for folder in ("records", "raw", "failed"):
+                atomic_json(output / folder / f"{window_id}.json", record)
+            atomic_json(output / "WORKER_RECOVERY.json", {"failed_windows": sorted(handled),
+                                                          "policy": "reap_worker_preserve_success_resume_remaining"})
 
 
 def stage_merge(
@@ -575,12 +703,12 @@ def stage_merge(
         return output
     inference_root = stage_dir(run_root, "infer") / "run"
     if (stage / "merged/summary.json").is_file():
-        retry_receipt = stage_dir(run_root, "merge") / "02b-retry" / "RETRY.json"
-        if retry_receipt.is_file():
-            apply_retry_highlights(
-                run_root,
-                read_json(retry_receipt)["merged_highlights"],
-            )
+        retry_path = run_root / "02b-retry/RETRY.json"
+        if retry_path.is_file() and "window_results" in read_json(retry_path):
+            receipt = read_json(retry_path)
+            if read_json(output / "summary.json").get("recovery_receipt_sha256") != canonical_sha256(receipt):
+                apply_retry_records(output, receipt)
+        verify_cached_artifacts(output)
         return output / "summary.json"
     if args.seed_strict_merged is not None:
         seed = args.seed_strict_merged.resolve()
@@ -593,18 +721,40 @@ def stage_merge(
         strict_summary = read_json(seed / "summary.json")
         failures = read_jsonl(seed / "failures.jsonl")
         if (
-            strict_summary.get("source_videos") != 426
-            or strict_summary.get("total_windows") != 523
-            or strict_summary.get("valid_windows") + len(failures) != 523
+            strict_summary.get("source_videos") != len(expected_ids(args))
+            or strict_summary.get("total_windows") != expected_window_count(args)
+            or strict_summary.get("valid_windows") + len(failures) != expected_window_count(args)
         ):
-            raise PipelineError("strict seed is not the expected 426/523/509/14 run")
-        if len(read_jsonl(seed / "windows.jsonl")) != 523:
-            raise PipelineError("strict seed windows.jsonl must contain 523 rows")
-        if len(read_jsonl(seed / "highlights.jsonl")) != 426:
-            raise PipelineError("strict seed highlights.jsonl must contain 426 rows")
-        output.mkdir(parents=True, exist_ok=False)
+            raise PipelineError("strict seed counts differ from the current input")
+        if len(read_jsonl(seed / "windows.jsonl")) != expected_window_count(args):
+            raise PipelineError("strict seed window count differs from current input")
+        if {str(row['video_id']) for row in read_jsonl(seed / "highlights.jsonl")} != set(expected_ids(args)):
+            raise PipelineError("strict seed source IDs differ from current input")
+        sample_ids = {f"{split}_{sample['source_video_id']}_w{int(sample['window_index']):04d}"
+                      for split, samples in read_json(args.materialized / "manifest.json")["samples"].items()
+                      for sample in samples}
+        if {str(row["window_id"]) for row in read_jsonl(seed / "windows.jsonl")} != sample_ids:
+            raise PipelineError("Strict seed window IDs differ; counts alone cannot identify the current input")
+        _, _, current_windows, _ = load_request_plan(args)
+        for window in read_jsonl(seed / "windows.jsonl"):
+            record = read_json(Path(window["record_path"]))
+            expected = current_windows[str(window["window_id"])]
+            keys = ("source_video_id", "window_start_sec", "window_end_sec", "window_video_sha256", "messages")
+            if any(record.get(key) != expected[key] for key in keys):
+                raise PipelineError(f"Strict seed request/video differs: {window['window_id']}")
+        source_runs = strict_summary.get("runs", [])
+        if not source_runs:
+            raise PipelineError("Strict seed lacks inference-plan provenance")
+        for source_run in source_runs:
+            plan = read_json(Path(source_run) / "plan.json")
+            if plan.get("adapter_sha256") != sha256_file(args.adapter / "adapter_model.safetensors"):
+                raise PipelineError("Strict seed used a different or unidentified Adapter")
+        temporary_output = output.with_name(f".importing-{uuid.uuid4().hex}")
+        temporary_output.mkdir(parents=True, exist_ok=False)
         for name in sorted(required):
-            shutil.copyfile(seed / name, output / name)
+            shutil.copyfile(seed / name, temporary_output / name)
+        verify_cached_artifacts(temporary_output)
+        os.replace(temporary_output, output)
         atomic_json(
             stage / "SEED.json",
             {
@@ -621,12 +771,6 @@ def stage_merge(
                 "inference_not_rerun": True,
             },
         )
-        if failures:
-            retry_failure_windows(args, run_root, seed, failures, execute=True)
-            apply_retry_highlights(
-                run_root,
-                read_json(stage / "02b-retry" / "RETRY.json")["merged_highlights"],
-            )
         return output / "summary.json"
     command = [
         str(args.python),
@@ -644,6 +788,12 @@ def stage_merge(
         environment=command_env(),
     )
     return output / "summary.json"
+
+
+def verify_cached_artifacts(output):
+    for name, expected in read_json(output / "summary.json").get("artifacts_sha256", {}).items():
+        if not (output / name).is_file() or sha256_file(output / name) != expected:
+            raise PipelineError(f"Cached aggregate was modified: {output / name}")
 
 
 def retry_failure_windows(
@@ -666,23 +816,24 @@ def retry_failure_windows(
 
     materialized = args.materialized.resolve()
     samples = []
-    for split in ("train", "val"):
+    offset = 0
+    for split, split_samples in read_json(materialized / "manifest.json")["samples"].items():
         samples.extend(
-            (int(index), split, sample)
-            for index, sample in enumerate(
-                read_json(materialized / "manifest.json")["samples"][split]
-            )
+            (offset + index, split, sample)
+            for index, sample in enumerate(split_samples)
         )
+        offset += len(split_samples)
     gpu_ids = [
         item.strip() for item in args.inference_gpus.split(",") if item.strip()
     ]
-    retry.mkdir(parents=True, exist_ok=False)
+    retry.mkdir(parents=True, exist_ok=True)
     rows = []
+    record_paths = {}
     for shard_index, gpu in enumerate(gpu_ids):
         assigned = failures[shard_index::len(gpu_ids)]
         if not assigned:
             continue
-        indexes = []
+        window_ids = []
         for failure in assigned:
             window_id = str(failure["window_id"])
             for index, split, sample in samples:
@@ -691,11 +842,11 @@ def retry_failure_windows(
                     f"{int(sample['window_index']):04d}"
                     == window_id
                 ):
-                    indexes.append(index)
+                    window_ids.append(window_id)
                     break
             else:
                 raise PipelineError(f"retry window is absent from materialized data: {window_id}")
-        if len(set(indexes)) != len(indexes):
+        if len(set(window_ids)) != len(window_ids):
             raise PipelineError("retry window indexes are not unique")
         shard = retry / f"gpu-{gpu}"
         command = [
@@ -724,16 +875,8 @@ def retry_failure_windows(
             "--per-gpu-gib",
             str(args.per_gpu_gib),
         ]
-        if len(indexes) == 1:
-            command.extend(["--start-index", str(indexes[0]), "--end-index", str(indexes[0] + 1)])
-        else:
-            start = min(indexes)
-            stop = max(indexes) + 1
-            if stop - start > 32:
-                raise PipelineError(
-                    "retry indexes span too many windows; use explicit per-window retry"
-                )
-            command.extend(["--start-index", str(start), "--end-index", str(stop)])
+        command.extend(["--resume", "--window-timeout-sec", str(getattr(args, "window_timeout_sec", 0)),
+                        "--window-ids", *window_ids])
         environment = command_env()
         environment.update(
             {
@@ -744,22 +887,20 @@ def retry_failure_windows(
                 "CUDA_VISIBLE_DEVICES": gpu,
             }
         )
-        run_command(
-            name="retry",
-            command=command,
-            output=retry,
-            environment=environment,
-        )
+        if not (shard / "summary.json").is_file():
+            run_inference_command(args, command, retry, shard, environment, name="retry")
         for record_path in (shard / "records").glob("*.json"):
-            rows.append(read_json(record_path))
+            row = read_json(record_path)
+            rows.append(row)
+            record_paths[str(row["window_id"])] = str(record_path)
     wanted = {str(item["window_id"]) for item in failures}
     if {str(row["window_id"]) for row in rows} != wanted:
         raise PipelineError("retry output does not cover exactly the failed windows")
-    if any(not row.get("raw_json_valid") for row in rows):
-        raise PipelineError("one or more retried windows still have no strict answer")
     strict = seed
     highlights = {str(row["video_id"]): row for row in read_jsonl(strict / "highlights.jsonl")}
     for row in rows:
+        if not row.get("raw_json_valid"):
+            continue
         video_id = str(row["source_video_id"])
         highlights[video_id]["highlights"].extend(row["source_highlights"])
     final = []
@@ -784,20 +925,73 @@ def retry_failure_windows(
             "failed_windows": sorted(wanted),
             "retried_windows": len(rows),
             "source_highlights": {
-                str(row["window_id"]): row["source_highlights"] for row in rows
+                str(row["window_id"]): row.get("source_highlights", []) for row in rows
             },
             "merged_highlights": final,
+            "window_results": rows,
+            "record_paths": record_paths,
+            "still_failed_windows": sum(not row.get("raw_json_valid") for row in rows),
         },
     )
     return read_json(receipt_path)
 
 
+def apply_retry_records(strict: Path, receipt: dict) -> None:
+    """Rebuild every strict aggregate from the new per-window terminal states."""
+    windows = read_jsonl(strict / "windows.jsonl")
+    replacements = {str(row["window_id"]): row for row in receipt["window_results"]}
+    if set(replacements) - {str(w["window_id"]) for w in windows}:
+        raise PipelineError("Retry contains an unknown window")
+    failures, intervals = [], {}
+    for window in windows:
+        window_id = str(window["window_id"])
+        row = replacements.get(window_id)
+        if row:
+            if (str(row["source_video_id"]), row["window_start_sec"], row["window_end_sec"]) != (
+                str(window["source_video_id"]), window["window_start_sec"], window["window_end_sec"]):
+                raise PipelineError("Retry changed window identity")
+            window.update(raw_json_valid=bool(row.get("raw_json_valid")),
+                          record_path=receipt["record_paths"][window_id],
+                          source_highlights=[[x["start"], x["end"]] for x in row.get("source_highlights", [])]
+                          if row.get("raw_json_valid") else [])
+        video_id = str(window["source_video_id"])
+        if window["raw_json_valid"]:
+            intervals.setdefault(video_id, []).extend(window.get("source_highlights", []))
+        else:
+            record = read_json(Path(window["record_path"]))
+            failures.append({"video_id": video_id, "window_id": window_id,
+                             "record_path": window["record_path"], "error": record.get("validation_error")})
+    highlights = read_jsonl(strict / "highlights.jsonl")
+    for row in highlights:
+        merged = []
+        for a, b in sorted(intervals.get(str(row["video_id"]), [])):
+            if merged and a <= merged[-1][1]:
+                merged[-1][1] = max(merged[-1][1], b)
+            else:
+                merged.append([a, b])
+        row["highlights"] = [{"start": a, "end": b} for a, b in merged]
+    for name, values in (("windows.jsonl", windows), ("failures.jsonl", failures), ("highlights.jsonl", highlights)):
+        temporary = strict / f".{name}.tmp"
+        temporary.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in values), encoding="utf-8")
+        os.replace(temporary, strict / name)
+    summary = read_json(strict / "summary.json")
+    summary.update(state="complete_with_failures" if failures else "complete", failures=failures,
+                   valid_windows=len(windows) - len(failures), failed_windows=len(failures),
+                   source_videos_with_highlights=sum(bool(r["highlights"]) for r in highlights),
+                   total_merged_highlights=sum(len(r["highlights"]) for r in highlights),
+                   recovery_receipt_sha256=canonical_sha256(receipt))
+    summary["artifacts_sha256"] = {name: sha256_file(strict / name) for name in
+                                   ("windows.jsonl", "failures.jsonl", "highlights.jsonl")}
+    atomic_json(strict / "summary.json", summary)
+
+
 def apply_retry_highlights(run_root: Path, rows: list[dict[str, Any]]) -> None:
+    """Legacy video-only API; the formal recovery path uses apply_retry_records."""
     strict_path = stage_dir(run_root, "merge") / "merged" / "highlights.jsonl"
     current = read_jsonl(strict_path)
     current_by_id = {str(row["video_id"]): row for row in current}
-    if len(current) != 426 or len(current_by_id) != 426:
-        raise PipelineError("strict merge highlights must contain 426 unique videos")
+    if not current or len(current_by_id) != len(current):
+        raise PipelineError("strict merge highlights must contain unique videos")
     for row in rows:
         video_id = str(row["video_id"])
         if video_id not in current_by_id:
@@ -820,13 +1014,119 @@ def stage_lenient(
     stage = stage_dir(run_root, "lenient")
     strict = stage_dir(run_root, "merge") / "merged"
     output = stage / "merged"
+    fallback_path = stage / "FALLBACKS.json"
     if not execute:
         return output
+    command = [
+            str(getattr(args, "python", sys.executable)), "-B",
+            str(REPO / "scripts/merge_video_ora_highlights_lenient_diagnostic.py"),
+            "--strict-merged", str(strict), "--output", str(output),
+            "--end-tolerance-sec", str(getattr(args, "end_tolerance_sec", 0.5)),
+            "--recovery-policy", TIME_RECOVERY_POLICY,
+        ]
     if (output / "summary.json").is_file():
-        summary = read_json(output / "summary.json")
-        if summary.get("unresolved_windows"):
-            raise PipelineError("previous lenient merge has unresolved windows")
-        return output / "summary.json"
+        old_inputs = read_json(output / "summary.json").get("strict_inputs_sha256")
+        if old_inputs and old_inputs != {name: sha256_file(strict / name) for name in old_inputs}:
+            os.replace(output, output.with_name(f"merged-before-recovery-{uuid.uuid4().hex}"))
+    if not (output / "summary.json").is_file():
+        run_command(name="lenient", command=command, output=stage, environment=command_env())
+    verify_cached_artifacts(output)
+    summary = read_json(output / "summary.json")
+    if summary.get("unresolved_windows") and getattr(args, "recovery_attempts", 0):
+        receipt_path = run_root / "02b-retry/RETRY.json"
+        already_applied = (receipt_path.is_file() and
+                           read_json(strict / "summary.json").get("recovery_receipt_sha256") ==
+                           canonical_sha256(read_json(receipt_path)))
+        if not already_applied:
+            receipt = retry_failure_windows(args, run_root, strict, summary["unresolved"], execute=True)
+            apply_retry_records(strict, receipt)
+            os.replace(output, output.with_name(f"merged-before-retry-{uuid.uuid4().hex}"))
+            run_command(name="lenient-after-retry", command=command, output=stage, environment=command_env())
+            verify_cached_artifacts(output)
+            summary = read_json(output / "summary.json")
+    if summary.get("unresolved_windows"):
+        unresolved = summary.get("unresolved", [])
+        if not unresolved:
+            raise PipelineError("unresolved count has no window details")
+        source_rows = read_jsonl(output / "highlights.jsonl")
+        source_by_id = {
+            str(row["video_id"]): row for row in source_rows
+        }
+        fallbacks = []
+        for item in unresolved:
+            video_id = str(item["video_id"])
+            if video_id not in source_by_id:
+                raise PipelineError(
+                    f"unresolved fallback has unknown source video: {video_id}"
+                )
+            fallbacks.append(
+                {
+                    "video_id": video_id,
+                    "window_id": str(item["window_id"]),
+                    "error": str(item.get("error", "")),
+                    "lenient_error": str(item.get("lenient_error", "")),
+                    "fallback": "drop_failed_window_only",
+                    "source_highlights_preserved": source_by_id[video_id][
+                        "highlights"
+                    ],
+                }
+            )
+        atomic_json(
+            fallback_path,
+            {
+                "schema": "video-ora-submission-fallback/v1",
+                "state": "APPLIED",
+                "policy": "drop_unresolved_window_preserve_other_windows",
+                "source_video_count": len({row["video_id"] for row in fallbacks}),
+                "fallbacks": fallbacks,
+            },
+        )
+        print(
+            json.dumps(
+                {
+                    "warnings": "unresolved windows explicitly dropped",
+                    "fallback_count": len(fallbacks),
+                    "fallback_receipt": str(fallback_path),
+                },
+                ensure_ascii=False,
+            ),
+            flush=True,
+        )
+    if {str(row["video_id"]) for row in read_jsonl(output / "highlights.jsonl")} != set(expected_ids(args)):
+        raise PipelineError("lenient source IDs differ from current input")
+    windows = read_jsonl(output / "windows.jsonl") if (output / "windows.jsonl").is_file() else []
+    terminal = []
+    unresolved_ids = {str(item["video_id"]) for item in summary.get("unresolved", [])}
+    for row in read_jsonl(output / "highlights.jsonl"):
+        video_id = str(row["video_id"])
+        own = [w for w in windows if str(w["source_video_id"]) == video_id]
+        if video_id in unresolved_ids:
+            state = "partial" if row["highlights"] else "inference_failed"
+        elif any(w.get("recovery_status") == "partial" for w in own):
+            state = "partial"
+        elif any(w.get("accepted_by_lenient") for w in own):
+            state = "repaired" if row["highlights"] else "no_highlights"
+        else:
+            state = "ok" if row["highlights"] else "no_highlights"
+        terminal.append({"video_id": video_id, "state": state,
+                         "unresolved_windows": [item["window_id"] for item in summary.get("unresolved", [])
+                                                if str(item["video_id"]) == video_id]})
+    atomic_json(stage / "TERMINAL_STATES.json", {"videos": terminal, "input_coverage": len(terminal),
+                                               "policy": TIME_FAILURE_POLICY})
+    return output / "summary.json"
+
+
+def recompute_lenient_to_backup(
+    args: argparse.Namespace,
+    run_root: Path,
+) -> Path:
+    """Recompute the lenient merge in a new directory without erasing evidence."""
+    stage = stage_dir(run_root, "lenient")
+    strict = stage_dir(run_root, "merge") / "merged"
+    previous = stage / "merged"
+    if not (previous / "summary.json").is_file():
+        return stage_lenient(args, run_root, execute=True)
+    output = stage / f"merged-recompute-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     command = [
         str(args.python),
         "-B",
@@ -837,22 +1137,37 @@ def stage_lenient(
         str(output),
         "--end-tolerance-sec",
         str(args.end_tolerance_sec),
+        "--recovery-policy", TIME_RECOVERY_POLICY,
     ]
     run_command(
-        name="lenient",
+        name="lenient-recompute",
         command=command,
         output=stage,
         environment=command_env(),
     )
     summary = read_json(output / "summary.json")
-    if summary.get("unresolved_windows"):
-        raise PipelineError(
-            f"{summary['unresolved_windows']} windows remain unresolved after "
-            "lenient repair"
-        )
-    if len(read_jsonl(output / "highlights.jsonl")) != 426:
-        raise PipelineError("lenient highlights must contain 426 source videos")
-    return output / "summary.json"
+    if {str(row["video_id"]) for row in read_jsonl(output / "highlights.jsonl")} != set(expected_ids(args)):
+        raise PipelineError("recomputed lenient source IDs differ from current input")
+    old = stage / f"merged-before-recompute-{uuid.uuid4().hex}"
+    os.replace(previous, old)
+    os.replace(output, previous)
+    atomic_json(
+        stage / "RECOMPUTE.json",
+        {
+            "schema": "video-ora-submission-lenient-recompute/v1",
+            "state": "COMPLETE",
+            "previous": str(old),
+            "active": str(previous),
+            "previous_summary_sha256": sha256_file(old / "summary.json"),
+            "active_summary_sha256": sha256_file(
+                previous / "summary.json"
+            ),
+            "active_highlights_sha256": sha256_file(
+                previous / "highlights.jsonl"
+            ),
+        },
+    )
+    return stage_lenient(args, run_root, execute=True)
 
 
 def stage_handoff(
@@ -872,89 +1187,51 @@ def stage_handoff(
             receipt.get("sha256") == sha256_file(output)
             and receipt.get("lenient_highlights_sha256")
             == sha256_file(stage_dir(run_root, "lenient") / "merged/highlights.jsonl")
+            and receipt.get("source_metadata_sha256") == sha256_file(args.materialized / "source_metadata.json")
+            and receipt.get("temporal_terminal_sha256") == (
+                sha256_file(stage_dir(run_root, "lenient") / "TERMINAL_STATES.json")
+                if (stage_dir(run_root, "lenient") / "TERMINAL_STATES.json").is_file() else None)
         ):
             return output
-    reference_handoff = args.spatial_package / "reference/stage1_expected.jsonl"
-    if not reference_handoff.is_file():
-        raise FileNotFoundError(reference_handoff)
-    reference_metadata = args.spatial_package / "reference/source_metadata426.json"
-    if not reference_metadata.is_file():
-        raise FileNotFoundError(reference_metadata)
+    source_metadata_path = args.materialized / "source_metadata.json"
+    terminal_path = stage_dir(run_root, "lenient") / "TERMINAL_STATES.json"
+    temporal_states = ({str(row["video_id"]): row["state"] for row in read_json(terminal_path)["videos"]}
+                       if terminal_path.is_file() else {})
     source_rows = read_jsonl(stage_dir(run_root, "lenient") / "merged/highlights.jsonl")
-    reference_rows = read_jsonl(reference_handoff)
-    reference_by_id = {str(row["video_id"]): row for row in reference_rows}
-    if len(reference_rows) != 426 or len(reference_by_id) != 426:
-        raise PipelineError("spatial reference handoff must contain 426 rows")
+    metadata_rows = prepared_metadata(args.materialized)
+    metadata_by_id = {str(row["video_id"]): row for row in metadata_rows}
+    ratios = {row["video_id"]: row["targetRatioWH"] for row in index_rows(args.index)}
     source_by_id = {str(row["video_id"]): row for row in source_rows}
-    if len(source_rows) != 426 or set(source_by_id) != set(reference_by_id):
-        raise PipelineError("lenient and spatial handoff IDs differ")
-    metadata_rows = read_json(reference_metadata)
-    metadata_by_hash = {
-        str(row["source_sha256"]): row for row in metadata_rows
-    }
+    if (len(source_by_id) != len(source_rows) or len(metadata_by_id) != len(metadata_rows)
+            or set(source_by_id) != set(ratios) or set(metadata_by_id) != set(ratios)):
+        raise PipelineError("input metadata and temporal result IDs differ")
 
     rows: list[dict[str, Any]] = []
-    for video_id in sorted(source_by_id, key=int):
+    for video_id in sorted(source_by_id, key=sort_id):
         source = source_by_id[video_id]
-        base = reference_by_id[video_id]
+        base = metadata_by_id[video_id]
         duration = float(base["duration_sec"])
-        metadata = metadata_by_hash.get(str(base["source_sha256"]))
-        if metadata is None:
-            raise PipelineError(
-                f"no target-ratio metadata for source hash {video_id}"
-            )
-        if base["targetRatioWH"] != metadata["target_ratio"]:
+        if base["target_ratio"] != ratios[video_id]:
             raise PipelineError(f"target ratio metadata mismatch: {video_id}")
+        if sha256_file(args.videos / f"{video_id}.mp4") != base["source_sha256"]:
+            raise PipelineError(f"source video changed: {video_id}")
         intervals = [
             [float(item["start"]), float(item["end"])]
             for item in source["highlights"]
         ]
         if any(
-            start < 0
+            not isfinite(start) or not isfinite(end) or start < 0
             or start >= end
             or end > duration
             for start, end in intervals
         ):
             raise PipelineError(f"invalid lenient interval for video {video_id}")
         frame_count = int(base["frame_count"])
-        segments_frame = []
-        for start, end in intervals:
-            source_duration = Decimal(str(duration))
-            source_start = Decimal(str(start))
-            source_end = Decimal(str(end))
-            first = min(
-                frame_count - 1,
-                max(
-                    0,
-                    int(
-                        (
-                            source_start
-                            * Decimal(frame_count)
-                            / source_duration
-                        ).to_integral_value(rounding="ROUND_CEILING")
-                    ),
-                ),
-            )
-            last = min(
-                frame_count - 1,
-                max(
-                    0,
-                    int(
-                        (
-                            source_end
-                            * Decimal(frame_count)
-                            / source_duration
-                        ).to_integral_value(rounding="ROUND_FLOOR")
-                    )
-                    - 1,
-                ),
-            )
-            if last >= first:
-                segments_frame.append([first, last])
+        segments_frame = frame_spans(intervals, base["pts_sec"])
         rows.append(
             {
                 "video_id": video_id,
-                "targetRatioWH": base["targetRatioWH"],
+                "targetRatioWH": ratios[video_id],
                 "segments_sec": intervals,
                 "segments_frame": segments_frame,
                 "frame_index_convention": "inclusive",
@@ -965,13 +1242,16 @@ def stage_handoff(
                 "valid": bool(segments_frame),
                 "subject_hint": "",
                 "action_description": "",
-                "semantic_status": "Video-ORA adapter118 lenient pipeline",
+                "semantic_status": "Video-ORA configured-adapter inference pipeline",
                 "event_quality_threshold": None,
                 "checkpoint_sha256": (
                     sha256_file(args.adapter / "adapter_model.safetensors")
                 ),
                 "adapter": str(args.adapter.resolve()),
-                "fallback_reason": None if segments_frame else "no_highlights",
+                "temporal_status": temporal_states.get(video_id, "ok" if intervals else "no_highlights"),
+                "fallback_reason": (None if segments_frame else
+                                    temporal_states.get(video_id) if temporal_states.get(video_id) in ("inference_failed", "partial") else
+                                    "no_frame_pts_in_highlight" if intervals else "no_highlights"),
             }
         )
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -995,13 +1275,10 @@ def stage_handoff(
                 for first, last in row["segments_frame"]
             ),
             "groups": sum(len(row["segments_frame"]) for row in rows),
-            "reference": str(reference_handoff),
-            "reference_sha256": sha256_file(reference_handoff),
-            "ratio_metadata": str(reference_metadata),
-            "ratio_metadata_sha256": sha256_file(reference_metadata),
-            "reference_usage": (
-                "frame metadata, duration, source hash, and target ratio only"
-            ),
+            "source_metadata": str(source_metadata_path),
+            "source_metadata_sha256": sha256_file(source_metadata_path),
+            "temporal_terminal_sha256": sha256_file(terminal_path) if terminal_path.is_file() else None,
+            "frame_mapping": "decoded source PTS, half-open time intervals",
             "reference_timestamps_used": False,
             "lenient_highlights_sha256": sha256_file(
                 stage_dir(run_root, "lenient") / "merged/highlights.jsonl"
@@ -1023,17 +1300,18 @@ def stage_spatial(
         return output
     if output.is_file() and (stage / "COMPLETE.json").is_file():
         receipt = read_json(stage / "COMPLETE.json")
-        if receipt.get("predictions_sha256") == sha256_file(output):
+        if (receipt.get("predictions_sha256") == sha256_file(output)
+                and receipt.get("handoff_sha256") == sha256_file(stage_dir(run_root, "handoff") / "temporal_handoff.jsonl")):
             return output
     handoff = stage_dir(run_root, "handoff") / "temporal_handoff.jsonl"
     receipt_path = stage_dir(run_root, "handoff") / "HANDOFF.json"
     receipt = read_json(receipt_path)
-    if len(read_jsonl(handoff)) != 426:
-        raise PipelineError("spatial handoff must contain 426 rows")
+    if {str(row["video_id"]) for row in read_jsonl(handoff)} != set(expected_ids(args)):
+        raise PipelineError("spatial handoff IDs differ from current input")
     source_videos = args.videos
     package = args.spatial_package
-    if not (package / "run.py").is_file():
-        raise FileNotFoundError(package / "run.py")
+    if not (package / "modules/stage2_b.py").is_file():
+        raise FileNotFoundError(package / "modules/stage2_b.py")
     if args.spatial_arm != "B":
         raise PipelineError(
             "only the frozen v7E Stage 2 B arm is supported by this submission path"
@@ -1049,10 +1327,6 @@ def stage_spatial(
         shutil.copyfile(handoff, target)
 
     work = stage / "work"
-    if (work / "COMPLETE.json").exists():
-        raise PipelineError(
-            "spatial work is complete but its predictions were not finalized"
-        )
     config = {
         "input": str(target),
         "input_sha256": sha256_file(target),
@@ -1066,6 +1340,8 @@ def stage_spatial(
         "conf": 0.15,
         "iou": 0.5,
         "training": False,
+        "failure_policy": SPATIAL_FAILURE_POLICY,
+        "video_timeout_sec": getattr(args, "spatial_video_timeout_sec", 1800),
     }
     config_path = stage / "CONFIG.json"
     if config_path.exists():
@@ -1089,16 +1365,16 @@ def stage_spatial(
         str(target),
         "--gpus",
         str(args.spatial_gpu),
+        "--source-metadata",
+        str(args.materialized / "source_metadata.json"),
         "--resume",
+        "--failure-policy", SPATIAL_FAILURE_POLICY,
+        "--video-timeout-sec", str(getattr(args, "spatial_video_timeout_sec", 1800)),
     ]
     environment = command_env()
     environment["CUDA_VISIBLE_DEVICES"] = str(args.spatial_gpu)
-    run_command(
-        name="spatial",
-        command=command,
-        output=stage,
-        environment=environment,
-    )
+    if not (work / "COMPLETE.json").is_file():
+        run_command(name="spatial", command=command, output=stage, environment=environment)
 
     candidates = sorted(work.rglob("predictions_spatial.jsonl"))
     if len(candidates) != 1:
@@ -1108,7 +1384,7 @@ def stage_spatial(
     shutil.copyfile(candidates[0], output)
     spatial_complete = read_json(work / "COMPLETE.json")
     if (
-        spatial_complete.get("videos") != 426
+        spatial_complete.get("videos") != len(expected_ids(args))
         or spatial_complete.get("spatial_sha256")
         != sha256_file(candidates[0])
     ):
@@ -1120,6 +1396,7 @@ def stage_spatial(
             "state": "COMPLETE",
             "predictions": str(output),
             "predictions_sha256": sha256_file(output),
+            "handoff_sha256": sha256_file(handoff),
             "videos": spatial_complete["videos"],
             "frames": spatial_complete["frames"],
             "groups": spatial_complete["groups"],
@@ -1156,55 +1433,77 @@ def stage_submission(
     if not execute:
         return output
     spatial = stage_dir(run_root, "spatial") / "predictions.jsonl"
-    rows = read_jsonl(spatial)
-    if len(rows) != 426:
-        raise PipelineError(f"spatial output has {len(rows)} rows, expected 426")
-    normalized = [normalize_submission_row(row) for row in rows]
-    ids = [row["video_id"] for row in normalized]
-    if ids != [str(value) for value in range(426)]:
-        raise PipelineError("submission video IDs must be exactly 0..425 in order")
-    expected_ratio = {
-        str(row["video_id"]): row["targetRatioWH"] for row in read_json(args.index)
-    }
-    for row in normalized:
-        if row["targetRatioWH"] != expected_ratio[row["video_id"]]:
-            raise PipelineError(
-                f"target ratio changed for video {row['video_id']}"
-            )
+    expected = index_rows(args.index)
+    expected_set = {r["video_id"] for r in expected}
+    handoff = {str(row["video_id"]): row for row in read_jsonl(stage_dir(run_root, "handoff") / "temporal_handoff.jsonl")}
+    metadata = {str(row["video_id"]): row for row in read_json(args.materialized / "source_metadata.json")}
+    if set(handoff) != expected_set or set(metadata) != expected_set:
+        raise PipelineError("Final export metadata differs from the input index")
+    offsets, duplicates = {}, set()
+    with spatial.open("r", encoding="utf-8-sig") as reader:
+        while True:
+            offset = reader.tell()
+            line = reader.readline()
+            if not line:
+                break
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            video_id = str(row.get("video_id", ""))
+            if video_id not in expected_set:
+                raise PipelineError(f"Unknown spatial video identity: {video_id!r}")
+            if video_id in offsets:
+                duplicates.add(video_id)
+            offsets[video_id] = offset
     output_dir.mkdir(parents=True, exist_ok=True)
-    temporary = output.with_suffix(".jsonl.tmp")
-    temporary.write_text(
-        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in normalized),
-        encoding="utf-8",
-    )
-    os.replace(temporary, output)
-    ok, errors = validate_submission(str(output), str(args.index), str(args.videos))
+    temporary = output.with_name(f".{output.name}.{uuid.uuid4().hex}.tmp")
+    frames, nonempty, recoveries = 0, 0, []
+    with temporary.open("x", encoding="utf-8") as writer, spatial.open("r", encoding="utf-8-sig") as reader:
+        for item in expected:
+            video_id = item["video_id"]
+            missing = video_id not in offsets or video_id in duplicates
+            if missing:
+                row = {}
+            else:
+                reader.seek(offsets[video_id])
+                row = json.loads(reader.readline())
+            first = handoff[video_id]
+            if first["targetRatioWH"] != item["targetRatioWH"]:
+                raise PipelineError("Temporal handoff ratio differs from the input index")
+            normalized, repaired = repair_spatial_row(row, first, metadata[video_id]["source_size"])
+            if repaired or missing or row.get("targetRatioWH") != item["targetRatioWH"]:
+                recoveries.append({"video_id": video_id, "state": "fallback" if missing else "repaired",
+                                   "repaired_frames": len(repaired),
+                                   "reason": "missing_or_duplicate_row" if missing else "invalid_spatial_fields"})
+            writer.write(json.dumps(normalized, ensure_ascii=False) + "\n")
+            frames += len(normalized["predictions"])
+            nonempty += bool(normalized["predictions"])
+    ok, errors = validate_submission(str(temporary), str(args.index), str(args.videos))
     if not ok:
         raise PipelineError("submission validation failed: " + "; ".join(errors[:12]))
+    os.replace(temporary, output)
+    atomic_json(output_dir / "REPAIRS.json", {"videos": recoveries, "policy": SPATIAL_FAILURE_POLICY})
 
     submission_alias = output_dir / "submission.jsonl"
-    if submission_alias.exists():
-        submission_alias.unlink()
-    os.link(output, submission_alias)
+    temporary_alias = output_dir / f".submission.{uuid.uuid4().hex}.jsonl"
+    shutil.copyfile(output, temporary_alias)
+    os.replace(temporary_alias, submission_alias)
 
     archive = output_dir / "submission.zip"
-    if archive.exists():
-        archive.unlink()
-    with ZipFile(archive, "w", compression=ZIP_DEFLATED) as handle:
+    temporary_archive = output_dir / f".submission.{uuid.uuid4().hex}.zip"
+    with ZipFile(temporary_archive, "w", compression=ZIP_DEFLATED) as handle:
         handle.write(output, arcname="predictions_spatial.jsonl")
-    with ZipFile(archive) as handle:
+    with ZipFile(temporary_archive) as handle:
+        with handle.open("predictions_spatial.jsonl") as zipped:
+            member_sha256 = stream_sha256(zipped)
         if (
             handle.namelist() != ["predictions_spatial.jsonl"]
             or handle.testzip() is not None
-            or sha256_file(output) != hashlib.sha256(
-                handle.read("predictions_spatial.jsonl")
-            ).hexdigest()
+            or sha256_file(output) != member_sha256
             or sha256_file(output) != sha256_file(submission_alias)
         ):
             raise PipelineError("submission ZIP verification failed")
-
-    frames = sum(len(row["predictions"]) for row in normalized)
-    nonempty = sum(bool(row["predictions"]) for row in normalized)
+    os.replace(temporary_archive, archive)
     report = {
         "schema": "video-ora-submission-final/v1",
         "state": "READY_TO_SUBMIT",
@@ -1215,7 +1514,7 @@ def stage_submission(
         "submission_jsonl_alias": str(submission_alias),
         "submission_zip": str(archive),
         "submission_zip_sha256": sha256_file(archive),
-        "videos": len(normalized),
+        "videos": len(expected),
         "videos_with_predictions": nonempty,
         "rounded_spatial_frames": frames,
         "stage1_handoff_sha256": read_json(
@@ -1226,18 +1525,44 @@ def stage_submission(
         ),
         "training": False,
         "website_submission_performed": False,
+        "final_spatial_repaired_videos": len(recoveries),
+        "temporal_terminal_states": str(stage_dir(run_root, "lenient") / "TERMINAL_STATES.json"),
+        "spatial_recovery_receipt": str(stage_dir(run_root, "spatial") / "work/RECOVERY.json"),
     }
     atomic_json(output_dir / "FINAL.json", report)
     return output
 
 
-def main() -> int:
+def main(argv=None) -> int:
+    def interrupted(signum, frame):
+        raise KeyboardInterrupt(f"Received signal {signum}; stopping owned pipeline children")
+    signal.signal(signal.SIGTERM, interrupted)
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, help="Experiment config; relative paths resolve against this file")
+    parser.add_argument("--input-root", type=Path, help="New input folder containing video(s)/ and jsonl/ or test_index.json")
+    parser.add_argument("--prompt", type=Path, default=REPO / "prompts/ora/whole-video-highlights-v1/prompt.txt")
+    parser.add_argument("--ffmpeg", default="ffmpeg")
+    parser.add_argument("--ffprobe", default="ffprobe")
+    parser.add_argument("--window-seconds", type=float, default=32.0)
+    parser.add_argument("--window-stride", type=float, default=24.0)
+    # Accept old commands without exposing a switch that can turn recovery off.
+    parser.add_argument("--unresolved-policy", choices=("error", "drop_windows"), default=TIME_FAILURE_POLICY,
+                        help=argparse.SUPPRESS)
+    parser.add_argument("--recovery-policy", choices=("diagnostic", "intersection"), default=TIME_RECOVERY_POLICY,
+                        help=argparse.SUPPRESS)
+    parser.add_argument("--recovery-attempts", type=int, choices=(0, 1), default=1)
+    parser.add_argument("--window-timeout-sec", type=float, default=600)
+    parser.add_argument("--command-timeout-sec", type=float, default=86400)
+    parser.add_argument("--spatial-video-timeout-sec", type=float, default=1800)
+    parser.add_argument("--spatial-failure-policy", choices=("error", "center"), default=SPATIAL_FAILURE_POLICY,
+                        help=argparse.SUPPRESS)
+    parser.add_argument("--prepare-only", action="store_true", help="Prepare new inputs on CPU; never load models")
+    parser.add_argument("--expected-model-revision")
     parser.add_argument("--model", type=Path, default=DEFAULT_MODEL)
     parser.add_argument("--adapter", type=Path, default=DEFAULT_ADAPTER)
     parser.add_argument(
         "--expected-adapter-sha256",
-        default=DEFAULT_ADAPTER_SHA256,
+        default=None,
         help="Freeze the exact LoRA adapter weights used by this submission",
     )
     parser.add_argument("--materialized", type=Path, default=DEFAULT_MATERIALIZED)
@@ -1248,14 +1573,19 @@ def main() -> int:
         "--spatial-python", type=Path, default=DEFAULT_SPATIAL_PYTHON
     )
     parser.add_argument("--spatial-package", type=Path, default=DEFAULT_SPATIAL_PACKAGE)
-    parser.add_argument("--pipeline-dir", type=Path, default=DEFAULT_PIPELINE_DIR)
+    parser.add_argument("--pipeline-dir", "--output", type=Path, default=DEFAULT_PIPELINE_DIR)
     parser.add_argument(
         "--seed-strict-merged",
         type=Path,
         help="Import an exact retained strict merge instead of rerunning inference",
     )
-    parser.add_argument("--inference-gpus", default="2,3,4,5")
-    parser.add_argument("--spatial-gpu", default="2")
+    parser.add_argument(
+        "--existing-run-root",
+        type=Path,
+        help="Explicitly resume an existing run after a code-contract update",
+    )
+    parser.add_argument("--inference-gpus", default="0")
+    parser.add_argument("--spatial-gpu", default="0")
     parser.add_argument("--fps", type=float, default=2.0)
     parser.add_argument("--max-frames", type=int, default=64)
     parser.add_argument("--video-max-token-num", type=int, default=196)
@@ -1267,9 +1597,55 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--execute-existing", action="store_true")
+    parser.add_argument(
+        "--recompute-lenient",
+        action="store_true",
+        help="Recompute lenient merge into a new directory and resume",
+    )
     parser.add_argument("--start-stage", choices=STAGES, default="infer")
     parser.add_argument("--stop-after", choices=STAGES, default="submission")
-    args = parser.parse_args()
+    config_arg, _ = parser.parse_known_args(argv)
+    if config_arg.config:
+        parser.set_defaults(**resolve_config(config_arg.config))
+    args = parser.parse_args(argv)
+    for name in RUNTIME_POLICIES:
+        setattr(args, name, runtime_policy(name, getattr(args, name)))
+    for name in ("window_timeout_sec", "command_timeout_sec", "spatial_video_timeout_sec"):
+        if not isfinite(getattr(args, name)) or getattr(args, name) <= 0:
+            parser.error(f"--{name.replace('_', '-')} must be finite and positive")
+    os.environ["VH_COMMAND_TIMEOUT_SEC"] = str(args.command_timeout_sec)
+    if STAGES.index(args.start_stage) > STAGES.index(args.stop_after):
+        parser.error("--start-stage must not be after --stop-after")
+    if args.dry_run and args.execute:
+        parser.error("--dry-run and --execute are mutually exclusive")
+    if not (isfinite(args.fps) and args.fps > 0 and isfinite(args.window_seconds)
+            and isfinite(args.window_stride) and args.max_frames > 0
+            and 0 <= args.end_tolerance_sec <= 1):
+        parser.error("Invalid/nonfinite sampling or tolerance parameter")
+    for name in ("model", "adapter", "videos", "index", "spatial_package", "pipeline_dir", "prompt", "materialized", "existing_run_root", "seed_strict_merged"):
+        value = getattr(args, name)
+        if value is not None:
+            setattr(args, name, Path(value).expanduser().resolve())
+    if args.input_root:
+        args.videos, args.index = discover_input(Path(args.input_root))
+    if not (0 < args.window_stride <= args.window_seconds) or args.window_seconds * args.fps > args.max_frames:
+        parser.error("Require 0 < stride <= window size and window size * fps <= max frames")
+    for name in ("python", "spatial_python", "ffmpeg", "ffprobe"):
+        setattr(args, name, executable(getattr(args, name)))
+    if args.dry_run and args.materialized is None:
+        rows = index_rows(args.index)
+        print(json.dumps({"dry_run": True, "videos": len(rows), "input": str(args.videos),
+                          "model": str(args.model), "adapter": str(args.adapter),
+                          "spatial_package": str(args.spatial_package), "pipeline_dir": str(args.pipeline_dir),
+                          "stages": ["prepare", *STAGES], "gpu_started": False,
+                          "recovery_policies": dict(RUNTIME_POLICIES)}, ensure_ascii=False, indent=2))
+        return 0
+    if args.materialized is None:
+        args.materialized = prepare_inputs(args)
+        args.index = args.materialized / "test_index.json"
+    if args.prepare_only:
+        print(json.dumps({"prepared_inputs": str(args.materialized), "gpu_started": False}, indent=2))
+        return 0
     if args.dry_run and args.execute:
         parser.error("--dry-run and --execute are mutually exclusive")
     if args.execute_existing and not args.dry_run:
@@ -1280,9 +1656,36 @@ def main() -> int:
         parser.error("--end-tolerance-sec must be between 0 and 1")
     if args.fps <= 0 or args.max_frames <= 0:
         parser.error("fps and max-frames must be positive")
+    if args.existing_run_root is not None:
+        if not (args.existing_run_root / "PIPELINE.json").is_file():
+            parser.error("--existing-run-root has no PIPELINE.json")
+        if not (
+            args.existing_run_root
+            / stage_dir(Path("."), "lenient")
+            / "merged/summary.json"
+        ).is_file():
+            parser.error(
+                "--existing-run-root has no completed lenient merge"
+            )
+        if args.start_stage == "infer":
+            parser.error(
+                "--existing-run-root cannot start from infer"
+            )
+        args.pipeline_dir = args.existing_run_root.parent
     verify_paths(args)
     pipeline_id = build_pipeline_id(args)
-    run_root, contract, resumed = prepare_run(args, pipeline_id)
+    if args.existing_run_root is not None:
+        run_root = args.existing_run_root.resolve()
+        contract = read_json(run_root / "PIPELINE.json")
+        current = pipeline_contract(args)
+        differences = [key for key, value in current.items() if contract.get(key) != value]
+        if differences:
+            raise PipelineError("Existing run inputs/code changed; use a new output run: " + ", ".join(differences))
+        resumed = True
+        atomic_json(args.pipeline_dir / "CURRENT.json", {"pipeline_id": contract["pipeline_id"],
+                    "run_root": str(run_root), "updated_at": utc_now()})
+    else:
+        run_root, contract, resumed = prepare_run(args, pipeline_id)
     print(
         json.dumps(
             {
@@ -1335,12 +1738,37 @@ def main() -> int:
         )
         return 0
 
+    with run_lock(run_root):
+        return execute_stages(args, run_root, pipeline_id)
+
+
+def execute_stages(args, run_root: Path, pipeline_id: str) -> int:
     selected = list(STAGES)
     begin = selected.index(args.start_stage)
     end = selected.index(args.stop_after) + 1
     if begin >= end:
-        parser.error("--start-stage must not be after --stop-after")
+        raise PipelineError("--start-stage must not be after --stop-after")
     try:
+        if args.recompute_lenient and args.start_stage != "lenient":
+            raise PipelineError(
+                "--recompute-lenient requires --start-stage lenient"
+            )
+        if args.recompute_lenient:
+            update_state(
+                run_root,
+                stage="lenient",
+                state="running",
+                detail="recomputing from preserved strict failures",
+            )
+            artifact = recompute_lenient_to_backup(args, run_root)
+            update_state(
+                run_root,
+                stage="lenient",
+                state="complete",
+                detail="lenient recompute completed",
+                artifact=artifact,
+            )
+            begin += 1
         for stage in selected[begin:end]:
             update_state(run_root, stage=stage, state="running", detail="started")
             if stage == "infer":
@@ -1375,7 +1803,7 @@ def main() -> int:
                 artifact=final_report,
             )
             print(json.dumps(report, ensure_ascii=False, indent=2))
-    except Exception as error:
+    except BaseException as error:
         current_stage = locals().get("stage", args.start_stage)
         update_state(
             run_root,
