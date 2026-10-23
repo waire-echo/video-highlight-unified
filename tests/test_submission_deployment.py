@@ -1,10 +1,12 @@
 """Deployment plumbing tests do not install packages or claim GPU quality."""
 import json
+import csv
 import os
 from pathlib import Path
 import subprocess
 import sys
 import venv
+from types import SimpleNamespace
 
 import pytest
 
@@ -86,6 +88,29 @@ def test_real_venv_interpreter_survives_config_and_executable_resolution(tmp_pat
     result = subprocess.run([str(selected), "-I", "-B", "-c", "import sys; print(sys.prefix)"],
                             check=True, text=True, capture_output=True)
     assert Path(result.stdout.strip()).resolve() == folder.resolve()
+
+
+def test_legacy_decord_metadata_correction_is_scoped_recorded_and_idempotent(tmp_path):
+    site = tmp_path / "venv/site-packages"
+    dist = site / "decord-0.6.0.dist-info"
+    dist.mkdir(parents=True)
+    wheel = dist / "WHEEL"
+    wheel.write_text("Wheel-Version: 1.0\nTag: cp36-cp36m-manylinux2010_x86_64\n", encoding="utf-8")
+    native = site / "libdecord.so"
+    native.write_bytes(b"unchanged native decoder fixture")
+    (dist / "RECORD").write_text("decord-0.6.0.dist-info/WHEEL,old,0\nlibdecord.so,native,32\n", encoding="utf-8")
+    distribution = SimpleNamespace(version="0.6.0", locate_file=lambda name: site / name)
+    with pytest.raises(ValueError, match="outside"):
+        setup.correct_legacy_decord_tag(tmp_path / "another-environment", distribution)
+    original = native.read_bytes()
+    receipt = setup.correct_legacy_decord_tag(tmp_path / "venv", distribution)
+    assert receipt["state"] == "APPLIED" and receipt["decoder_code_modified"] is False
+    assert "Tag: py3-none-manylinux2010_x86_64" in wheel.read_text(encoding="utf-8")
+    with (dist / "RECORD").open(encoding="utf-8", newline="") as reader:
+        rows = list(csv.reader(reader))
+    assert rows[0][1].startswith("sha256=") and int(rows[0][2]) == wheel.stat().st_size
+    assert setup.correct_legacy_decord_tag(tmp_path / "venv", distribution) == receipt
+    assert native.read_bytes() == original
 
 
 @pytest.mark.parametrize("existing_not_venv", [False, True])

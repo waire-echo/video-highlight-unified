@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import csv
+import hashlib
+import importlib.metadata
+import io
 import json
 import os
 import platform
@@ -98,6 +103,51 @@ def install_cuda_runtime(python: Path, index_url: str) -> None:
                         "--index-url", index_url], check=True)
 
 
+def correct_legacy_decord_tag(prefix: Path, distribution=None) -> dict:
+    """Correct 0.6.0's cp36 WHEEL tag to its published py3 wheel filename tag.
+
+    The decoder uses ctypes, not the CPython 3.6 extension ABI. No Python or
+    native decoder bytes change. Keep a replayable receipt and RECORD hashes.
+    """
+    dist = distribution or importlib.metadata.distribution("decord")
+    if dist.version != "0.6.0":
+        return {"state": "NOT_NEEDED"}
+    wheel = Path(dist.locate_file("decord-0.6.0.dist-info/WHEEL")).resolve()
+    if not wheel.is_relative_to(prefix.resolve()):
+        raise ValueError("Refusing to repair metadata outside the isolated environment")
+    before = wheel.read_text(encoding="utf-8")
+    old, new = "Tag: cp36-cp36m-manylinux2010_x86_64", "Tag: py3-none-manylinux2010_x86_64"
+    receipt_path = prefix / ".runtime/decord-wheel-tag.json"
+    receipt = read_json(receipt_path) if receipt_path.exists() else None
+    if old not in before:
+        if not receipt or receipt["state"] != "PENDING" or new not in before:
+            return receipt or {"state": "NOT_NEEDED"}
+    else:
+        receipt = {"state": "PENDING", "package": "decord==0.6.0", "wheel_before": before,
+                   "wheel_before_sha256": digest(wheel), "published_wheel_tag": new,
+                   "decoder_code_modified": False}
+        write_json(receipt_path, receipt)
+        temporary = wheel.with_suffix(".tag-fix.tmp")
+        temporary.write_text(before.replace(old, new), encoding="utf-8")
+        os.replace(temporary, wheel)
+    record = wheel.parent / "RECORD"
+    rows = list(csv.reader(io.StringIO(record.read_text(encoding="utf-8"))))
+    payload = wheel.read_bytes()
+    name = wheel.relative_to(wheel.parent.parent).as_posix()
+    matching = [row for row in rows if row[0] == name]
+    if len(matching) != 1:
+        raise ValueError("Unexpected decord WHEEL entry in RECORD")
+    matching[0][1:] = ["sha256=" + base64.urlsafe_b64encode(hashlib.sha256(payload).digest()).rstrip(b"=").decode(), str(len(payload))]
+    buffer = io.StringIO(newline="")
+    csv.writer(buffer, lineterminator="\n").writerows(rows)
+    temporary = record.with_suffix(".tag-fix.tmp")
+    temporary.write_text(buffer.getvalue(), encoding="utf-8")
+    os.replace(temporary, record)
+    receipt.update(state="APPLIED", wheel_after_sha256=digest(wheel))
+    write_json(receipt_path, receipt)
+    return receipt
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--python", type=Path, default=Path(sys.executable), help="Python 3.11 used to create the venv")
@@ -114,7 +164,14 @@ def main(argv=None) -> int:
     parser.add_argument("--with-tests", action="store_true")
     parser.add_argument("--skip-install", action="store_true", help="Reconfigure/recheck an already installed isolated environment")
     parser.add_argument("--check-only", action="store_true", help="Verify without changing config or installing packages")
+    parser.add_argument("--fix-legacy-decord-tag", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
+    if args.fix_legacy_decord_tag:
+        if sys.prefix == sys.base_prefix:
+            raise ValueError("Legacy metadata repair requires an isolated virtual environment")
+        import decord  # Native library must load before its tag can be corrected.
+        print(json.dumps(correct_legacy_decord_tag(Path(sys.prefix))))
+        return 0
     requirements = args.requirements or REPO / "requirements-submission.lock.txt"
     if args.requirements is None and not requirements.is_file():
         requirements = REPO / "requirements-submission.txt"
@@ -149,6 +206,8 @@ def main(argv=None) -> int:
         subprocess.run([str(python), "-m", "pip", "install", "-r", str(requirements)], check=True)
         if args.with_tests:
             subprocess.run([str(python), "-m", "pip", "install", "pytest>=8"], check=True)
+    if not args.check_only:
+        subprocess.run([str(python), "-I", "-B", str(Path(__file__).resolve()), "--fix-legacy-decord-tag"], check=True)
     subprocess.run([str(python), "-m", "pip", "check"], check=True)
     probe = probe_environment(python, args.inference_gpus)
     if probe["gpu_count"] != len(args.inference_gpus.split(",")):

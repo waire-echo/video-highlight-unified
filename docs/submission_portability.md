@@ -86,7 +86,7 @@ bash scripts/run_submission.sh --input-root /path/to/new_testset --output output
 安装器在当前仓库/交付包内创建 `.venv`，不继承训练环境的 site-packages；安装固定
 CUDA 12.8 PyTorch 及仓库依赖，执行 `pip check` 和隔离模式导入/CUDA 检查。
 先从 PyTorch 官方源安装 GPU 版 torch/torchvision 本体，Linux x86_64 再根据该 wheel
-元数据安装完全匹配的 NVIDIA/Tr­iton 运行库，最后从当前配置的 PyPI 源统一解析安装
+元数据安装完全匹配的 NVIDIA/Triton 运行库，最后从当前配置的 PyPI 源统一解析安装
 普通 Python 与项目依赖；全部完成并通过检查前，不视为可运行环境。
 提供 `requirements-submission.lock.txt` 时优先使用其中的实测 Linux/Python 3.11 依赖快照；
 自定义平台可用 `--requirements` 指定另一份依赖合同，但不继承原验收结论。
@@ -98,6 +98,10 @@ FFmpeg/FFprobe 是系统媒体依赖：先安装，或通过上述参数指定�
 也可用 `--input-root` 指定新文件夹。不需手工激活环境。
 解释器配置保留 `.venv/bin/python` 的调用路径，不把软链接还原成基础 Python；
 主流程与子进程必须使用同一独立环境。
+`decord==0.6.0` 的公开 wheel 文件名为 `py3-none-manylinux2010_x86_64`，内部 WHEEL
+却误标 `cp36-cp36m`，新版 pip 会报平台不支持。安装器仅在新 venv 中、原生库可加载且
+确认为这一已知标签时修正 WHEEL/RECORD 元数据；不改 Python/原生解码器代码，
+保存 `.venv/.runtime/decord-wheel-tag.json` 前后哈希，再执行完整 `pip check`。
 新实验改变 Adapter 时用 `--skip-install --adapter ...` 重新配置，不必重装所有包。
 只读环境复查使用 `--check-only`。它只验证环境，不宣称模型推理或定位质量已通过。
 
