@@ -20,6 +20,26 @@ Video-ORA-4B + checkpoint-118 LoRA
   -> 426 行 predictions_spatial.jsonl
 ```
 
+## 新权重
+
+本目录用于第二轮 `checkpoint-228` 的新权重全量运行：
+
+```text
+/media/kubevolume/teacher1/video-highlight/runtime/
+  sft426-doubao237-continue-adapter118-lr3e5-world3-v13-e1-20261023/
+  trainer/checkpoint-228
+```
+
+Adapter SHA256 固定为：
+
+```text
+37b5d75def0c4c9061efc405495c3d5bcc6ace4b60c509657a68c0d90678c790
+```
+
+总控在推理前重新计算并校验该哈希，不能用同名路径误切到其他权重。
+新运行目录为 `runtime/submission-pipeline-new-20261023`，不复用父 Adapter
+的 523 个回答。
+
 ## 已有严格结果续跑
 
 为节省已经完成的 523 窗口 ORA 推理，可显式导入完整严格 merge：
