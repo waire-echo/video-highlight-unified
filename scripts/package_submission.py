@@ -100,7 +100,12 @@ def build_package(config_path: Path, output: Path) -> dict:
             copy(path, path.relative_to(REPO))
     for source, target_dir in ((model, "models/ora"), (adapter, "models/adapter")):
         for path in source.iterdir():
-            if path.is_file() and path.suffix in MODEL_EXTENSIONS:
+            # Checkpoints also contain args/trainer_state/additional_config
+            # JSON: none is required by PeftModel.from_pretrained, and they can
+            # expose dataset paths, training logs or private runtime settings.
+            allowed = (path.name in {"adapter_config.json", "adapter_model.safetensors"}
+                       if source == adapter else path.suffix in MODEL_EXTENSIONS)
+            if path.is_file() and allowed:
                 copy(path, Path(target_dir) / path.name)
         for path in (source / "chat_templates").rglob("*"):
             if path.is_file() and path.suffix in {".jinja", ".jinja2", ".json"}:

@@ -266,12 +266,16 @@ def test_relocated_package_runs_cpu_preparation_without_source_checkout(example)
                         "recovery_policy": "diagnostic", "spatial_failure_policy": "error"})
     (example.spatial / "reference").mkdir()
     (example.spatial / "reference/old_test_answers.jsonl").write_text("private", encoding="utf-8")
+    for name in ("args.json", "trainer_state.json", "additional_config.json"):
+        put(example.adapter / name, {"private_training_setting": "must-not-ship"})
     release = example.root / "release"
     result = packaging.build_package(example.config, release)
     assert result["state"] == "VERIFIED"
     assert not (release / "models/spatial/reference").exists()
     assert not (release / ".env").exists()
     assert not (release / "models/spatial/run.py").exists()
+    assert {path.name for path in (release / "models/adapter").iterdir()} == {
+        "adapter_config.json", "adapter_model.safetensors"}
     release_config = inputs.read_json(release / "configs/submission.json")
     assert not {"unresolved_policy", "recovery_policy", "spatial_failure_policy"} & release_config.keys()
     assert inputs.read_json(release / "models/adapter/adapter_config.json")["base_model_name_or_path"] == "../ora"
