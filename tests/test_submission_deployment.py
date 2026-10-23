@@ -1,8 +1,10 @@
 """Deployment plumbing tests do not install packages or claim GPU quality."""
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
+import venv
 
 import pytest
 
@@ -57,6 +59,21 @@ def test_environment_probe_does_not_hide_import_failure(monkeypatch):
                         subprocess.CompletedProcess(command, 1, "", "missing CUDA dependency"))
     with pytest.raises(RuntimeError, match="missing CUDA dependency"):
         setup.probe_environment(Path(sys.executable), "0,1")
+
+
+def test_real_venv_interpreter_survives_config_and_executable_resolution(tmp_path):
+    folder = tmp_path / "isolated runtime"
+    venv.EnvBuilder(with_pip=False, symlinks=os.name != "nt").create(folder)
+    python = folder / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    config_path = tmp_path / "config/submission.local.json"
+    put(config_path, {"schema": "video-highlight-submission-config/v1",
+                      "python": setup.relative_value(python, config_path.parent)})
+    configured = inputs.resolve_config(config_path)["python"]
+    selected = inputs.executable(configured)
+    assert selected == python.absolute()
+    result = subprocess.run([str(selected), "-I", "-B", "-c", "import sys; print(sys.prefix)"],
+                            check=True, text=True, capture_output=True)
+    assert Path(result.stdout.strip()).resolve() == folder.resolve()
 
 
 @pytest.mark.parametrize("existing_not_venv", [False, True])

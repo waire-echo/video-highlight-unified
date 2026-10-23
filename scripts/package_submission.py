@@ -92,6 +92,8 @@ def build_package(config_path: Path, output: Path) -> dict:
     copy(prompt, "prompts/ora/whole-video-highlights-v1/prompt.txt")
     for name in ("LICENSE", "requirements-submission.txt"):
         copy(REPO / name, name)
+    if (REPO / "requirements-submission.lock.txt").is_file():
+        copy(REPO / "requirements-submission.lock.txt", "requirements-submission.lock.txt")
     copy(REPO / "docs/submission_portability.md", "README.md")
     for path in (REPO / "licenses").rglob("*"):
         if path.is_file():

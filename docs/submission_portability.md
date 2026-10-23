@@ -85,12 +85,16 @@ bash scripts/run_submission.sh --input-root /path/to/new_testset --output output
 
 安装器在当前仓库/交付包内创建 `.venv`，不继承训练环境的 site-packages；安装固定
 CUDA 12.8 PyTorch 及仓库依赖，执行 `pip check` 和隔离模式导入/CUDA 检查。
+提供 `requirements-submission.lock.txt` 时优先使用其中的实测 Linux/Python 3.11 依赖快照；
+自定义平台可用 `--requirements` 指定另一份依赖合同，但不继承原验收结论。
 驱动/硬件不匹配时须明确调整 `--torch-index-url` 并重新验收，不能自动改用 CPU。
 FFmpeg/FFprobe 是系统媒体依赖：先安装，或通过上述参数指定已安装的工具。
 安装结果和完整 Python 包版本写到被忽略的 `.runtime/environment.json`；个人路径
 与 Adapter 校验值写到 `configs/submission.local.json`，不上传 GitHub、不混入赛方包。
 之后只需放入新测试集并执行 `bash scripts/run_submission.sh`；默认读取包内 `input/`，
 也可用 `--input-root` 指定新文件夹。不需手工激活环境。
+解释器配置保留 `.venv/bin/python` 的调用路径，不把软链接还原成基础 Python；
+主流程与子进程必须使用同一独立环境。
 新实验改变 Adapter 时用 `--skip-install --adapter ...` 重新配置，不必重装所有包。
 只读环境复查使用 `--check-only`。它只验证环境，不宣称模型推理或定位质量已通过。
 

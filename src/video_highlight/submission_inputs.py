@@ -119,7 +119,9 @@ def resolve_config(path: Path) -> dict:
     for key in EXEC_OPTIONS & result.keys():
         value = result[key]
         if value and ("/" in value or "\\" in value):
-            result[key] = str((path.resolve().parent / Path(value).expanduser()).resolve())
+            # Dereferencing venv/bin/python selects the base interpreter and
+            # loses the virtual environment. Preserve its invocation pathname.
+            result[key] = os.path.abspath(path.resolve().parent / Path(value).expanduser())
     for key in RUNTIME_POLICIES.keys() & result.keys():
         result[key] = runtime_policy(key, result[key])
     return result
@@ -129,7 +131,7 @@ def executable(value) -> Path:
     found = shutil.which(str(value))
     if not found:
         raise FileNotFoundError(f"Executable not available: {value}")
-    return Path(found).resolve()
+    return Path(os.path.abspath(found))
 
 
 @contextmanager

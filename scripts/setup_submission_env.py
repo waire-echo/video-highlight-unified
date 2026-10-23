@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -17,10 +16,11 @@ from video_highlight.submission_inputs import digest, read_json, resolve_config,
 
 
 def relative_value(path: Path, config_dir: Path) -> str:
+    invocation = Path(os.path.abspath(path.expanduser()))
     try:
-        return Path(os.path.relpath(path.resolve(), config_dir.resolve())).as_posix()
+        return Path(os.path.relpath(invocation, config_dir.resolve())).as_posix()
     except ValueError:  # Different Windows drives: personal config only.
-        return str(path.resolve())
+        return str(invocation)
 
 
 def checked_tool(value: str) -> Path:
@@ -97,12 +97,16 @@ def main(argv=None) -> int:
     parser.add_argument("--ffmpeg", default="ffmpeg")
     parser.add_argument("--ffprobe", default="ffprobe")
     parser.add_argument("--torch-index-url", default="https://download.pytorch.org/whl/cu128")
+    parser.add_argument("--requirements", type=Path, help="Override the verified Linux lockfile; requires fresh validation")
     parser.add_argument("--inference-gpus", default="0,1")
     parser.add_argument("--spatial-gpu", default="0")
     parser.add_argument("--with-tests", action="store_true")
     parser.add_argument("--skip-install", action="store_true", help="Reconfigure/recheck an already installed isolated environment")
     parser.add_argument("--check-only", action="store_true", help="Verify without changing config or installing packages")
     args = parser.parse_args(argv)
+    requirements = args.requirements or REPO / "requirements-submission.lock.txt"
+    if args.requirements is None and not requirements.is_file():
+        requirements = REPO / "requirements-submission.txt"
     venv = args.venv.expanduser().resolve()
     python = venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     config_path = REPO / "configs/submission.local.json"
@@ -129,7 +133,7 @@ def main(argv=None) -> int:
         subprocess.run([str(python), "-m", "pip", "install", "--upgrade", "pip"], check=True)
         subprocess.run([str(python), "-m", "pip", "install", "torch==2.10.0", "torchvision==0.25.0",
                         "--index-url", args.torch_index_url], check=True)
-        subprocess.run([str(python), "-m", "pip", "install", "-r", str(REPO / "requirements-submission.txt")], check=True)
+        subprocess.run([str(python), "-m", "pip", "install", "-r", str(requirements)], check=True)
         if args.with_tests:
             subprocess.run([str(python), "-m", "pip", "install", "pytest>=8"], check=True)
     subprocess.run([str(python), "-m", "pip", "check"], check=True)
@@ -146,6 +150,8 @@ def main(argv=None) -> int:
         write_json(REPO / ".runtime/environment.json", {
             "schema": "video-highlight-submission-environment/v1", "environment_probe": probe,
             "requirements_sha256": digest(REPO / "requirements-submission.txt"),
+            "installed_requirements_sha256": digest(requirements),
+            "installed_requirements_file": requirements.name,
             "config": str(config_path), "adapter_sha256": adapter_sha,
             "pip_freeze": frozen.splitlines(), "gpu_pipeline_validation": "pending"})
         for folder in ("input/video", "input/jsonl", "outputs"):
