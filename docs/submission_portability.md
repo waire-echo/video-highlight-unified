@@ -85,6 +85,8 @@ bash scripts/run_submission.sh --input-root /path/to/new_testset --output output
 
 安装器在当前仓库/交付包内创建 `.venv`，不继承训练环境的 site-packages；安装固定
 CUDA 12.8 PyTorch 及仓库依赖，执行 `pip check` 和隔离模式导入/CUDA 检查。
+先从 PyTorch 官方源安装 GPU 版 torch/torchvision 本体，再从当前配置的 PyPI 源统一
+解析安装其依赖与项目依赖；两步完成并通过检查前，不视为可运行环境。
 提供 `requirements-submission.lock.txt` 时优先使用其中的实测 Linux/Python 3.11 依赖快照；
 自定义平台可用 `--requirements` 指定另一份依赖合同，但不继承原验收结论。
 驱动/硬件不匹配时须明确调整 `--torch-index-url` 并重新验收，不能自动改用 CPU。
