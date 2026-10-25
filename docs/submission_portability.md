@@ -32,7 +32,7 @@ Jinja 聊天模板及其 `chat_templates/` 子目录；模型加载使用本地�
 python3.11 scripts/setup_submission_env.py \
   --model /path/to/base_model --adapter /path/to/adapter \
   --spatial-package /path/to/spatial_assets \
-  --ffmpeg /path/to/ffmpeg --ffprobe /path/to/ffprobe --with-tests
+  --ffmpeg /path/to/ffmpeg --ffprobe /path/to/ffprobe
 ```
 
 完整模型包使用默认目录时可省略三个资产路径参数；媒体工具在 PATH 中时也可省略对应参数。

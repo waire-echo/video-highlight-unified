@@ -57,13 +57,7 @@ bash scripts/run_submission.sh \
 - `submission.zip`：仅包含 `predictions_spatial.jsonl` 的结果压缩包。
 - `FINAL.json`：结果校验及文件摘要。
 
-## 测试与交付
-
-源码测试需要 pytest，可在环境安装命令中附加 `--with-tests`。
-
-```bash
-python -B -m pytest -q -p no:cacheprovider
-```
+## 交付与许可
 
 完整模型包的构建、校验及独立环境运行步骤见[部署与运行说明](docs/submission_portability.md)。
 第三方组件的许可说明保留于 `LICENSE`、`licenses/` 及对应模型目录。

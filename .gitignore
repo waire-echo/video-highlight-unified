@@ -46,3 +46,5 @@ experiments/artifact_locations.local.json
 *.h5
 *.hdf5
 *.log
+/tests/
+/pytest.ini
