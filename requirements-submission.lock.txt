@@ -1,6 +1,4 @@
-# Verified installation snapshot: Linux x86_64, Python 3.11, CUDA 12.8.
-# Built in a fresh venv from requirements-submission.txt on 2026-10-23.
-# GPU pipeline acceptance is recorded separately in docs/submission_deployment_acceptance.md.
+# Dependency lock: Linux x86_64, Python 3.11, CUDA 12.8.
 # Install via scripts/setup_submission_env.py (GPU wheels come from the explicit PyTorch index).
 absl-py==2.5.1
 accelerate==1.15.0

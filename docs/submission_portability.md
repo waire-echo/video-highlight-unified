@@ -1,149 +1,157 @@
-# 可搬移的比赛推理包
+# 部署与运行说明
 
-此入口只推理、不训练、不上传比赛官网。代码不依赖学校服务器路径、训练集、
-历史预测或固定的视频数量。旧实验目录不覆盖。GPU 全流程验证须另行执行，
-CPU 测试及打包哈希通过不代表模型效果或官方成绩。
+## 1. 运行环境与资产
 
-## 输入和运行
+使用 Linux x86_64、Python 3.11、NVIDIA GPU 及与 CUDA 12.8 PyTorch 匹配的驱动。
+FFmpeg 和 FFprobe 须位于 PATH 中，或在安装时显式指定位置。
+Python 固定依赖见 `requirements-submission.lock.txt`；使用其他平台或依赖版本时需重新验证。
 
-输入文件夹放 `video/<video_id>.mp4` 和 `jsonl/<video_id>.jsonl`，每份 JSONL
-仅一行 `{"video_id":"7","targetRatioWH":[9,16]}`。也支持 `videos/` 和
-单个 `test_index.json`（对象数组）/`test_index.jsonl`；不要同时放多个索引。
-不要求连续编号或 426 条，不需要高光答案、训练标注或预切片。
+完整模型包目录如下：
 
-包内配置 `configs/submission.json` 的相对路径全部以**配置文件所在目录**为基准。
-开发仓库使用 `configs/submission.example.json`，填写自己机器的模型位置；
-机器绝对路径只放个人配置，不写入执行代码或赛方包。
-
-```bash
-python scripts/run_submission_pipeline.py --config configs/submission.json \
-  --input-root /path/to/new_testset --output outputs/experiment_a \
-  --inference-gpus 0,1 --spatial-gpu 0
+```text
+configs/submission.json
+models/ora/                基座权重、tokenizer、processor 和聊天模板
+models/adapter/            adapter_config.json、adapter_model.safetensors
+models/spatial/            空间模块源码、配置和 YOLO 权重
+scripts/                   环境安装、推理与打包入口
+src/video_highlight/        公共模块
+prompts/                   时间定位提示词
+requirements-submission.txt
+requirements-submission.lock.txt
 ```
 
-`/path/to/new_testset` 是使用者传入的示例值，不是程序默认目录。
-不提供上述参数时，包内配置默认读 `input/`，写 `outputs/submission/`。
-在其他工作目录调用也可；脚本、Prompt、模型均不依赖 shell 当前目录。
+模型、适配器、提示词和空间配置须使用同一套交付资产，文件校验值由 `PACKAGE.json` 记录。
+基础模型须包含完整分片、分片索引、tokenizer、processor 配置、
+Jinja 聊天模板及其 `chat_templates/` 子目录；模型加载使用本地文件。
 
-CPU 准备和只读计划：
+## 2. 创建独立环境
+
+源码部署时指定已有资产位置：
+
+```bash
+python3.11 scripts/setup_submission_env.py \
+  --model /path/to/base_model --adapter /path/to/adapter \
+  --spatial-package /path/to/spatial_assets \
+  --ffmpeg /path/to/ffmpeg --ffprobe /path/to/ffprobe --with-tests
+```
+
+完整模型包使用默认目录时可省略三个资产路径参数；媒体工具在 PATH 中时也可省略对应参数。
+
+安装器创建独立 `.venv`，先安装指定 CUDA 源的 PyTorch，再按 wheel 元数据安装匹配的
+NVIDIA/Triton 运行库及项目依赖，最后执行 `pip check` 和隔离模式下的导入/CUDA 检查。
+存在依赖锁定文件时优先采用锁定版本，不继承其他环境的 site-packages。
+目标驱动不匹配时可通过 `--torch-index-url` 指定相应源；`--requirements` 可指定依赖合同。
+
+安装记录保存在 `.runtime/environment.json`，机器路径配置保存在
+`configs/submission.local.json`。这些是部署后生成的本机文件，不属于通用交付配置。
+环境解释器保留 `.venv/bin/python` 调用路径，主流程与子进程使用同一独立环境。
+
+Decord 0.6.0 的部分 wheel 存在内部标签不一致问题。安装器仅在新虚拟环境中、
+确认该标签且原生库可加载时修正 WHEEL/RECORD 元数据；记录位于
+`.venv/.runtime/decord-wheel-tag.json`，不修改解码器代码。
+
+更换适配器而不重装依赖：
+
+```bash
+.venv/bin/python -I -B scripts/setup_submission_env.py \
+  --skip-install --adapter /path/to/adapter
+```
+
+仅检查环境使用 `--check-only`。之后通过统一启动脚本运行，无需手动激活环境。
+
+## 3. 输入与配置
+
+输入目录包含 `video/<video_id>.mp4` 和 `jsonl/<video_id>.jsonl`。
+每份 JSONL 仅一行，例如：
+
+```json
+{"video_id":"sample","targetRatioWH":[9,16]}
+```
+
+也支持 `videos/`，以及单个 `test_index.json`（对象数组）或 `test_index.jsonl`。
+不要同时提供多个索引。编号可以不连续、可以包含非数字字符；不需要高光标注或预切片。
+视频应可解码，逐帧时间戳须可读取且严格递增；带非零旋转元数据的输入会被拒绝。
+
+配置中的相对路径以配置文件所在目录为基准，而非 shell 当前目录。
+源码默认配置为 `configs/submission.example.json`，完整模型包使用 `configs/submission.json`。
+启动脚本优先使用安装器生成的 `configs/submission.local.json`。
+
+只读计划与输入准备：
 
 ```bash
 python scripts/run_submission_pipeline.py --config configs/submission.json --dry-run
 python scripts/run_submission_pipeline.py --config configs/submission.json --prepare-only
 ```
 
-流程自动完成：媒体/画幅检查 → 32 秒窗口/24 秒步长准备 → 指定 Adapter 推理
-→ 合并与有审计的格式修复 → 真实原视频 PTS 映射 → v7E 空间裁剪 → 校验和 ZIP。
-窗口、FPS、视觉预算和生成参数均在配置中。空间阶段只调用 Stage 2，不调用
-复现包的旧 Stage 1，也不读取旧视频元数据、参考高光或按测试视频哈希定制的检测参数。
+在源码目录运行以上命令时，将配置名换为 `configs/submission.example.json` 或已生成的本机配置。
 
-同一命令重跑复用已完成的检查点；换视频、目标画幅、Prompt、模型、权重或参数，
-自动创建新输入缓存/运行，不混用旧回答。不要复制整个旧运行冒充新实验。
-异常保留原始回答和失败记录。正式入口固定为有审计的自动容错，不提供严格停跑模式：
-
-- 正常有效回答原样保留；异常回答固定按合法时间交集处理，
-  仅对可独立解析的完整条目取合法时间交集，坏条目单独审计，不猜单位、不交换起止。
-- 先本地修复，再仅重试仍未解决的精确 `window_id`；`recovery_attempts=1`，
-  预算与结果持久化，同一运行重启不叠加新重试。仍失败时自动
-  只丢失败窗口，保留同视频其他窗口，记录 `03-lenient/FALLBACKS.json`。
-- `03-lenient/TERMINAL_STATES.json` 区分 `ok/repaired/partial/no_highlights/inference_failed`。
-  推理全失败产生空结果不等于模型判定无高光。
-- 空间异常/缺失框或 worker 崩溃，自动仅对受影响帧使用目标比例下的
-  最大合法中心框，遵守赛题 `[x,y,w]` 协议；不改变时间层已经选好的帧集合。
-  记录 `05-spatial/work/RECOVERY.json`、`TERMINAL_STATES.json` 和最终 `REPAIRS.json`。
-- 缺模型、错误哈希、无 CUDA、输入身份混淆、不可写磁盘等部署故障明确失败，不能伪造全体空结果。
-
-旧配置/命令中的 `recovery_policy=diagnostic`、`unresolved_policy=error`、
-`spatial_failure_policy=error`（单独空间入口为 `--failure-policy error`）仅兼容读取：
-打印 `strict_runtime_disabled` 警告并固定使用交集修复、失败窗口隔离、空间中心框兜底，
-不能关闭兜底。示例配置、发布包和命令帮助不再提供这些切换项。
-可将 `recovery_attempts` 设为 0 省去模型重试，但确定性修复与最终兜底始终保留。
-局部故障仍有错误详情与降级终态；最终提交协议校验和全局部署/身份检查不关闭。
-
-`window_timeout_sec=600`、`spatial_video_timeout_sec=1800`、`command_timeout_sec=86400`
-是可改的初始预算，不是速度承诺。时间窗口有父进程硬看门狗；超时回收本次 worker，
-保存该窗口失败后重新启动 worker 补其余窗口。空间超时回收该 worker，只补其尚未完成的视频。
-`command_timeout_sec` 是每个阶段命令/时间推理分片预算，**不是整场比赛总时限**；
-达到此阶段预算会停止并保留检查点，不能继续运行时假称整批已完成。
-尚未启用未经 GPU 验证的 OOM 自动减帧/视觉预算切换。
-
-最终产物位于 `outputs/experiment_a/run-<id>/06-submission/`，包含
-`predictions_spatial.jsonl`、`submission.jsonl`、`submission.zip` 和 `FINAL.json`。
-
-## 环境
-
-Linux/Python 3.11 首次部署可运行以下命令；权重、Adapter、空间资产和媒体工具位置
-由使用者传入，不写死在代码。若使用含权重的完整交付包，三个资产路径可省略。
+## 4. 推理与结果
 
 ```bash
-python3.11 scripts/setup_submission_env.py \
-  --model /path/to/base_model --adapter /path/to/adapter \
-  --spatial-package /path/to/stage2_assets \
-  --ffmpeg /path/to/ffmpeg --ffprobe /path/to/ffprobe --with-tests
-bash scripts/run_submission.sh --input-root /path/to/new_testset --output outputs/experiment_a
+bash scripts/run_submission.sh \
+  --input-root /path/to/input --output outputs/submission \
+  --inference-gpus 0,1 --spatial-gpu 0
 ```
 
-安装器在当前仓库/交付包内创建 `.venv`，不继承训练环境的 site-packages；安装固定
-CUDA 12.8 PyTorch 及仓库依赖，执行 `pip check` 和隔离模式导入/CUDA 检查。
-先从 PyTorch 官方源安装 GPU 版 torch/torchvision 本体，Linux x86_64 再根据该 wheel
-元数据安装完全匹配的 NVIDIA/Triton 运行库，最后从当前配置的 PyPI 源统一解析安装
-普通 Python 与项目依赖；全部完成并通过检查前，不视为可运行环境。
-提供 `requirements-submission.lock.txt` 时优先使用其中的实测 Linux/Python 3.11 依赖快照；
-自定义平台可用 `--requirements` 指定另一份依赖合同，但不继承原验收结论。
-驱动/硬件不匹配时须明确调整 `--torch-index-url` 并重新验收，不能自动改用 CPU。
-FFmpeg/FFprobe 是系统媒体依赖：先安装，或通过上述参数指定已安装的工具。
-安装结果和完整 Python 包版本写到被忽略的 `.runtime/environment.json`；个人路径
-与 Adapter 校验值写到 `configs/submission.local.json`，不上传 GitHub、不混入赛方包。
-之后只需放入新测试集并执行 `bash scripts/run_submission.sh`；默认读取包内 `input/`，
-也可用 `--input-root` 指定新文件夹。不需手工激活环境。
-解释器配置保留 `.venv/bin/python` 的调用路径，不把软链接还原成基础 Python；
-主流程与子进程必须使用同一独立环境。
-`decord==0.6.0` 的公开 wheel 文件名为 `py3-none-manylinux2010_x86_64`，内部 WHEEL
-却误标 `cp36-cp36m`，新版 pip 会报平台不支持。安装器仅在新 venv 中、原生库可加载且
-确认为这一已知标签时修正 WHEEL/RECORD 元数据；不改 Python/原生解码器代码，
-保存 `.venv/.runtime/decord-wheel-tag.json` 前后哈希，再执行完整 `pip check`。
-新实验改变 Adapter 时用 `--skip-install --adapter ...` 重新配置，不必重装所有包。
-只读环境复查使用 `--check-only`。它只验证环境，不宣称模型推理或定位质量已通过。
-
-建议 Linux、Python 3.11 和独立虚拟环境。安装与驱动匹配的 CUDA PyTorch，
-再安装 `requirements-submission.txt`；确保 `ffmpeg`、`ffprobe` 在 PATH。
-可用 `--python` / `--spatial-python` 指定分离环境，`--ffmpeg` / `--ffprobe`
-指定工具位置，不需修改源码。单卡显存不足时显式传多卡；两张 12GB 卡可作为
-现有模型配置的起点。本分支已在两张 RTX 3060 12GB 上通过公开小样本真实全流程及
-中断续跑；实测范围见仓库 `docs/submission_deployment_acceptance.md`，不是全部输入容量保证。
-运行离线加载本地模型，不能通过下载或闭源 API 偷换缺失权重。
-时间推理固定 `decord` 视频读取器，与保留的已完成推理日志一致；依赖包含
-`decord`、PyAV、accelerate 和 einops，避免只装权重加载库却漏视频读取/分卡依赖。
-基础模型的独立 Jinja 聊天模板（含 `chat_templates/`）随包复制，不只复制 JSON 和权重。
-逐帧时间戳必须可读、严格递增；带非零旋转元数据的输入目前明确拒绝，
-避免自动旋转后裁剪坐标不再属于原视频。不能把这类输入标成正常无高光。
-
-本分支已完成独立新 venv 安装及搬目录 GPU 小样本验收，并保存实装依赖快照。
-不同 CUDA/驱动、权重和新构建仍需重新验收，不能仅凭依赖文件存在声称已通过。
-包装器保留 Stage 2 主体检测/关联逻辑，但不携带按历史测试视频哈希选择的检测配置；
-原来的比例估算帧号已改为真实 PTS。因此不能声称与历史 41.09 包的完整输出逐帧相同，
-更不能把历史成绩算作此新包成绩。
-
-## 从开发仓库制作赛方包
-
-个人实验配置指定本机现有 `model`、`adapter`、`spatial_package`。在有模型的
-服务器上打包，避免把大权重经开发电脑来回传：
+也可直接指定配置运行：
 
 ```bash
-python scripts/package_submission.py --config configs/my_experiment.local.json --output dist/release_v2
-python dist/release_v2/scripts/package_submission.py --verify dist/release_v2
+.venv/bin/python -I -B scripts/run_submission_pipeline.py \
+  --config configs/submission.json --input-root /path/to/input \
+  --output outputs/submission --inference-gpus 0,1 --spatial-gpu 0
 ```
 
-构建器使用白名单打包代码、Prompt、基础模型、LoRA、Stage 2 和 YOLO 权重、
-依赖说明与许可证，生成逐文件 SHA256；缺模型立即失败，不生成伪“可运行”的代码空包。
-**不带测试视频、标注、参考答案、历史预测、`.env`、SSH key、训练日志或虚拟环境**。
-基础模型及 Adapter 元数据随包提供，Adapter 权重字节不改。空间包仅携带 Stage 2
-需要的组件，不捆绑无关训练模型。Adapter 不带训练参数、trainer state 或训练日志。
-解压后可移动到任意目录；赛方只需安装环境、
-放入新输入并执行统一命令。`PACKAGE.json` 明确记录本次包的 GPU 验证仍为待验。
+设备编号按目标机器选择；单卡运行可将两个设备参数都设为 `0`，实际容量需满足模型与输入配置。
+可通过 `--python`、`--spatial-python`、`--ffmpeg`、`--ffprobe` 指定解释器和媒体工具。
 
-上述是通用构建的默认状态，不会借用旧包结论。实际完成验收的特定实体包可另附
-`ACCEPTANCE.json` 并更新其验证状态；必须核对报告绑定的运行文件/权重/环境哈希和范围。
+流程为：媒体检查 → 视频窗口准备 → 适配器时间推理 → 区间合并与修复
+→ 原视频逐帧时间戳映射 → 主体检测与空间裁剪 → 协议校验与压缩。
+默认采用 32 秒窗口、24 秒步长和 2 FPS；最大帧数、视觉预算、生成长度等以配置为准。
+时间推理使用 Decord 读取器；空间模块以当前时间交接文件确定待处理帧。
 
-交付前必须：完整包哈希校验 → 搬到另一目录 → 在干净环境做 GPU 小样本全流程
-→ 中断续跑与结果逐帧校验。只有这些验收实际完成，才能称“赛方可复现已验收”。
+同一命令再次运行时复用已完成检查点。输入、模型、提示词或配置变化时创建独立运行；
+代码指纹变化也会更新运行身份。不要将不同运行的缓存混合使用。
+
+输出目录的 `CURRENT.json` 指向 `run-<id>`；其 `06-submission/` 包含
+`predictions_spatial.jsonl`、`submission.jsonl`、`submission.zip`、`FINAL.json`。
+两个 JSONL 内容相同；ZIP 内仅有 `predictions_spatial.jsonl`。
+预测框采用 `[x,y,w]`，帧号属于原视频。
+
+## 5. 异常恢复
+
+- 有效时间回答保持不变。异常条目按合法时间交集处理；只解析可独立解码的完整条目，
+  不猜时间单位、不交换起止点。未解决窗口最多按 `recovery_attempts` 重试，默认一次。
+- 重试预算持久化，重启不会叠加预算。仍失败时隔离该窗口，保留其余窗口结果；
+  `03-lenient/TERMINAL_STATES.json` 区分正常无高光、局部失败和推理失败，
+  `03-lenient/FALLBACKS.json` 记录降级。
+- 空间异常仅对受影响帧补目标比例下的合法中心框，不增加或删除时间阶段选定的帧。
+  空间阶段的 `RECOVERY.json`、`TERMINAL_STATES.json` 及最终 `REPAIRS.json` 记录处理情况。
+- 缺少模型、权重校验失败、CUDA 不可用、输入身份冲突或磁盘不可写时明确报错。
+  最终 ID、比例、帧号、裁剪框和 ZIP 校验始终执行。
+
+正式入口固定采用上述恢复策略。兼容字段 `recovery_policy=diagnostic`、
+`unresolved_policy=error`、`spatial_failure_policy=error` 或空间入口的
+`--failure-policy error` 不会关闭恢复；读取时会给出提示。
+`recovery_attempts=0` 仅取消模型重试，不取消确定性修复和最终局部兜底。
+
+窗口、空间视频和阶段命令的初始超时分别为 `600`、`1800`、`86400` 秒，
+对应 `window_timeout_sec`、`spatial_video_timeout_sec`、`command_timeout_sec`。
+窗口或空间 worker 超时后回收该进程并保留已完成结果；阶段命令预算不是整个任务总时限。
+采样帧数与视觉预算不会因 OOM 自动调整；修改相关配置后应重新验证。
+
+## 6. 构建与验证完整模型包
+
+在配置中填写实际基座、适配器和空间资产目录，再构建到新的输出目录：
+
+```bash
+python scripts/package_submission.py --config configs/submission.local.json --output dist/release
+python dist/release/scripts/package_submission.py --verify dist/release
+```
+
+构建器按白名单复制运行源码、提示词、基座、适配器、空间资产、依赖说明和许可证，
+生成逐文件 SHA256。缺少必需资产会中止构建；适配器仅复制配置和推理权重，权重字节保持不变。
+包中不包含输入视频、标注、预测缓存、凭据、训练状态或虚拟环境。
+
+文件完整性校验完成后，将包移动到另一目录，在独立环境中使用允许复现的视频执行全流程，
+检查 `FINAL.json`、结果 JSONL 与 ZIP，再验证中断续跑及完成后重复运行的一致性。
+`PACKAGE.json` 中的 `gpu_validation` 记录该实体包的验证状态；仅完成文件校验不等于模型推理验证。

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a frozen highlights-only LoRA adapter over every materialized test window.
+"""Run video highlight inference with a fixed LoRA adapter.
 
 This is an inference-only entry point. It removes assistant messages before
 generation, maps window-local seconds back to the source-video timeline, merges
@@ -542,7 +542,7 @@ def infer_all(
                         for source in source_index]
     selected_sources = [source for source in selected_sources if source["windows"]]
     plan = {
-        "schema": "video-ora-adapter426-inference/v1",
+        "schema": "video-ora-adapter-inference/v1",
         "created_at": utc_now(),
         "model": model_path,
         "adapter": str(adapter),

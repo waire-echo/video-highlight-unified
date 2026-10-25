@@ -7,7 +7,7 @@ transformers==5.19.0
 peft==0.20.0
 tokenizers==0.23.1
 qwen-vl-utils==0.0.14
-# Video readers and adapter dispatch used by the retained successful temporal run.
+# Video decoding and model dispatch dependencies.
 decord==0.6.0
 av==18.1.0
 accelerate==1.15.0

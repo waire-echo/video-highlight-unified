@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
-"""Run frozen v7E Stage 2 from this pipeline's handoff without package fallback.
+"""Run spatial detection and cropping from the current temporal handoff.
 
-The teammate release package is an approved 41.09-point reproduction. Its
-normal Stage 2 runner validates the supplied Stage 1 file but then also checks
-the output against the package's historical Stage 1 fixture. That behavior is
-useful for reproduction and unsafe for a live submission because the current
-temporal answer must control the selected frames.
-
-This wrapper imports the frozen package's own Stage 2 module, detector assets,
-and validation functions, but passes the current handoff directly and writes
-an independent run. It never calls the package's Stage 1 model or reads its
-reference timestamps as answers.
+The wrapper imports the spatial module, detector assets, and validators from
+the configured package. Selected frames come from the supplied handoff, and
+outputs are written to an independent run directory.
 """
 
 from __future__ import annotations

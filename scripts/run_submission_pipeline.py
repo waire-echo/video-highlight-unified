@@ -61,7 +61,7 @@ STAGES = (
     "spatial",
     "submission",
 )
-SPATIAL_RUNNER_SOURCE = REPO / "scripts/run_v7e_stage2_submission.py"
+SPATIAL_RUNNER_SOURCE = REPO / "scripts/run_spatial_submission.py"
 
 
 class PipelineError(RuntimeError):
@@ -82,7 +82,7 @@ def expected_window_count(args) -> int:
 
 
 def load_request_plan(args):
-    spec = importlib.util.spec_from_file_location("submission_request_plan", REPO / "scripts/infer_video_ora_highlights_adapter_426.py")
+    spec = importlib.util.spec_from_file_location("submission_request_plan", REPO / "scripts/infer_video_ora_highlights.py")
     inference = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(inference)
     return inference.load_plan(args.materialized, args.videos)
@@ -400,7 +400,7 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
                                     if path.is_file() and path.suffix in (".json", ".model", ".txt", ".tiktoken", ".vocab", ".jinja", ".jinja2")},
         "source_files_sha256": {
             str(path.relative_to(REPO)): sha256_file(path)
-            for path in [REPO / "scripts/infer_video_ora_highlights_adapter_426.py",
+            for path in [REPO / "scripts/infer_video_ora_highlights.py",
                          REPO / "scripts/merge_video_ora_highlights_inference.py",
                          REPO / "scripts/merge_video_ora_highlights_lenient_diagnostic.py",
                          *sorted((SRC / "video_highlight").glob("submission_*.py")),
@@ -600,7 +600,7 @@ def stage_inference(
             str(args.python),
             "-B",
             "-u",
-            str(REPO / "scripts/infer_video_ora_highlights_adapter_426.py"),
+            str(REPO / "scripts/infer_video_ora_highlights.py"),
             "--model",
             str(args.model),
             "--adapter",
@@ -853,7 +853,7 @@ def retry_failure_windows(
             str(args.python),
             "-B",
             "-u",
-            str(REPO / "scripts/infer_video_ora_highlights_adapter_426.py"),
+            str(REPO / "scripts/infer_video_ora_highlights.py"),
             "--model",
             str(args.model),
             "--adapter",

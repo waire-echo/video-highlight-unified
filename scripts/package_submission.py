@@ -15,8 +15,8 @@ sys.path.insert(0, str(REPO / "src"))
 from video_highlight.submission_inputs import digest, read_json, resolve_config, write_json
 
 
-SCRIPTS = ("run_submission_pipeline.py", "run_v7e_stage2_submission.py",
-           "infer_video_ora_highlights_adapter_426.py", "merge_video_ora_highlights_inference.py",
+SCRIPTS = ("run_submission_pipeline.py", "run_spatial_submission.py",
+           "infer_video_ora_highlights.py", "merge_video_ora_highlights_inference.py",
            "merge_video_ora_highlights_lenient_diagnostic.py", "package_submission.py",
            "setup_submission_env.py", "run_submission.sh")
 SPATIAL_CODE = ("pipeline/__init__.py", "pipeline/common.py", "modules/__init__.py",
@@ -116,7 +116,7 @@ def build_package(config_path: Path, output: Path) -> dict:
     for index in model.glob("*.safetensors.index.json"):
         for shard in set(read_json(index)["weight_map"].values()):
             copy(inside(model, shard), Path("models/ora") / shard)
-    # This metadata is not a weight: remove the old server's base-model pathname.
+    # Use a package-relative base-model path in adapter metadata.
     adapter_config = read_json(staging / "models/adapter/adapter_config.json")
     adapter_config["base_model_name_or_path"] = "../ora"
     write_json(staging / "models/adapter/adapter_config.json", adapter_config)
@@ -130,7 +130,7 @@ def build_package(config_path: Path, output: Path) -> dict:
         if (spatial / name).is_file():
             copy(spatial / name, Path("models/spatial") / name)
     copy(yolo_source, Path("models/spatial") / yolo_asset["path"])
-    # Only Stage 2 is called; never ship historical videos, targets or Stage 1 models.
+    # Include only the spatial module and assets required for inference.
     spatial_config = {key: spatial_config[key] for key in ("schema", "pipeline_version", "stage2")}
     spatial_config["stage2"].pop("historical_detector_profile", None)
     spatial_config["assets"] = {"yolo": yolo_asset}

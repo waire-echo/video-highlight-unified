@@ -1,4 +1,4 @@
-"""CPU/media engineering tests; dummy weights/models are never quality evidence."""
+"""CPU and media tests for input preparation, recovery, and packaging."""
 import argparse
 import hashlib
 import importlib
@@ -13,10 +13,10 @@ from types import SimpleNamespace
 import pytest
 
 from video_highlight import submission_inputs as inputs
-import infer_video_ora_highlights_adapter_426 as inference
+import infer_video_ora_highlights as inference
 import package_submission as packaging
 import run_submission_pipeline as pipeline
-import run_v7e_stage2_submission as spatial_runner
+import run_spatial_submission as spatial_runner
 
 
 def put(path, value):
