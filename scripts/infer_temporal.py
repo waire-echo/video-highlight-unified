@@ -542,7 +542,7 @@ def infer_all(
                         for source in source_index]
     selected_sources = [source for source in selected_sources if source["windows"]]
     plan = {
-        "schema": "video-ora-adapter426-inference/v1",
+        "schema": "video-ora-adapter-inference/v1",
         "created_at": utc_now(),
         "model": model_path,
         "adapter": str(adapter),

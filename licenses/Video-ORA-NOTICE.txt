@@ -1,0 +1,8 @@
+Video-ORA-4B
+Copyright 2026 The OraRL Authors
+
+This distribution contains a fine-tuned derivative of Qwen/Qwen3.5-4B:
+https://huggingface.co/Qwen/Qwen3.5-4B
+
+The upstream model and the Video-ORA-4B modifications are distributed under
+the Apache License, Version 2.0.

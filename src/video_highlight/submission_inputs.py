@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from bisect import bisect_left
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from decimal import Decimal
 import hashlib
@@ -95,7 +96,7 @@ def discover_input(root: Path) -> tuple[Path, Path]:
 
 
 PATH_OPTIONS = {"model", "adapter", "materialized", "videos", "index", "spatial_package",
-                "pipeline_dir", "input_root", "prompt", "seed_strict_merged", "existing_run_root"}
+                "rgb_rank_assets", "pipeline_dir", "input_root", "prompt", "seed_strict_merged", "existing_run_root"}
 EXEC_OPTIONS = {"python", "spatial_python", "ffmpeg", "ffprobe"}
 VALUE_OPTIONS = {"expected_adapter_sha256", "expected_model_revision", "inference_gpus",
                  "spatial_gpu", "fps", "max_frames", "video_max_token_num", "video_min_token_num",
@@ -257,7 +258,8 @@ def prepare_inputs(args) -> Path:
         write_json(output / "PREPARING.json", contract)
         metadata, samples, requests, files = [], [], [], {}
         prompt = args.prompt.read_text(encoding="utf-8-sig").strip()
-        for row in rows:
+        def prepare_video(row):
+            video_samples, video_requests, video_files = [], [], {}
             video_id = row["video_id"]
             source = actual[video_id]
             meta_path = output / "media" / f"{video_id}.json"
@@ -269,7 +271,6 @@ def prepare_inputs(args) -> Path:
                 meta = {**probe_video(source, args.ffprobe), "video_id": video_id,
                         "source_sha256": sources[video_id], "target_ratio": row["targetRatioWH"]}
                 write_json(meta_path, meta)
-            metadata.append(meta)
             width, height = resized_shape(*meta["source_size"], args.video_min_token_num, args.video_max_token_num)
             for number, (start, end) in enumerate(window_spans(meta["duration_sec"], args.window_seconds, args.window_stride)):
                 clip = output / "clips" / f"{video_id}_w{number:04d}.mp4"
@@ -280,23 +281,39 @@ def prepare_inputs(args) -> Path:
                 else:
                     clip.parent.mkdir(parents=True, exist_ok=True)
                     partial = clip.with_name(f".{clip.stem}.{uuid.uuid4().hex}.mp4")
+                    # Preserve SFT/v2's CFR timeline explicitly: MP4 auto mode
+                    # differs across FFmpeg versions. The decord reader samples
+                    # by frame index / average FPS, not individual source PTS.
                     subprocess.run([str(args.ffmpeg), "-hide_banner", "-loglevel", "error", "-n",
-                                    "-threads", "2", "-ss", str(start), "-i", str(source),
+                                    "-threads", "2", "-filter_threads", "2", "-ss", str(start), "-i", str(source),
                                     "-t", str(end - start), "-an", "-vf", f"scale={width}:{height}:flags=bicubic",
-                                    "-vsync", "0", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                                    "-vsync", "cfr", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
                                     "-threads", "2", "-pix_fmt", "yuv420p", str(partial)], check=True, timeout=900)
                     clip_meta = probe_video(partial, args.ffprobe)
                     if abs(clip_meta["duration_sec"] - (end - start)) > max(0.1, 2 * (end - start) / clip_meta["frame_count"]):
                         raise ValueError(f"Materialized window duration mismatch: {clip}")
                     os.replace(partial, clip)
                     write_json(receipt, {"sha256": digest(clip), "start": start, "end": end})
-                files[str(clip.relative_to(output))] = digest(clip)
-                samples.append({"source_video_id": video_id, "source_video": source.name,
+                video_files[str(clip.relative_to(output))] = digest(clip)
+                video_samples.append({"source_video_id": video_id, "source_video": source.name,
                                 "source_duration_sec": meta["duration_sec"], "window_index": number,
                                 "window_start_sec": start, "window_end_sec": end,
                                 "window_duration_sec": end - start})
-                requests.append({"videos": [str(clip.relative_to(output))], "messages": [
+                video_requests.append({"videos": [str(clip.relative_to(output))], "messages": [
                     {"role": "user", "content": "<video>\n" + prompt}]})
+            return meta, video_samples, video_requests, video_files
+
+        workers = getattr(args, "prepare_workers", 1)
+        if type(workers) is not int or workers < 1:
+            raise ValueError("prepare_workers must be a positive integer")
+        # Only independent videos run concurrently. map preserves index order,
+        # and each worker owns distinct metadata, clips and atomic receipts.
+        with ThreadPoolExecutor(max_workers=min(workers, len(rows))) as pool:
+            for meta, video_samples, video_requests, video_files in pool.map(prepare_video, rows):
+                metadata.append(meta)
+                samples.extend(video_samples)
+                requests.extend(video_requests)
+                files.update(video_files)
         write_json(output / "source_metadata.json", metadata)
         write_json(output / "test_index.json", rows)
         request_file = output / "test.windows.jsonl"

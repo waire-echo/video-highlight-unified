@@ -82,7 +82,7 @@ def expected_window_count(args) -> int:
 
 
 def load_request_plan(args):
-    spec = importlib.util.spec_from_file_location("submission_request_plan", REPO / "scripts/infer_video_ora_highlights_adapter_426.py")
+    spec = importlib.util.spec_from_file_location("submission_request_plan", REPO / "scripts/infer_temporal.py")
     inference = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(inference)
     return inference.load_plan(args.materialized, args.videos)
@@ -296,6 +296,8 @@ def verify_paths(args: argparse.Namespace) -> None:
         args.video_min_token_num = 128
     if not hasattr(args, "spatial_arm"):
         args.spatial_arm = "B"
+    if args.spatial_arm in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+        rgb_backend_contract(args)
     seed = getattr(args, "seed_strict_merged", None)
     if seed is not None:
         seed_required = {
@@ -354,6 +356,13 @@ def build_pipeline_id(args: argparse.Namespace) -> str:
     return canonical_sha256(pipeline_contract(args))[:16]
 
 
+def rgb_backend_contract(args):
+    if getattr(args, "spatial_arm", "B") not in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):return None
+    from video_highlight.stage2_rgb_assets import asset_contract
+    folder=Path(args.rgb_rank_assets)
+    return {"assets":asset_contract(folder),"asset_root":str(folder.resolve())}
+
+
 def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
     model_config = read_json(args.model / "config.json")
     seed = getattr(args, "seed_strict_merged", None)
@@ -400,12 +409,13 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
                                     if path.is_file() and path.suffix in (".json", ".model", ".txt", ".tiktoken", ".vocab", ".jinja", ".jinja2")},
         "source_files_sha256": {
             str(path.relative_to(REPO)): sha256_file(path)
-            for path in [REPO / "scripts/infer_video_ora_highlights_adapter_426.py",
+            for path in [REPO / "scripts/infer_temporal.py",
                          REPO / "scripts/merge_video_ora_highlights_inference.py",
                          REPO / "scripts/merge_video_ora_highlights_lenient_diagnostic.py",
                          *sorted((SRC / "video_highlight").glob("submission_*.py")),
                          *[SRC / "video_highlight" / name for name in
-                           ("highlight_output.py", "timing.py", "validation.py", "io_utils.py")]]
+                           ("highlight_output.py", "timing.py", "validation.py", "io_utils.py",
+                             "stage2_rgb_assets.py", "stage2_rgb_rank.py", "rgb_rank_core.py", "rgb_vision_compat.py")]]
         },
         "lenient_end_tolerance_sec": args.end_tolerance_sec,
         "strict_seed": (
@@ -441,6 +451,7 @@ def pipeline_contract(args: argparse.Namespace) -> dict[str, Any]:
         "pipeline_runner": str(Path(__file__).resolve()),
         "pipeline_runner_sha256": sha256_file(Path(__file__).resolve()),
         "spatial_arm": spatial_arm,
+        "rgb_rank_backend": rgb_backend_contract(args),
         "training": False,
     }
 
@@ -600,7 +611,7 @@ def stage_inference(
             str(args.python),
             "-B",
             "-u",
-            str(REPO / "scripts/infer_video_ora_highlights_adapter_426.py"),
+            str(REPO / "scripts/infer_temporal.py"),
             "--model",
             str(args.model),
             "--adapter",
@@ -853,7 +864,7 @@ def retry_failure_windows(
             str(args.python),
             "-B",
             "-u",
-            str(REPO / "scripts/infer_video_ora_highlights_adapter_426.py"),
+            str(REPO / "scripts/infer_temporal.py"),
             "--model",
             str(args.model),
             "--adapter",
@@ -1312,7 +1323,7 @@ def stage_spatial(
     package = args.spatial_package
     if not (package / "modules/stage2_b.py").is_file():
         raise FileNotFoundError(package / "modules/stage2_b.py")
-    if args.spatial_arm != "B":
+    if args.spatial_arm not in ("B", "B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
         raise PipelineError(
             "only the frozen v7E Stage 2 B arm is supported by this submission path"
         )
@@ -1333,6 +1344,7 @@ def stage_spatial(
         "videos": str(source_videos),
         "package": str(package),
         "arm": args.spatial_arm,
+        "rgb_rank_backend": rgb_backend_contract(args),
         "gpu": args.spatial_gpu,
         "stage": "stage2",
         "stride": 3,
@@ -1371,6 +1383,9 @@ def stage_spatial(
         "--failure-policy", SPATIAL_FAILURE_POLICY,
         "--video-timeout-sec", str(getattr(args, "spatial_video_timeout_sec", 1800)),
     ]
+    command += ["--arm", args.spatial_arm]
+    if args.spatial_arm in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+        command += ["--rgb-rank-assets", str(args.rgb_rank_assets)]
     environment = command_env()
     environment["CUDA_VISIBLE_DEVICES"] = str(args.spatial_gpu)
     if not (work / "COMPLETE.json").is_file():
@@ -1403,6 +1418,7 @@ def stage_spatial(
             "spatial_run_fingerprint": spatial_complete["run_fingerprint"],
             "source_work": str(work),
             "arm": args.spatial_arm,
+        "rgb_rank_backend": rgb_backend_contract(args),
         },
     )
     return output
@@ -1593,7 +1609,8 @@ def main(argv=None) -> int:
     parser.add_argument("--inference-max-tokens", type=int, default=512)
     parser.add_argument("--per-gpu-gib", type=int, default=8)
     parser.add_argument("--end-tolerance-sec", type=float, default=0.5)
-    parser.add_argument("--spatial-arm", choices=("B",), default="B")
+    parser.add_argument("--rgb-rank-assets", type=Path, default=REPO / "models/spatial_rgb_rank")
+    parser.add_argument("--spatial-arm", choices=("B", "B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"), default="B")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--execute-existing", action="store_true")
@@ -1622,7 +1639,7 @@ def main(argv=None) -> int:
             and isfinite(args.window_stride) and args.max_frames > 0
             and 0 <= args.end_tolerance_sec <= 1):
         parser.error("Invalid/nonfinite sampling or tolerance parameter")
-    for name in ("model", "adapter", "videos", "index", "spatial_package", "pipeline_dir", "prompt", "materialized", "existing_run_root", "seed_strict_merged"):
+    for name in ("model", "adapter", "videos", "index", "spatial_package", "rgb_rank_assets", "pipeline_dir", "prompt", "materialized", "existing_run_root", "seed_strict_merged"):
         value = getattr(args, name)
         if value is not None:
             setattr(args, name, Path(value).expanduser().resolve())

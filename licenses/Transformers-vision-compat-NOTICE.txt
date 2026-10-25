@@ -1,0 +1,4 @@
+RGBRank vision inference compatibility derives the rotary embedding, position interpolation and inference forward from Hugging Face Transformers 5.5.4, Qwen3.5.
+Copyright 2025 The Qwen Team and The HuggingFace Inc. team. Apache License 2.0; see LICENSE.
+Modified by this integration: isolated subclass, inference-only forward without collection decorators; no installed-package modification.
+Original modeling file SHA256: aee59d55ee4e8ce0e50bf0e279796b85c2c66a28dfae55c3fcbb62fa9bcba048

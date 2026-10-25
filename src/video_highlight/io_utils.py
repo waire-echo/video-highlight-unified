@@ -10,7 +10,7 @@ IndexItem = Tuple[str, Tuple[int, int]]
 
 
 def load_index(index_path: str) -> List[IndexItem]:
-    """Load either the official array index or a directory of per-video jsonl files."""
+    """Load either the input array index or a directory of per-video jsonl files."""
     path = Path(index_path)
     if path.is_dir():
         items = []

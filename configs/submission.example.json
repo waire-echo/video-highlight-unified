@@ -1,12 +1,12 @@
 {
   "schema": "video-highlight-submission-config/v1",
-  "model": "../models/ora",
-  "adapter": "../models/adapter",
+  "model": "../../AIC-2026-37717297-模型文件与运行环境/models/ora",
+  "adapter": "../../AIC-2026-37717297-模型文件与运行环境/models/adapter",
   "spatial_package": "../models/spatial",
   "prompt": "../prompts/ora/whole-video-highlights-v1/prompt.txt",
   "input_root": "../input",
   "pipeline_dir": "../outputs/submission",
-  "inference_gpus": "0",
+  "inference_gpus": "0,1",
   "spatial_gpu": "0",
   "fps": 2.0,
   "max_frames": 64,
@@ -20,5 +20,8 @@
   "recovery_attempts": 1,
   "window_timeout_sec": 600,
   "command_timeout_sec": 86400,
-  "spatial_video_timeout_sec": 1800
+  "spatial_video_timeout_sec": 7200,
+  "rgb_rank_assets": "../../AIC-2026-37717297-模型文件与运行环境/models/spatial_rgb_rank",
+  "spatial_arm": "B_RGBRank_MissingEvidenceNative_v1",
+  "expected_adapter_sha256": "37b5d75def0c4c9061efc405495c3d5bcc6ace4b60c509657a68c0d90678c790"
 }

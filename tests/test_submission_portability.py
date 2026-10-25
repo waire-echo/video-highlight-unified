@@ -13,7 +13,7 @@ from types import SimpleNamespace
 import pytest
 
 from video_highlight import submission_inputs as inputs
-import infer_video_ora_highlights_adapter_426 as inference
+import infer_temporal as inference
 import package_submission as packaging
 import run_submission_pipeline as pipeline
 import run_v7e_stage2_submission as spatial_runner

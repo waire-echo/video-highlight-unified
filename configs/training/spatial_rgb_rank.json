@@ -1,0 +1,20 @@
+{
+  "architecture": {
+    "arm": "visual",
+    "trainable_parameters": 192257
+  },
+  "settings": {
+    "learning_rate": 0.0001,
+    "weight_decay": 0.01,
+    "seed": 23,
+    "gradient_clip": 1.0,
+    "max_epochs": 40,
+    "patience": 6,
+    "min_improvement": 0.002,
+    "videos_per_batch": 4,
+    "points_per_video_max": 6,
+    "ranking_iou_gap": 0.1,
+    "calibration_mse_weight": 0.5,
+    "score_advantage": 0.03
+  }
+}

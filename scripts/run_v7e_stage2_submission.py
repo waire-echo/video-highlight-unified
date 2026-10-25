@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
-"""Run frozen v7E Stage 2 from this pipeline's handoff without package fallback.
-
-The teammate release package is an approved 41.09-point reproduction. Its
-normal Stage 2 runner validates the supplied Stage 1 file but then also checks
-the output against the package's historical Stage 1 fixture. That behavior is
-useful for reproduction and unsafe for a live submission because the current
-temporal answer must control the selected frames.
-
-This wrapper imports the frozen package's own Stage 2 module, detector assets,
-and validation functions, but passes the current handoff directly and writes
-an independent run. It never calls the package's Stage 1 model or reads its
-reference timestamps as answers.
-"""
+"""Run subject association and RGB scoring from the current temporal handoff."""
 
 from __future__ import annotations
 
@@ -151,6 +139,17 @@ def build_empty_spatial_outputs(
     return stage1, stage2, done
 
 
+def recover_saved_b(folder, video, first, size, run_key, validate):
+    """Only a hash-bound baseline from this run may survive a refinement worker crash."""
+    try:
+        identity=read_json(folder/"stage2.B.IDENTITY.json")
+        if identity["run_fingerprint"]!=run_key or identity["source_sha256"]!=video["sha256"]:return None
+        if identity["stage2_sha256"]!=sha256_file(folder/"stage2.B.json"):return None
+        row=read_json(folder/"stage2.B.json");validate(row,first,*size)
+        return row
+    except (OSError,ValueError,KeyError,TypeError):return None
+
+
 def run_worker(plan_path: Path) -> int:
     """Stage 2 only: no historical Stage 1 models, answers or video table."""
     plan = read_json(plan_path)
@@ -170,6 +169,11 @@ def run_worker(plan_path: Path) -> int:
         raise RuntimeError("Stage 2 requires a supported NVIDIA GPU")
     torch.set_num_threads(2)
     cv2.setNumThreads(2)
+    if plan.get("arm", "B") in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+        for name,expected in plan["rgb_code"].items():
+            if sha256_file(Path(__file__).resolve().parents[1]/"src/video_highlight"/name)!=expected:
+                raise ValueError("RGB source changed after planning")
+        from video_highlight.stage2_rgb_rank import refine
     config = plan["config"]
     stage2 = common.entrypoint(config["stage2"]["entrypoint"])
     first_by_id = {str(row["video_id"]): row for row in read_jsonl(Path(plan["stage1_file"]))}
@@ -192,13 +196,22 @@ def run_worker(plan_path: Path) -> int:
             raise ValueError("Source changed during Stage 2")
         context = {"root": package, "config": config, "video_dir": folder,
                    "resume": plan["resume"], "code_fingerprint": plan["code_fingerprint"],
-                   "historical_detector_profile": {}}
+                   "historical_detector_profile": {},
+                   "rgb_missing_evidence": plan.get("arm") == "B_RGBRank_MissingEvidenceNative_v1"}
         status_path = Path(plan.get("worker_status", output / "worker_status.json"))
         common.write(status_path, {"state": "RUNNING", "video_id": video["video_id"],
                                    "started_monotonic": time.monotonic()})
         state, reason, repaired = "ok", None, []
         try:
             second = stage2(context, video, first, size)
+            if plan.get("arm", "B") in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+                common.write(folder / "stage2.B.json", second)
+                common.write(folder / "stage2.B.IDENTITY.json", {"run_fingerprint":plan["run_fingerprint"], "source_sha256":video["sha256"], "stage2_sha256":sha256_file(folder/"stage2.B.json")})
+                try:
+                    second = refine(context, video, first, size, second, Path(plan["rgb_rank_assets"]))
+                except Exception as rgb_error:
+                    state, reason = "fallback", "rgb_refinement_failed_using_B: " + repr(rgb_error)
+                    common.write(folder / "RGB_FALLBACK.json", {"state":"fallback_B", "reason":reason})
             fixed, repaired = repair_spatial_row(second, first, size)
             if repaired or second.get("predictions") != fixed["predictions"]:
                 common.write(folder / "stage2.raw.json", second)
@@ -231,6 +244,8 @@ def main() -> int:
     parser.add_argument("--videos", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--stage1-file", type=Path)
+    parser.add_argument("--arm", choices=("B", "B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"), default="B")
+    parser.add_argument("--rgb-rank-assets", type=Path)
     parser.add_argument("--gpus", default="0")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--failure-policy", choices=("error", "center"), default=SPATIAL_FAILURE_POLICY,
@@ -264,6 +279,13 @@ def main() -> int:
         path = package / item["path"]
         if sha256_file(path) != item["sha256"]:
             raise ValueError(f"packaged asset changed: {path}")
+    rgb_identity = None
+    if args.arm in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+        from video_highlight.stage2_rgb_assets import asset_contract
+        if args.rgb_rank_assets is None:raise ValueError("RGB backend requires --rgb-rank-assets")
+        rgb_identity = asset_contract(args.rgb_rank_assets)
+    rgb_code = {name: sha256_file(Path(__file__).resolve().parents[1] / "src/video_highlight" / name)
+                for name in ("stage2_rgb_assets.py", "stage2_rgb_rank.py", "rgb_rank_core.py", "rgb_vision_compat.py")} if rgb_identity else None
     stage1_rows = read_jsonl(stage1_file)
     by_id = {str(row["video_id"]): row for row in stage1_rows}
     if not stage1_rows or len(by_id) != len(stage1_rows):
@@ -323,6 +345,7 @@ def main() -> int:
             "code": package_code_fingerprint,
             "videos": videos,
             "stage": "stage2",
+            "arm": args.arm, "rgb_assets": rgb_identity, "rgb_code": rgb_code,
             "stage1_sha256": sha256_file(stage1_file),
             "wrapper_sha256": sha256_file(Path(__file__).resolve()),
             "recovery_sha256": sha256_file(Path(__file__).resolve().parents[1] / "src/video_highlight/submission_recovery.py"),
@@ -371,6 +394,13 @@ def main() -> int:
         detector_probe = YOLO(str(package / config["assets"]["yolo"]["path"]))
         del detector_probe
         common.entrypoint(config["stage2"]["entrypoint"])
+    if worker_videos and args.arm in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+        import gc
+        from video_highlight import stage2_rgb_rank as rgb_runtime
+        loaded=rgb_runtime.load_runtime(args.rgb_rank_assets)
+        del loaded
+        rgb_runtime._runtime=None
+        gc.collect();torch.cuda.empty_cache()
     shards = [[] for _ in gpu_ids]
     for index, video in enumerate(worker_videos):
         shards[index % len(shards)].append(video)
@@ -401,6 +431,9 @@ def main() -> int:
             common.write(
                 plan_path,
                 {
+                    "arm": args.arm,
+                    "rgb_rank_assets": str(args.rgb_rank_assets) if rgb_identity else None,
+                    "rgb_code": rgb_code,
                     "package": str(package),
                     "config": config,
                     "videos": shard,
@@ -474,8 +507,14 @@ def main() -> int:
                     os.replace(folder / "stage2.json", folder / f"stage2.before-recovery-{uuid.uuid4().hex}.json")
                 first = by_id[video["video_id"]]
                 second, repaired = repair_spatial_row({}, first, video["source_metadata"]["source_size"])
+                recovery_reason="worker_crashed_or_timed_out"
+                if args.arm in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1"):
+                    saved=recover_saved_b(folder, video, first, video["source_metadata"]["source_size"], run_key, common.validate_stage2)
+                    if saved is not None:
+                        second,repaired=saved,[];recovery_reason="refinement_worker_failed_using_saved_B"
+                        common.write(folder/"RGB_FALLBACK.json", {"state":"fallback_B", "reason":recovery_reason})
                 save_video(common, folder, first, second, video["source_metadata"]["source_size"], run_key,
-                           state="fallback", reason="worker_crashed_or_timed_out", repaired_frames=len(repaired))
+                           state="fallback", reason=recovery_reason, repaired_frames=len(repaired))
         common.write(output / "RECOVERY.json", {"worker_failures": failures,
                                                 "policy": args.failure_policy,
                                                 "videos": [read_json(output / "per_video" / v["video_id"] / "DONE.json")

@@ -447,7 +447,7 @@ def evaluate(
                 )
     summary: dict[str, Any] = {
         "evaluation_scope": (
-            "frozen validation windows; proxy temporal metrics, not official accuracy"
+            "frozen validation windows; proxy temporal metrics on supplied validation inputs"
         ),
         "selected_windows": len(rows),
         "exact_adapter_tensor_matches": adapter_reloads,

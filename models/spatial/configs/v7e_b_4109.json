@@ -1,0 +1,16 @@
+{
+  "schema": "video-highlight-pipeline/v1",
+  "pipeline_version": "v7E_B_4109_20261022_v1",
+  "stage2": {
+    "entrypoint": "modules.stage2_b:run",
+    "version": "B-original-overlap-control",
+    "stride": 3,
+    "default_nms_iou": 0.5
+  },
+  "assets": {
+    "yolo": {
+      "path": "assets/yolo11m.pt",
+      "sha256": "d5ffc1a674953a08e11a8d21e022781b1b23a19b730afc309290bd9fb5305b95"
+    }
+  }
+}

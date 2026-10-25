@@ -1,0 +1,15 @@
+{
+  "policy": "confident_missing_evidence",
+  "runtime_backend": "B_RGBRank_MissingEvidenceNative_v1",
+  "runtime_module": "video_highlight.stage2_rgb_rank",
+  "runtime_function": "refine",
+  "runtime_context": {
+    "rgb_missing_evidence": true
+  },
+  "score_advantage": 0.03,
+  "movement": 0.05,
+  "feature_cut": 0.65,
+  "missing_subject_scoring_required": true,
+  "canonical_native_decode_required": true,
+  "binding": "Original pipeline selects spatial_arm and the original dispatcher passes runtime_context"
+}

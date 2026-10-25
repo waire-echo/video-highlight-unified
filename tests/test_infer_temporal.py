@@ -11,7 +11,7 @@ import pytest
 sys.path.insert(
     0, str(Path(__file__).resolve().parents[1] / "scripts")
 )
-import infer_video_ora_highlights_adapter_426 as module  # noqa: E402
+import infer_temporal as module  # noqa: E402
 
 
 def test_highlights_contract_and_exact_empty_think_prefix():

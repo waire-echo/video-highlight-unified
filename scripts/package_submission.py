@@ -16,13 +16,15 @@ from video_highlight.submission_inputs import digest, read_json, resolve_config,
 
 
 SCRIPTS = ("run_submission_pipeline.py", "run_v7e_stage2_submission.py",
-           "infer_video_ora_highlights_adapter_426.py", "merge_video_ora_highlights_inference.py",
+           "infer_temporal.py", "merge_video_ora_highlights_inference.py",
            "merge_video_ora_highlights_lenient_diagnostic.py", "package_submission.py",
            "setup_submission_env.py", "run_submission.sh")
 SPATIAL_CODE = ("pipeline/__init__.py", "pipeline/common.py", "modules/__init__.py",
                 "modules/stage2_b.py", "vendor/__init__.py", "vendor/yolo_center.py", "vendor/subject_association.py")
 MODEL_EXTENSIONS = {".json", ".safetensors", ".model", ".txt", ".tiktoken", ".vocab", ".jinja", ".jinja2"}
-PACKAGE_MODULES = ("__init__.py", "submission_inputs.py", "submission_recovery.py", "validation.py", "io_utils.py", "highlight_output.py", "timing.py")
+PACKAGE_MODULES = ("__init__.py", "submission_inputs.py", "submission_recovery.py", "validation.py", "io_utils.py", "highlight_output.py", "timing.py",
+                   "stage2_rgb_assets.py", "stage2_rgb_rank.py", "rgb_rank_core.py", "rgb_vision_compat.py",
+                   "spatial_supervision.py", "spatial_source_roles.py", "spatial_feature_materials.py", "spatial_rank_training.py")
 
 
 def inside(folder: Path, relative: str) -> Path:
@@ -72,6 +74,13 @@ def build_package(config_path: Path, output: Path) -> dict:
     yolo_source = inside(spatial, yolo_asset["path"])
     if digest(yolo_source) != yolo_asset["sha256"]:
         raise ValueError("Spatial model weight fingerprint differs from its config")
+    rgb_root = Path(options["rgb_rank_assets"]) if options.get("rgb_rank_assets") else None
+    rgb_manifest = None
+    if rgb_root is not None and (rgb_root / "ASSETS.json").is_file():
+        from video_highlight.stage2_rgb_assets import asset_contract
+        rgb_manifest = asset_contract(rgb_root)
+    if options.get("spatial_arm", "B") in ("B_RGBRank_DP_v1", "B_RGBRank_MissingEvidenceNative_v1") and rgb_manifest is None:
+        raise FileNotFoundError("RGB assets required by selected backend")
     output = output.resolve()
     if output.exists():
         raise FileExistsError(output)
@@ -95,6 +104,8 @@ def build_package(config_path: Path, output: Path) -> dict:
     if (REPO / "requirements-submission.lock.txt").is_file():
         copy(REPO / "requirements-submission.lock.txt", "requirements-submission.lock.txt")
     copy(REPO / "docs/submission_portability.md", "README.md")
+    if (REPO / "docs/stage2_rgb_rank_dp_v1.md").is_file():
+        copy(REPO / "docs/stage2_rgb_rank_dp_v1.md", "docs/stage2_rgb_rank_dp_v1.md")
     for path in (REPO / "licenses").rglob("*"):
         if path.is_file():
             copy(path, path.relative_to(REPO))
@@ -138,11 +149,17 @@ def build_package(config_path: Path, output: Path) -> dict:
     write_json(staging / "models/spatial/RELEASE_MANIFEST.json",
                {"stage": "stage2-only", "reference_answers_included": False})
     release_config = read_json(REPO / "configs/submission.example.json")
+    release_config.update(model="../models/ora", adapter="../models/adapter", spatial_package="../models/spatial")
     for name in ("fps", "max_frames", "window_seconds", "window_stride", "video_max_token_num",
                  "video_min_token_num", "inference_max_tokens", "per_gpu_gib", "end_tolerance_sec",
                  "recovery_attempts", "window_timeout_sec", "command_timeout_sec", "spatial_video_timeout_sec"):
         if name in options:
             release_config[name] = options[name]
+    if rgb_manifest is not None:
+        for name in ["ASSETS.json", *rgb_manifest["files"]]:
+            copy(rgb_root/name, Path("models/spatial_rgb_rank")/name)
+        release_config["rgb_rank_assets"] = "../models/spatial_rgb_rank"
+    release_config["spatial_arm"] = options.get("spatial_arm", "B")
     release_config["expected_adapter_sha256"] = adapter_sha
     write_json(staging / "configs/submission.json", release_config)
     for name in ("input/video", "input/jsonl", "outputs"):
