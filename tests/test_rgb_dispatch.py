@@ -23,7 +23,7 @@ def load(name, path):
     ("B", None),
 ])
 def test_worker_selects_expected_rgb_evidence_mode(tmp_path, monkeypatch, arm, expected):
-    runner = load("rgb_dispatch_runner", ROOT / "scripts/run_v7e_stage2_submission.py")
+    runner = load("rgb_dispatch_runner", ROOT / "scripts/run_spatial_submission.py")
     package = ROOT / "models/spatial"
     common = load("rgb_dispatch_common", package / "pipeline/common.py")
     source = tmp_path / "synthetic-source.bin"

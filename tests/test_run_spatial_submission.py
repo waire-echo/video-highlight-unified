@@ -5,10 +5,10 @@ from pathlib import Path
 MODULE_PATH = (
     Path(__file__).resolve().parents[1]
     / "scripts"
-    / "run_v7e_stage2_submission.py"
+    / "run_spatial_submission.py"
 )
 SPEC = importlib.util.spec_from_file_location(
-    "run_v7e_stage2_submission", MODULE_PATH
+    "run_spatial_submission", MODULE_PATH
 )
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)

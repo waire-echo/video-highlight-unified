@@ -1,4 +1,4 @@
-"""Portable, inference-only input preparation. No training labels or old answers."""
+"""Prepare video inputs and timing metadata for inference."""
 from __future__ import annotations
 
 from bisect import bisect_left

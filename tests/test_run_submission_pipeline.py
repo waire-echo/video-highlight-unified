@@ -328,7 +328,7 @@ def test_apply_retry_highlights_replaces_only_target_source(tmp_path):
         {"video_id": "0", "duration": 10.0, "highlights": []},
         {"video_id": "1", "duration": 20.0, "highlights": []},
     ]
-    for video_id in range(2, 426):
+    for video_id in range(2, 5):
         original.append(
             {"video_id": str(video_id), "duration": 30.0, "highlights": []}
         )
@@ -344,9 +344,9 @@ def test_apply_retry_highlights_replaces_only_target_source(tmp_path):
                 [{"start": 3.0, "end": 4.0}] if video_id == 1 else []
             ),
         }
-        for video_id in range(426)
+        for video_id in range(5)
     ]
     MODULE.apply_retry_highlights(run_root, replacement)
     rows = MODULE.read_jsonl(target)
-    assert len(rows) == 426
+    assert len(rows) == 5
     assert rows[1]["highlights"] == [{"start": 3.0, "end": 4.0}]

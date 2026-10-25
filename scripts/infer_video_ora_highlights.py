@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a frozen highlights-only LoRA adapter over every materialized test window.
+"""Run video highlight inference with a fixed LoRA adapter.
 
 This is an inference-only entry point. It removes assistant messages before
 generation, maps window-local seconds back to the source-video timeline, merges

@@ -15,10 +15,10 @@ import pytest
 from video_highlight.submission_recovery import center_box, recover_intervals, repair_spatial_row
 from test_submission_portability import example, args_for, put, put_rows
 from video_highlight import submission_inputs as inputs
-import infer_temporal as inference
+import infer_video_ora_highlights as inference
 import merge_video_ora_highlights_inference as merger
 import run_submission_pipeline as pipeline
-import run_v7e_stage2_submission as spatial
+import run_spatial_submission as spatial
 
 
 @pytest.mark.parametrize("excess", [0.04, 5, 50])
@@ -220,7 +220,7 @@ def test_wall_clock_timeout_reaps_owned_process_and_records_failure(tmp_path):
 def test_killed_process_claim_does_not_block_resume(tmp_path):
     script_dir = Path(inference.__file__).parent
     code = ("import sys,time; from pathlib import Path; "
-            f"sys.path.insert(0,{str(script_dir)!r}); import infer_temporal as m; "
+            f"sys.path.insert(0,{str(script_dir)!r}); import infer_video_ora_highlights as m; "
             f"print(m.acquire_window_claim(Path({str(tmp_path)!r}),'test_x_w0000'),flush=True); time.sleep(20)")
     process = subprocess.Popen([sys.executable, "-B", "-u", "-c", code], stdout=subprocess.PIPE, text=True)
     try:
@@ -399,7 +399,7 @@ def test_hung_request_process_is_reaped_and_remaining_windows_resume(example):
 import sys,time
 from pathlib import Path
 sys.path.insert(0, {str(Path(inference.__file__).parent)!r})
-import infer_temporal as m
+import infer_video_ora_highlights as m
 out = Path({str(output)!r})
 _, windows, _, _ = m.load_plan(Path({str(args.materialized)!r}), Path({str(args.videos)!r}))
 for index, item in enumerate(windows):

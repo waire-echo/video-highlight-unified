@@ -11,7 +11,7 @@ import pytest
 sys.path.insert(
     0, str(Path(__file__).resolve().parents[1] / "scripts")
 )
-import infer_temporal as module  # noqa: E402
+import infer_video_ora_highlights as module  # noqa: E402
 
 
 def test_highlights_contract_and_exact_empty_think_prefix():
@@ -181,7 +181,7 @@ def test_window_claim_is_exclusive_and_released(tmp_path):
 
 
 def test_window_partitions_are_disjoint_and_complete():
-    first = list(range(0, 262))
-    second = list(range(262, 523))
+    first = list(range(0, 9))
+    second = list(range(9, 17))
     assert not set(first) & set(second)
-    assert sorted(first + second) == list(range(523))
+    assert sorted(first + second) == list(range(17))

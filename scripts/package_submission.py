@@ -15,8 +15,8 @@ sys.path.insert(0, str(REPO / "src"))
 from video_highlight.submission_inputs import digest, read_json, resolve_config, write_json
 
 
-SCRIPTS = ("run_submission_pipeline.py", "run_v7e_stage2_submission.py",
-           "infer_temporal.py", "merge_video_ora_highlights_inference.py",
+SCRIPTS = ("run_submission_pipeline.py", "run_spatial_submission.py",
+           "infer_video_ora_highlights.py", "merge_video_ora_highlights_inference.py",
            "merge_video_ora_highlights_lenient_diagnostic.py", "package_submission.py",
            "setup_submission_env.py", "run_submission.sh")
 SPATIAL_CODE = ("pipeline/__init__.py", "pipeline/common.py", "modules/__init__.py",
